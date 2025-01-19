@@ -17,10 +17,9 @@ if($_SESSION['status']=="loggedout" || $_SESSION['status']=="" || empty($_SESSIO
 </head>
 <body>
 <link rel="stylesheet" href="nav.css">
-<nav>
+<nav style="width:fit-content">
 	<a href="#">Home</a>
 	<a href="#">Quizzes</a>
-	<a href="#">---</a>
     <a href="#">Contact</a>
 	<a href="./logout.php">logout</a>
 	
