@@ -57,20 +57,65 @@ if($_SERVER['REQUEST_METHOD']=='POST')
     <style>
         select{
             width: 100%;
+            padding: 5px;
+            margin-bottom: 5px;
+            font-size: 15px;
             text-align: center;
         }
+        nav{
+              width:43%;
+              height:50px;
+              
+         }
+         nav a{
+            text-align: center;
+         }
+         a:nth-child(1) {
+	width: 110px;
+}
+a:nth-child(2) {
+	width: 130px;
+    
+}
+a:nth-child(3) {
+	width: 100px;
+}
+nav .home,a:nth-child(1):hover~.animation {
+	width: 110px;
+	left: 0;
+	background-color: #1abc9c;
+}
+nav .quizes,a:nth-child(2):hover~.animation {
+	width: 140px;
+	left: 110px;
+	background-color:rgb(26, 61, 188);
+}
+nav .create,a:nth-child(3):hover~.animation {
+	width: 110px;
+	left:250px;
+	background-color:rgb(42, 148, 177);
+}
+nav .update,a:nth-child(4):hover~.animation {
+	width: 120px;
+	left:370px;
+	background-color:rgb(70, 83, 196);
+}
+nav .logout,a:nth-child(5):hover~.animation {
+	width: 150px;
+	left:490px;
+	background-color:rgb(185, 91, 51);
+}
     </style>
 </head>
 <body>
-<nav style='width:fit-content;font-size:16px;overflow:none'>
-<a href='./quizform.php'>Update Quiz</a>
+<nav >
+
 <a href='#'>Home</a>
 	<a href='#'>Quizzes</a>
-    
-  
-    <a href='./createquiz.php'>Create Quiz</a>
+    <a href='./createquiz.php'>Create </a>
+    <a href='./quizform.php'>Update </a>
 	<a style='width:100px' href='./logout.php'>logout</a>
-	<div class='animation start-home' ></div>
+	<div class='animation update' ></div>
 </nav>
     <form action='./quizform.php' method="POST" style="margin-top:10px;">
     <div class='quizform'>
@@ -79,7 +124,7 @@ if($_SERVER['REQUEST_METHOD']=='POST')
             <?php 
             foreach($res as $row)
             {
-                echo "<option value='" . $row['quizid'] . "'>" . $row['quizname'] . "</option>";
+                echo "<option value='".$row['quizid']."'>" . $row['quizname'] . "</option>";
             }?>
             
         </select>

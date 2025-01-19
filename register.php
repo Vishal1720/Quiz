@@ -36,11 +36,42 @@ else
     <title>Document</title>
     <link rel="shortcut icon" href="quiz.png" type="image/x-icon">
     <link rel="stylesheet" href="form.css"> <link rel="stylesheet" href="nav.css">
+    <style>
+         nav{
+              width:25%;
+              height:50px;
+              line-height:20px;
+         }
+         nav a{
+            text-align: center;
+         }
+         a:nth-child(1) {
+	width: 120px;
+}
+a:nth-child(2) {
+	width: 130px;
     
-   <style>
-    form{
-        max-width: 600px;
-    }
+}
+a:nth-child(3) {
+	width: 120px;
+}
+nav a:nth-child(1):hover~.animation {
+	width: 110px;
+	left: 0;
+	background-color: #1abc9c;
+}
+nav a:nth-child(2):hover~.animation {
+	width: 150px;
+	left: 110px;
+	background-color:rgb(26, 61, 188);
+}
+nav a:nth-child(3):hover~.animation {
+	width: 120px;
+	left:260px;
+	background-color:rgb(42, 148, 177);
+}
+   </style>
+   
    </style>
 </head>
 <body>

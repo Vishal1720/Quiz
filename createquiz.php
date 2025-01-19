@@ -65,18 +65,64 @@ if(isset($_POST['category']) && isset($_POST['quizname']) )
             padding: 10px;
             border-radius:10px ;
         }
+
+        nav{
+              width:43%;
+              height:50px;
+              
+         }
+         nav a{
+            text-align: center;
+         }
+         a:nth-child(1) {
+	width: 110px;
+}
+a:nth-child(2) {
+	width: 130px;
+    
+}
+a:nth-child(3) {
+	width: 100px;
+}
+nav .home,a:nth-child(1):hover~.animation {
+	width: 110px;
+	left: 0;
+	background-color: #1abc9c;
+}
+nav .quizes,a:nth-child(2):hover~.animation {
+	width: 140px;
+	left: 110px;
+	background-color:rgb(26, 61, 188);
+}
+nav .create,a:nth-child(3):hover~.animation {
+	width: 110px;
+	left:250px;
+	background-color:rgb(42, 148, 177);
+}
+nav .update,a:nth-child(4):hover~.animation {
+	width: 120px;
+	left:370px;
+	background-color:rgb(70, 83, 196);
+}
+nav .logout,a:nth-child(5):hover~.animation {
+	width: 150px;
+	left:490px;
+	background-color:rgb(185, 91, 51);
+}
     </style>
 </head>
 <body>
 
-<nav style="width:fit-content;font-size:16px;overflow:none">
-<a href="./quizformtemplate.html">Create Quiz</a>	
+<nav style="font-size:16px;overflow:none">
 <a href="#">Home</a>
-	<a href="#">Quizzes</a>
+<a href="#">Quizzes</a>
+<a href="./quizformtemplate.html">Create</a>	
+
+	
    
-    <a href="./quizform.php">Update Quiz</a>
+    <a href="./quizform.php">Update</a>
 	<a style="width:100px" href="./logout.php">logout</a>
-	<div class="animation start-home" ></div>
+	<div class="animation create" ></div>
 </nav>
 
     <form action="./createquiz.php" method="POST">
