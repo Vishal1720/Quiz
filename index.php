@@ -12,18 +12,18 @@ if($_SESSION['status']=="loggedout" || $_SESSION['status']=="" || empty($_SESSIO
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="quiz.png" type="image/x-icon">
+    <link rel="stylesheet" href="nav.css">
     <title>Document</title>
 
 </head>
 <body>
-<link rel="stylesheet" href="nav.css">
-<nav style="width:fit-content">
+
+<nav style="width:fit-content;font-size:16px;overflow:none">
 	<a href="#">Home</a>
 	<a href="#">Quizzes</a>
-    <a href="#">Contact</a>
-	<a href="./logout.php">logout</a>
-	
-	<div class="animation start-home"></div>
+    <a href="./">Contact</a>
+	<a style="width:100px" href="./logout.php">logout</a>
+	<div class="animation start-home" ></div>
 </nav>
 
 

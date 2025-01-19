@@ -1,6 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Agdasima:wght@400;700&family=Jost:ital,wght@0,100..900;1,100..900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap');
 *{
-    box-sizing: border-box;
-  
+	font-family: "Jost";
+	font-size: 14px;
+	box-sizing: border-box;
 }
 nav {
 	margin: 27px auto 0;
@@ -42,7 +44,7 @@ a:nth-child(3) {
 	width: 100px;
 }
 a:nth-child(4) {
-	width: 160px;
+	width: 140px;
 }
 a:nth-child(5) {
 	width: 120px;
@@ -63,7 +65,7 @@ nav .start-blog, a:nth-child(3):hover~.animation {
 	background-color: #3498db;
 }
 nav .start-portefolio, a:nth-child(4):hover~.animation {
-	width: 160px;
+	width: 120px;
 	left: 310px;
 	background-color: #9b59b6;
 }
@@ -74,9 +76,9 @@ nav .start-contact, a:nth-child(5):hover~.animation {
 }
 
 body {
-	font-size: 12px;
-	font-family: sans-serif;
+	
 	background: #2c3e50;
+	
 }
 /* h1 {
 	text-align: center;
