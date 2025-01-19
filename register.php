@@ -56,9 +56,9 @@ else
             <label for="email">Email</label>
             <input type="email" name="email" id="email" placeholder="Email" required>
             <label for="name">Name</label>
-            <input type="text" name="name" id="name" placeholder="Name" pattern="^[a-z A-Z \s]+$" required>
+            <input type="text" name="name" id="name" placeholder="Name" title="Only alphabets"  pattern="^[a-z A-Z \s]+$" required>
             <label for="contact">Contact</label>
-            <input type="text" name="contact"  pattern="^\d{10}$" placeholder="Contact info" title="Enter phone number containing 10 digits" required>
+            <input type="text" name="contact"  pattern="^\d{10}$" maxlength="10" placeholder="Contact info" title="Enter phone number containing 10 digits" required>
             <label for="password">Password</label>
             <input type="password" name="password" id="password" placeholder="Password" required>
             <label for="conf">Confirm Password</label>

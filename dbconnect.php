@@ -17,4 +17,8 @@ $_SESSION['status']=null;//initialising values if they haven't been initialises
 }
 if(!isset($_SESSION['email']))
 $_SESSION['email']=null;
+if(!isset($_SESSION['qid']))
+{
+    $_SESSION['qid']=null;
+}
     }
