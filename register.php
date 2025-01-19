@@ -76,7 +76,7 @@ else
 <body>
     <nav style="width:fit-content">
         <a href="./register.php">Register</a>
-        <a href="./loginform.php">Login</a>
+        <a href="./login.php">Login</a>
         
         <a href="#">About</a>
         
