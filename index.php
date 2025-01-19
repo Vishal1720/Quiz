@@ -21,6 +21,7 @@ if($_SESSION['status']=="loggedout" || $_SESSION['status']=="" || empty($_SESSIO
 <nav style="width:fit-content;font-size:16px;overflow:none">
 	<a href="#">Home</a>
 	<a href="#">Quizzes</a>
+    <a href="./quizformtemplate.html">Create Quiz</a>
     <a href="./">Contact</a>
 	<a style="width:100px" href="./logout.php">logout</a>
 	<div class="animation start-home" ></div>

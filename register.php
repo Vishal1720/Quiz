@@ -35,43 +35,13 @@ else
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <link rel="shortcut icon" href="quiz.png" type="image/x-icon">
-    <style>
-    form {
+    <link rel="stylesheet" href="form.css"> <link rel="stylesheet" href="nav.css">
+    
+   <style>
+    form{
         max-width: 600px;
-        margin: 0 auto;
-        padding: 20px;
-        border: 1px solid #ccc;
-        border-radius: 8px;
-        background-color: #f9f9f9;
     }
-    label {
-        display: block;
-        margin-bottom: 5px;
-        font-weight: bold;
-    }
-    input {
-        width: 100%;
-        padding: 10px;
-        margin: 10px 0;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-    }
-    
-    .button {
-        width: 100%;
-        padding: 10px;
-        background-color: #34495e;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-    
-    .button:hover {
-        background-color: #2c3e50;
-    }
-</style>
-<link rel="stylesheet" href="nav.css">
+   </style>
 </head>
 <body>
     <nav style="width:fit-content">
