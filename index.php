@@ -13,7 +13,7 @@ if($_SESSION['status']=="loggedout" || $_SESSION['status']=="" || empty($_SESSIO
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="quiz.png" type="image/x-icon">
     <link rel="stylesheet" href="nav.css">
-    <title>Document</title>
+    <title>Quiz</title>
 <style>
       nav{
               width:43%;
