@@ -14,6 +14,17 @@ if(isset($_POST['category']) && isset($_POST['quizname']) )
     $email=$_SESSION['email'];
     $cat=$_POST['category'];
     $quizname=$_POST['quizname'];
+    //check for duplicate quizname
+    $query="Select quizname from quizdetails where quizname='$quizname'";
+    if($con->query($query)->num_rows>0)
+    {
+        echo "<script>alert('Quizname already exists');
+        window.location.href='./createquiz.php';</script>";
+        
+        exit();
+    }
+
+
     $query="INSERT INTO `quizdetails` (`category`, `quizname`, `email`) 
     VALUES ( '$cat', '$quizname', '$email')";
     $res=$con->query($query);
@@ -59,10 +70,11 @@ if(isset($_POST['category']) && isset($_POST['quizname']) )
 <body>
 
 <nav style="width:fit-content;font-size:16px;overflow:none">
-	<a href="#">Home</a>
+<a href="./quizformtemplate.html">Create Quiz</a>	
+<a href="#">Home</a>
 	<a href="#">Quizzes</a>
-    <a href="./quizformtemplate.html">Create Quiz</a>
-    <a href="./">Contact</a>
+   
+    <a href="./quizform.php">Update Quiz</a>
 	<a style="width:100px" href="./logout.php">logout</a>
 	<div class="animation start-home" ></div>
 </nav>
@@ -73,7 +85,9 @@ if(isset($_POST['category']) && isset($_POST['quizname']) )
         <label for="cat">Category</label>
         <select name="category" id="cat" required>
             <option value="Programming">Programming</option>
-            <option value="Programming">Literature</option>
+            <option value="Literature">Literature</option>
+            <option value="Entertainment">Entertainment</option>
+            <option value="Educational">Educational</option>
         </select>
         <input type="submit" value="Create Quiz">
     </form>
