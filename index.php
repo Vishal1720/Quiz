@@ -1,10 +1,7 @@
 <?php include "dbconnect.php" ;
-echo $_SESSION['status'];
 if($_SESSION['status']=="loggedout" || $_SESSION['status']=="" || empty($_SESSION['status'])) 
 {
-    echo "In";
     header("Location: login.php");
-
     exit();
 }
 
@@ -23,7 +20,7 @@ if($_SESSION['status']=="loggedout" || $_SESSION['status']=="" || empty($_SESSIO
 <nav>
 	<a href="#">Home</a>
 	<a href="#">Quizzes</a>
-	<a href="#">Blog</a>
+	<a href="#">---</a>
     <a href="#">Contact</a>
 	<a href="./logout.php">logout</a>
 	

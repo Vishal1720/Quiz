@@ -3,14 +3,12 @@ require "dbconnect.php";
 
 if(isset($_POST['email']) && isset($_POST['password'])) 
 {
-    echo "In the Form";
 $email=$_POST['email'];
 $pwd=$_POST['password'];
 $query="Select email from users where email='$email' and password='$pwd' ";
 $result=$con->query($query);
 if($result->num_rows>0)
 {
-    echo "Login Successfull";
     $_SESSION['status']="loggedin";
     $_SESSION['email']=$email;
     header("Location: index.php");
