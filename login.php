@@ -81,7 +81,6 @@ nav a:nth-child(3):hover~.animation {
     <a href="./login.php">Login</a>
     <a href="./register.php">Register</a>
 	<a href="#">About</a>
-    
 	<div class="animation start-home"></div>
     </nav>
     <form action="./login.php" method="post" style="margin-top: 50px;font-size:15px;">

@@ -78,8 +78,6 @@ nav a:nth-child(3):hover~.animation {
     <nav >
     <a href="./login.php">Login</a>
     <a href="./register.php">Register</a>
-        
-        
         <a href="#">About</a>
         
         <div class="animation register"></div>

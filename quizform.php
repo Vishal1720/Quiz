@@ -115,7 +115,7 @@ nav .logout,a:nth-child(5):hover~.animation {
 	<a href='#'>Quizzes</a>
     <a href='./createquiz.php'>Create </a>
     <a href='./quizform.php'>Update </a>
-	<a style='width:100px' href='./logout.php'>logout</a>
+	<a style='width:100px' href='./logout.php'>Logout</a>
 	<div class='animation update' ></div>
 </nav>
     <form action='./quizform.php' method="POST" style="margin-top:10px;">
