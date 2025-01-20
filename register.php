@@ -46,7 +46,7 @@ else
             text-align: center;
          }
          a:nth-child(1) {
-	width: 120px;
+	width: 110px;
 }
 a:nth-child(2) {
 	width: 130px;
@@ -60,7 +60,7 @@ nav a:nth-child(1):hover~.animation {
 	left: 0;
 	background-color: #1abc9c;
 }
-nav a:nth-child(2):hover~.animation {
+nav .register,a:nth-child(2):hover~.animation {
 	width: 150px;
 	left: 110px;
 	background-color:rgb(26, 61, 188);
@@ -75,13 +75,14 @@ nav a:nth-child(3):hover~.animation {
    </style>
 </head>
 <body>
-    <nav style="width:fit-content">
-        <a href="./register.php">Register</a>
-        <a href="./login.php">Login</a>
+    <nav >
+    <a href="./login.php">Login</a>
+    <a href="./register.php">Register</a>
+        
         
         <a href="#">About</a>
         
-        <div class="animation start-home"></div>
+        <div class="animation register"></div>
         </nav>
         <form action="./register.php" id="regform" method="post" style="margin-top: 50px;font-size:15px;">
             <label for="email">Email</label>
