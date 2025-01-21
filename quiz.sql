@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 21, 2025 at 02:13 PM
+-- Generation Time: Jan 21, 2025 at 02:53 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -59,7 +59,8 @@ CREATE TABLE `quizdetails` (
 --
 
 INSERT INTO `quizdetails` (`quizid`, `category`, `quizname`, `email`) VALUES
-(2, 'Entertainment', 'English', 'vishal198shetty@gmail.com');
+(2, 'Entertainment', 'English', 'vishal198shetty@gmail.com'),
+(3, 'Educational', 'Maths Basics', 'aneesh@gmail.com');
 
 -- --------------------------------------------------------
 
@@ -83,7 +84,8 @@ CREATE TABLE `quizes` (
 --
 
 INSERT INTO `quizes` (`ID`, `question`, `quizid`, `option1`, `option2`, `option3`, `option4`, `answer`) VALUES
-(1, 'What among these is a pronoun?', 2, 'Aneesh', 'he', 'green', 'playing', 'he');
+(1, 'What among these is a pronoun?', 2, 'Aneesh', 'he', 'green', 'playing', 'he'),
+(2, 'Q) 1 is __________.', 3, 'prime', 'composite', 'prime and composite', 'neither prime nor composite', 'neither prime nor composite');
 
 -- --------------------------------------------------------
 
@@ -103,6 +105,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`email`, `name`, `password`, `contact`) VALUES
+('aneesh@gmail.com', 'Aneesh Bhat', 'aneesh123', '9145314131'),
 ('vishal198shetty@gmail.com', 'Vishal Shetty', 'Vishal1720', '8088835539');
 
 --
@@ -145,13 +148,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `quizdetails`
 --
 ALTER TABLE `quizdetails`
-  MODIFY `quizid` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `quizid` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `quizes`
 --
 ALTER TABLE `quizes`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Constraints for dumped tables
