@@ -120,7 +120,7 @@ nav .logout,a:nth-child(5):hover~.animation {
 <body>
 
 <nav style="font-size:16px;overflow:none">
-<a href="#">Home</a>
+<a href="./index.php">Home</a>
 <a href="#">Quizzes</a>
 <a href="./createquiz.php">Create</a>	
     <a href="./quizform.php">Insert</a>
