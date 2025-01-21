@@ -110,6 +110,11 @@ nav .logout,a:nth-child(5):hover~.animation {
 	left:490px;
 	background-color:rgb(185, 91, 51);
 }
+#cat{
+    width: 100%;
+    text-align: center;
+    font-size: 16px;
+}
     </style>
 </head>
 <body>
@@ -127,11 +132,17 @@ nav .logout,a:nth-child(5):hover~.animation {
         <label for="quizname">Quizname</label>
         <input type="text" name="quizname" id="quizname" placeholder="Quiz Name (Should be unique)" required>
         <label for="cat">Category</label>
+       
         <select name="category" id="cat" required>
-            <option value="Programming">Programming</option>
-            <option value="Literature">Literature</option>
-            <option value="Entertainment">Entertainment</option>
-            <option value="Educational">Educational</option>
+        <?php 
+        $query="Select categoryname from category";
+        $res=$con->query($query);
+        while($row=$res->fetch_assoc())
+        {
+            $cat=$row['categoryname'];
+            echo "<option  value='$cat'>$cat</option>";
+        }
+        ?>
         </select>
         <input type="submit" value="Create Quiz">
     </form>
