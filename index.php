@@ -58,15 +58,28 @@ nav .logout,a:nth-child(5):hover~.animation {
 	left:490px;
 	background-color:rgb(185, 91, 51);
 }
-
+.categorycard{
+	background-color:rgb(168, 58, 58);
+	display: flex;
+	padding: 20px;
+	margin: auto;
+	margin-top: 15px;
+	border-radius: 14px;
+	width:50%;
+}
 .card{
 border: 2px;
 background-color: #f9f9f9;
 min-width: fit-content;
 max-width: 200px;
 padding: 10px;
+margin:5px;
+cursor: pointer;
 }
 .titlecard{
+	text-align: center;
+}
+.categorytitle{
 	text-align: center;
 }
 </style>
@@ -93,8 +106,9 @@ while($row=$res->fetch_assoc())
 
 	if($res2->num_rows==0)//continuing if no quizzes are there in the category
 	continue;
+	echo "<h1 class='categorytitle'>".$row['categoryname']."</h1>";
 echo "<div class='categorycard'>";
-	echo "<h1>".$row['categoryname']."</h1>";
+	
 	while($row2=$res2->fetch_assoc())
 	{
 		echo "<div class='card'>";
