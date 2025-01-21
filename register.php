@@ -16,7 +16,7 @@ if($res->num_rows>0)
 }
 else
 {
-    $query="Insert into users values('$email','$name','$contact','$pwd')";
+    $query="INSERT INTO `users` (`email`, `name`, `password`, `contact`) VALUES ('$email', '$name',  '$pwd','$contact');";
     $res2=$con->query($query);
     if(!$res2)
     {
