@@ -58,6 +58,17 @@ nav .logout,a:nth-child(5):hover~.animation {
 	left:490px;
 	background-color:rgb(185, 91, 51);
 }
+
+.card{
+border: 2px;
+background-color: #f9f9f9;
+min-width: fit-content;
+max-width: 200px;
+padding: 10px;
+}
+.titlecard{
+	text-align: center;
+}
 </style>
 </head>
 <body>
@@ -70,7 +81,30 @@ nav .logout,a:nth-child(5):hover~.animation {
 	<a style="width:100px" href="./logout.php">Logout</a>
 	<div class="animation start-home" ></div>
 </nav>
+<?php 
+$query="SELECT * FROM category";
+$res=$con->query($query);
+while($row=$res->fetch_assoc())
+{
+	$cat=$row['categoryname'];
+	
+	$query2="SELECT * FROM `quizdetails` WHERE `category`='$cat'";
+	$res2=$con->query($query2);
 
+	if($res2->num_rows==0)//continuing if no quizzes are there in the category
+	continue;
+echo "<div class='categorycard'>";
+	echo "<h1>".$row['categoryname']."</h1>";
+	while($row2=$res2->fetch_assoc())
+	{
+		echo "<div class='card'>";
+		echo "<h3 class='titlecard'> {$row2['quizname']}</h3>";
+		echo "<h3>ID:{$row2['quizid']}</h3>";
+		echo "</div>";
+	}
+	echo "</div>";
+}
+?>
 
 </body>
 </html>
