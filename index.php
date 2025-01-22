@@ -94,10 +94,13 @@ cursor: pointer;
 }
 input[type='submit']{
 	background-color:rgb(125, 106, 201);
-	padding: 10px 20px;
+	padding: 15px 20px;
 	text-align: center;
-	font-size: 16px;
+	
 	border-radius: 5px;
+	color:white;
+	text-shadow: 1.1px 1.1px 1px black;
+	font-size:18px;
 }
 </style>
 </head>
