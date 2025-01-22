@@ -85,9 +85,9 @@ nav a:nth-child(3):hover~.animation {
     </nav>
     <form action="./login.php" method="post" style="margin-top: 50px;font-size:15px;">
         <label for="email">Email</label>
-        <input type="email" name="email" id="email" placeholder="Enter registered email" required>
+        <input type="email" name="email" maxlength="222" id="email" placeholder="Enter registered email" required>
         <label for="password">Password</label>
-        <input type="password" name="password" id="password" placeholder="Enter Password" required>
+        <input type="password" name="password" maxlength="222" id="password" placeholder="Enter Password" required>
         <button>Login</button>
     </form>
 </body>
