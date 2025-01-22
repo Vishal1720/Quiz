@@ -59,28 +59,45 @@ nav .logout,a:nth-child(5):hover~.animation {
 	background-color:rgb(185, 91, 51);
 }
 .categorycard{
-	background-color:rgb(168, 58, 58);
+	background-color:#2E2D4D;
 	display: flex;
 	padding: 20px;
 	margin: auto;
 	margin-top: 15px;
 	border-radius: 14px;
 	width:50%;
+	border: 0.1px solid whitesmoke;
 }
 .card{
-border: 2px;
-background-color: #f9f9f9;
-min-width: fit-content;
-max-width: 200px;
+border: 1px solid black;
+border-radius: 15px;
+background-color:#337357;
+filter: blur(0.2px);
+
+width: 150px;
+height: 150px;
 padding: 10px;
 margin:5px;
 cursor: pointer;
 }
 .titlecard{
 	text-align: center;
+	color: white;
+	text-shadow: 1px 1px 1px black;
+	font-size: 19px;
+	
 }
 .categorytitle{
 	text-align: center;
+	color: white;
+	text-shadow: 1.2px 1.2px 1px black;
+}
+input[type='submit']{
+	background-color:rgb(125, 106, 201);
+	padding: 10px 20px;
+	text-align: center;
+	font-size: 16px;
+	border-radius: 5px;
 }
 </style>
 </head>
@@ -112,8 +129,13 @@ echo "<div class='categorycard'>";
 	while($row2=$res2->fetch_assoc())
 	{
 		echo "<div class='card'>";
-		echo "<h3 class='titlecard'> {$row2['quizname']}</h3>";
-		echo "<h3>ID:{$row2['quizid']}</h3>";
+		echo "<div style='height:75px;display:flex;justify-content:center;align-items:center;'><h3 class='titlecard'> {$row2['quizname']}</h3></div>";
+		echo "<form  method='GET' action='/takequiz.php'>
+		<input type='hidden' name='quizid' value='{$row2['quizid']}'>
+		<div style='height:75px;'>
+		<input type='submit' style='width:100%;padding:7px;font-size:14px;' value='Take Quiz'>
+		</div>
+		</form>";
 		echo "</div>";
 	}
 	echo "</div>";
