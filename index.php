@@ -108,7 +108,7 @@ input[type='submit']{
 
 <nav>
 	<a href="#">Home</a>
-	<a href="#">Quizzes</a>
+	<a href="./quizmanip.php">Edit</a>
     <a href="./createquiz.php">Create </a>
     <a href="./quizform.php">Insert</a>
 	<a style="width:100px" href="./logout.php">Logout</a>

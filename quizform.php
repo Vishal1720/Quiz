@@ -40,7 +40,7 @@ if($_SERVER['REQUEST_METHOD']=='POST')
         echo "<script>alert('Error in inserting')</script>";
     }
     else{
-        echo "<script>alert('Inserted question successfully')</script>";
+        echo "<script>alert('Inserted question successfully');window.location.href='http://localhost/quiz/quizform.php';</script>";
     }
 
 }
@@ -112,7 +112,7 @@ nav .logout,a:nth-child(5):hover~.animation {
 <nav >
 
 <a href='./index.php'>Home</a>
-	<a href='#'>Quizzes</a>
+	<a href='./quizmanip.php'>Edit</a>
     <a href='./createquiz.php'>Create </a>
     <a href='./quizform.php'>Insert </a>
 	<a style='width:100px' href='./logout.php'>Logout</a>

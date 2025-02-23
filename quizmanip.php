@@ -122,7 +122,7 @@ nav .logout,a:nth-child(5):hover~.animation {
 <nav >
 
 <a href='./index.php'>Home</a>
-	<a href='#'>Quizzes</a>
+	<a href='./quizmanip.php'>Edit</a>
     <a href='./createquiz.php'>Create </a>
     <a href='./quizform.php'>Insert </a>
 	<a style='width:100px' href='./logout.php'>Logout</a>
@@ -170,14 +170,12 @@ nav .logout,a:nth-child(5):hover~.animation {
                     <form method='POST' action='quizmanip.php' style='max-width:100%;display:flex;flex-direction:row;'>                
         <input type="text" name="question" style="width:fit-content" value="<?= $res3['question'] ?>">
         
-        <input type="text" name="option1" style="width:fit-content" value="<?=$res3['option1']?>">
-        <input type="text" name="option2" style="width:fit-content" value="<?=$res3['option2']?>">
-        <input type="text" name="option3" style="width:fit-content" value="<?=$res3['option3']?>">
-        <input type="text" name="option4" style="width:fit-content" value="<?=$res3['option4']?>">
-        
-
-        <input type="text" name="quizid" style="width:fit-content" value="<?=$res3['quizid']?>"> 
-        <input type="text" name="qid" style="width:fit-content" value="<?=$res3['ID']?>"> 
+        <input type="text" required name="option1" style="width:fit-content" value="<?=$res3['option1']?>">
+        <input type="text" required name="option2" style="width:fit-content" value="<?=$res3['option2']?>">
+        <input type="text" required name="option3" style="width:fit-content" value="<?=$res3['option3']?>">
+        <input type="text" required name="option4" style="width:fit-content" value="<?=$res3['option4']?>">
+        <input type="hidden" required name="quizid" style="width:fit-content" value="<?=$res3['quizid']?>"> 
+        <input type="hidden" required name="qid" style="width:fit-content" value="<?=$res3['ID']?>"> 
         <input type="submit" value="Update" name="update">
         <input type='submit' value='Delete' name='delete'>
         </form>
