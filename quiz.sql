@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 21, 2025 at 02:53 PM
+-- Generation Time: Feb 23, 2025 at 04:53 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -60,7 +60,8 @@ CREATE TABLE `quizdetails` (
 
 INSERT INTO `quizdetails` (`quizid`, `category`, `quizname`, `email`) VALUES
 (2, 'Entertainment', 'English', 'vishal198shetty@gmail.com'),
-(3, 'Educational', 'Maths Basics', 'aneesh@gmail.com');
+(3, 'Educational', 'Maths Basics', 'aneesh@gmail.com'),
+(5, 'Programming', 'CPP', 'vishal198shetty@gmail.com');
 
 -- --------------------------------------------------------
 
@@ -84,8 +85,8 @@ CREATE TABLE `quizes` (
 --
 
 INSERT INTO `quizes` (`ID`, `question`, `quizid`, `option1`, `option2`, `option3`, `option4`, `answer`) VALUES
-(1, 'What among these is a pronoun?', 2, 'Aneesh', 'he', 'green', 'playing', 'he'),
-(2, 'Q) 1 is __________.', 3, 'prime', 'composite', 'prime and composite', 'neither prime nor composite', 'neither prime nor composite');
+(12, 'Who developed C++?', 5, 'Bjarne Stroustrup', 'Dennis Ritchie', 'James Goslings', 'Guido van Rossum', 'Bjarne Stroustrup'),
+(13, 'Who developed OOP?', 5, 'Bjarne Stroustrup', 'Dennis Ritchie', 'James Goslings', 'Guido van Rossum', 'break');
 
 -- --------------------------------------------------------
 
@@ -148,13 +149,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `quizdetails`
 --
 ALTER TABLE `quizdetails`
-  MODIFY `quizid` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `quizid` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `quizes`
 --
 ALTER TABLE `quizes`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- Constraints for dumped tables
