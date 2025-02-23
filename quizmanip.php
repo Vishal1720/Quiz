@@ -96,7 +96,7 @@ nav .home,a:nth-child(1):hover~.animation {
 	left: 0;
 	background-color: #1abc9c;
 }
-nav .quizes,a:nth-child(2):hover~.animation {
+nav .edit,a:nth-child(2):hover~.animation {
 	width: 140px;
 	left: 110px;
 	background-color:rgb(26, 61, 188);
@@ -126,7 +126,7 @@ nav .logout,a:nth-child(5):hover~.animation {
     <a href='./createquiz.php'>Create </a>
     <a href='./quizform.php'>Insert </a>
 	<a style='width:100px' href='./logout.php'>Logout</a>
-	<div class='animation update' ></div>
+	<div class='animation edit' ></div>
 </nav>
 
             <?php 
@@ -148,7 +148,7 @@ nav .logout,a:nth-child(5):hover~.animation {
             <?php
             foreach($res as $row)
             {
-                echo "<option value='".$row['quizid']."'>".$row['quizname'].$row['quizid']."</option>";
+                echo "<option value='".$row['quizid']."'>".$row['quizname']."</option>";
             }?>
             </select>
             <input type="submit" value="Refresh" name="refresh">
