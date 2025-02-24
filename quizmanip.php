@@ -170,10 +170,16 @@ nav .logout,a:nth-child(5):hover~.animation {
                     <form method='POST' action='quizmanip.php' style='max-width:100%;display:flex;flex-direction:row;'>                
         <input type="text" name="question" style="width:fit-content" value="<?= $res3['question'] ?>">
         
-        <input type="text" required name="option1" style="width:fit-content" value="<?=$res3['option1']?>">
-        <input type="text" required name="option2" style="width:fit-content" value="<?=$res3['option2']?>">
-        <input type="text" required name="option3" style="width:fit-content" value="<?=$res3['option3']?>">
-        <input type="text" required name="option4" style="width:fit-content" value="<?=$res3['option4']?>">
+        <input type="text" onkeyup="changenow(<?=$res3['ID']?>,0,4)" class="<?=$res3['ID']?>"  required name="option1" style="width:fit-content" value="<?=$res3['option1']?>">
+        <input type="text" onkeyup="changenow(<?=$res3['ID']?>,1,5)" class="<?=$res3['ID']?>" required name="option2" style="width:fit-content" value="<?=$res3['option2']?>">
+        <input type="text" onkeyup="changenow(<?=$res3['ID']?>,2,6)" class="<?=$res3['ID']?>" required name="option3" style="width:fit-content" value="<?=$res3['option3']?>">
+        <input type="text" onkeyup="changenow(<?=$res3['ID']?>,3,7)" class="<?=$res3['ID']?>" required name="option4" style="width:fit-content" value="<?=$res3['option4']?>">
+        <select>
+            <option value="1"  class="<?=$res3['ID']?>" <?php if($res3['answer']==$res3['option1']) echo "selected";?>><?=$res3['option1']?></option>
+            <option value="2" class="<?=$res3['ID']?>" <?php if($res3['answer']==$res3['option2']) echo "selected";?>><?=$res3['option2']?></option>
+            <option value="3" class="<?=$res3['ID']?>" <?php if($res3['answer']==$res3['option3']) echo "selected";?>><?=$res3['option3']?></option>
+            <option value="4" class="<?=$res3['ID']?>" <?php if($res3['answer']==$res3['option4']) echo "selected";?>><?=$res3['option4']?></option>
+        </select>
         <input type="hidden" required name="quizid" style="width:fit-content" value="<?=$res3['quizid']?>"> 
         <input type="hidden" required name="qid" style="width:fit-content" value="<?=$res3['ID']?>"> 
         <input type="submit" value="Update" name="update">
@@ -184,7 +190,15 @@ nav .logout,a:nth-child(5):hover~.animation {
                 }
             }
             ?>
-            
-       
+        
+            <script>
+function changenow(classname,num1,num2)
+{
+    var x=document.getElementsByClassName(classname);
+    x[num2].textContent=x[num1].value;
+    console.log("in");
+}
+
+</script>
         </body>
         </html>
