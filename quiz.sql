@@ -85,9 +85,17 @@ CREATE TABLE `quizes` (
 --
 
 INSERT INTO `quizes` (`ID`, `question`, `quizid`, `option1`, `option2`, `option3`, `option4`, `answer`) VALUES
-(12, 'Who developed C++?', 5, 'Bjarne Stroustrup', 'Dennis Ritchie', 'James Goslings', 'Guido van Rossum', 'Bjarne Stroustrup'),
-(13, 'Who developed OOP?', 5, 'Bjarne Stroustrup', 'Dennis Ritchie', 'James Goslings', 'Guido van Rossum', 'break');
-
+(1, 'What is the correct way to declare an integer variable in C++?', 1, 'int num;', 'integer num;', 'num int;', 'var num;', 'int num;'),
+(2, 'Which of the following is used to output text in C++?', 2, 'print()', 'echo', 'cout <<', 'display()', 'cout <<'),
+(3, 'Which symbol is used for single-line comments in C++?', 3, '#', '//', '/* */', '--', '//'),
+(4, 'Which of these is a correct for loop syntax in C++?', 4, 'for (i = 0; i < 5; i++)', 'for (int i = 0; i < 5; i++)', 'for i = 0; i < 5; i++', 'loop for (int i = 0; i < 5; i++)', 'for (int i = 0; i < 5; i++)'),
+(5, 'What is the output of 5 / 2 in C++ (assuming both are integers)?', 5, '2.5', '2', '3', 'Error', '2'),
+(6, 'Which header file is needed for input and output operations in C++?', 6, '<stdio.h>', '<iostream>', '<conio.h>', '<fstream>', '<iostream>'),
+(7, 'What does new do in C++?', 7, 'Declares a new variable', 'Allocates memory dynamically', 'Deletes a variable', 'Creates a new function', 'Allocates memory dynamically'),
+(8, 'What will sizeof(int) return in most systems?', 8, '2', '4', '8', 'Depends on system', 'Depends on system'),
+(9, 'Which keyword is used to define a constant variable?', 9, 'constant', 'const', 'define', 'let', 'const'),
+(10, 'Which of these is NOT a valid C++ data type?', 10, 'double', 'char', 'real', 'bool', 'real');
+                                                                                                                                                                                                                                           
 -- --------------------------------------------------------
 
 --
