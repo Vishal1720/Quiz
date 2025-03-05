@@ -1,0 +1,47 @@
+/* Add these styles to each form page's <style> section */
+
+select.form-control,
+select.select-category,
+.answer-select {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    width: 100%;
+    font-size: 1rem;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='white' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: calc(100% - 12px) center;
+    background-size: 12px;
+    padding-right: 35px;
+}
+
+select.form-control option,
+select.select-category option,
+.answer-select option {
+    background: #2c3e50;
+    color: #fff;
+    padding: 12px;
+}
+
+select.form-control:focus,
+select.select-category:focus,
+.answer-select:focus {
+    border-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
+    outline: none;
+}
+
+/* Fix for Firefox */
+@-moz-document url-prefix() {
+    select.form-control,
+    select.select-category,
+    .answer-select {
+        background-color: rgba(44, 62, 80, 0.95);
+        color: #fff;
+    }
+}

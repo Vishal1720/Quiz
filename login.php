@@ -41,47 +41,53 @@ else
     <link rel="stylesheet" href="form.css">
    <link rel="stylesheet" href="nav.css">
    <style>
-         nav{
-              width:25%;
-              height:50px;
-              line-height:20px;
-         }
-         nav a{
-            text-align: center;
-         }
-         a:nth-child(1) {
-	width: 110px;
-}
-a:nth-child(2) {
-	width: 130px;
-    
-}
-a:nth-child(3) {
-	width: 120px;
-}
-nav a:nth-child(1):hover~.animation {
-	width: 110px;
-	left: 0;
-	background-color: #1abc9c;
-}
-nav a:nth-child(2):hover~.animation {
-	width: 150px;
-	left: 110px;
-	background-color:rgb(26, 61, 188);
-}
-nav a:nth-child(3):hover~.animation {
-	width: 120px;
-	left:260px;
-	background-color:rgb(42, 148, 177);
-}
+        nav {
+            width: 250px;
+            height: 50px;
+            line-height: 20px;
+        }
+        /* Remove existing nav styles */
    </style>
+   <style>
+    body {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .auth-container {
+        width: 100%;
+        max-width: 400px;
+        margin: 2rem auto;
+        animation: fadeIn 0.5s ease;
+    }
+
+    form {
+        background: rgba(255, 255, 255, 0.08);
+        margin-top: 2rem;
+    }
+
+    .form-title {
+        color: #fff;
+        text-align: center;
+        font-size: 1.8rem;
+        margin-bottom: 2rem;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+</style>
 </head>
 <body>
-    <nav >
-    <a href="./login.php">Login</a>
-    <a href="./register.php">Register</a>
-	<a href="#">About</a>
-	<div class="animation start-home"></div>
+    <nav class="two-items">
+        <a href="./login.php" class="active">Login</a>
+        <a href="./register.php">Register</a>
+        <div class="animation login"></div>
     </nav>
     <form action="./login.php" method="post" style="margin-top: 50px;font-size:15px;">
         <label for="email">Email</label>

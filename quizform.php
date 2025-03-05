@@ -51,124 +51,179 @@ if($_SERVER['REQUEST_METHOD']=='POST')
 <head>
     <meta charset='UTF-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    <title>Quiz</title>
+    <title>Insert Question</title>
     <link rel="shortcut icon" href="quiz.png" type="image/x-icon">
     <link rel='stylesheet' href='nav.css'>
     <link rel='stylesheet' href='form.css'>
     <style>
-        select{
-            width: 100%;
-            padding: 5px;
-            margin-bottom: 5px;
-            font-size: 15px;
-            text-align: center;
+        .container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 0 1rem;
         }
-        nav{
-              width:43%;
-              height:50px;
-              
-         }
-         nav a{
+
+        .page-title {
+            color: #fff;
             text-align: center;
-         }
-         a:nth-child(1) {
-	width: 110px;
-}
-a:nth-child(2) {
-	width: 130px;
-    
-}
-a:nth-child(3) {
-	width: 100px;
-}
-nav .home,a:nth-child(1):hover~.animation {
-	width: 110px;
-	left: 0;
-	background-color: #1abc9c;
-}
-nav .quizes,a:nth-child(2):hover~.animation {
-	width: 140px;
-	left: 110px;
-	background-color:rgb(26, 61, 188);
-}
-nav .create,a:nth-child(3):hover~.animation {
-	width: 110px;
-	left:250px;
-	background-color:rgb(42, 148, 177);
-}
-nav .update,a:nth-child(4):hover~.animation {
-	width: 120px;
-	left:370px;
-	background-color:rgb(70, 83, 196);
-}
-nav .logout,a:nth-child(5):hover~.animation {
-	width: 150px;
-	left:490px;
-	background-color:rgb(185, 91, 51);
-}
+            font-size: 2rem;
+            margin: 2rem 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .quiz-form {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+        }
+
+        .select-quiz {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .options-container {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+        }
+
+        .option-group {
+            margin-bottom: 1rem;
+        }
+
+        .answer-select {
+            margin-top: 1.5rem;
+            width: 100%;
+            padding: 12px;
+            background: rgba(74, 144, 226, 0.1);
+            border: 1px solid rgba(74, 144, 226, 0.3);
+            border-radius: 8px;
+            color: #fff;
+        }
+
+        @media (max-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
-<nav >
+    <nav>
+        <a href='./index.php'>Home</a>
+        <a href='./quizmanip.php'>Edit</a>
+        <a href='./createquiz.php'>Create </a>
+        <a href='./quizform.php'>Insert </a>
+        <a style='width:100px' href='./logout.php'>Logout</a>
+        <div class='animation update' ></div>
+    </nav>
 
-<a href='./index.php'>Home</a>
-	<a href='./quizmanip.php'>Edit</a>
-    <a href='./createquiz.php'>Create </a>
-    <a href='./quizform.php'>Insert </a>
-	<a style='width:100px' href='./logout.php'>Logout</a>
-	<div class='animation update' ></div>
-</nav>
-    <form action='./quizform.php' method="POST" style="margin-top:10px;">
-    <div class='quizform'>
-        <label for='quizid'>Quiz Name</label>
-        <select name="quizid" id="quizid" required>
-            <?php 
-            foreach($res as $row)
-            {
-                echo "<option value='".$row['quizid']."'>" . $row['quizname'] . "</option>";
-            }?>
-            
-        </select>
-        <label for='q'>Question</label>
-        <input type='text' placeholder='Question' name='question' id='q' required></input>
-        <div>
-            <label for='option1'>Option 1</label>
-        <input maxlength="40" type='text' maxlength="1000" placeholder='Enter option'
-         onkeyup="change('option1','op1')"  maxlength="222" id='option1'name='option1' required>
+    <div class="container">
+        <h1 class="page-title">Insert New Question</h1>
+        
+        <form method="POST" action="quizform.php" class="quiz-form">
+            <div class="select-quiz">
+                <label for="quizid">Select Quiz</label>
+                <select name="quizid" id="quizid" class="form-control" required>
+                    <?php 
+                    foreach($res as $row)
+                    {
+                        echo "<option value='".$row['quizid']."'>" . $row['quizname'] . "</option>";
+                    }?>
+                </select>
+            </div>
 
-        <label for='option2'>Option 2</label>
-        <input type='text' placeholder='Enter option' 
-        onkeyup="change('option2','op2')" id='option2' maxlength="222" name='option2' required>
+            <div class="form-group">
+                <label for="q">Question</label>
+                <input type="text" placeholder="Enter your question" name="question" id="q" class="form-control" required>
+            </div>
 
+            <div class="options-container">
+                <h3 style="color: #fff; margin-bottom: 1rem;">Options</h3>
+                <div class="form-grid">
+                    <div class="option-group">
+                        <label for="option1">Option 1</label>
+                        <input type="text" maxlength="40" placeholder="Enter option" 
+                               onkeyup="change('option1','op1')" id="option1" 
+                               name="option1" class="form-control" required>
+                    </div>
+
+                    <div class="option-group">
+                        <label for="option2">Option 2</label>
+                        <input type="text" placeholder="Enter option" 
+                               onkeyup="change('option2','op2')" id="option2" 
+                               name="option2" class="form-control" required>
+                    </div>
+
+                    <div class="option-group">
+                        <label for="option3">Option 3</label>
+                        <input type="text" placeholder="Enter option" 
+                               onkeyup="change('option3','op3')" id="option3" 
+                               name="option3" class="form-control" required>
+                    </div>
+
+                    <div class="option-group">
+                        <label for="option4">Option 4</label>
+                        <input type="text" placeholder="Enter option" 
+                               onkeyup="change('option4','op4')" id="option4" 
+                               name="option4" class="form-control" required>
+                    </div>
+                </div>
+
+                <label for="answer">Correct Answer</label>
+                <select name="answer" id="answer" class="answer-select">
+                    <option value="1" id="op1">Option 1</option>
+                    <option value="2" id="op2">Option 2</option>
+                    <option value="3" id="op3">Option 3</option>
+                    <option value="4" id="op4">Option 4</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="margin-top: 1.5rem;">
+                Add Question
+            </button>
+        </form>
     </div>
-    <div>
-        <label for='option3'>Option 3</label>
-        <input type='text' placeholder='Enter option' maxlength="222" onkeyup="change('option3','op3')" 
-        id='option3' name='option3' required>
 
-        <label for='option4'>Option 4</label>
-        <input type='text' placeholder='Enter option' 
-        onkeyup="change('option4','op4')" id='option4' maxlength="222" name='option4' required>
-
-    </div>
-    <label for='answer'>Answer</label>
-    <select name='answer' placeholder='Answer' >
-        <option value='1' id="op1">Options</option>
-        <option value='2' id="op2">Options</option>
-        <option value='3' id="op3">Options</option>
-        <option value='4' id="op4">Options</option>
-    </select>
-    <input type='submit' value='Submit'>
-    </div>
-</div>
-<script>
-
-function change(inpid,option){
-    var box = document.getElementById(inpid).value;
-    var val = document.getElementById(option);
-    val.value=box;
-    val.textContent=box;
-}
-</script>
+    <script>
+        function change(inpid,option){
+            var box = document.getElementById(inpid).value;
+            var val = document.getElementById(option);
+            val.value=box;
+            val.textContent=box;
+        }
+    </script>
 </body>
 </html>

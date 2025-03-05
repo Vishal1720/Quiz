@@ -59,62 +59,84 @@ if(isset($_POST['category']) && isset($_POST['quizname']) )
     <link rel="stylesheet" href="nav.css">
     <link rel="stylesheet" href="form.css">
     <style>
-        form{
-            margin-top: 30px;
-        }
-        select{
-            padding: 10px;
-            border-radius:10px ;
+        .create-quiz-container {
+            max-width: 600px;
+            margin: 3rem auto;
+            padding: 0 1rem;
         }
 
-        nav{
-              width:43%;
-              height:50px;
-              
-         }
-         nav a{
+        .page-title {
+            color: #fff;
             text-align: center;
-         }
-         a:nth-child(1) {
-	width: 110px;
-}
-a:nth-child(2) {
-	width: 130px;
-    
-}
-a:nth-child(3) {
-	width: 100px;
-}
-nav .home,a:nth-child(1):hover~.animation {
-	width: 110px;
-	left: 0;
-	background-color: #1abc9c;
-}
-nav .quizes,a:nth-child(2):hover~.animation {
-	width: 140px;
-	left: 110px;
-	background-color:rgb(26, 61, 188);
-}
-nav .create,a:nth-child(3):hover~.animation {
-	width: 110px;
-	left:250px;
-	background-color:rgb(42, 148, 177);
-}
-nav .update,a:nth-child(4):hover~.animation {
-	width: 120px;
-	left:370px;
-	background-color:rgb(70, 83, 196);
-}
-nav .logout,a:nth-child(5):hover~.animation {
-	width: 150px;
-	left:490px;
-	background-color:rgb(185, 91, 51);
-}
-#cat{
-    width: 100%;
-    text-align: center;
-    font-size: 16px;
-}
+            font-size: 2.2rem;
+            margin-bottom: 2rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .create-form {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 2.5rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            animation: slideUp 0.5s ease;
+        }
+
+        .form-group {
+            margin-bottom: 1.8rem;
+        }
+
+        .form-control {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 14px;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
+        }
+
+        .select-category {
+            width: 100%;
+            padding: 14px;
+            background: rgba(74, 144, 226, 0.1);
+            border: 1px solid rgba(74, 144, 226, 0.3);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .create-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(45deg, #4a90e2, #357abd);
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .create-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(74, 144, 226, 0.3);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
@@ -128,23 +150,37 @@ nav .logout,a:nth-child(5):hover~.animation {
 	<div class="animation create" ></div>
 </nav>
 
-    <form action="./createquiz.php" method="POST">
-        <label for="quizname">Quizname</label>
-        <input type="text" name="quizname" id="quizname" placeholder="Quiz Name (Should be unique)" required>
-        <label for="cat">Category</label>
-       
-        <select name="category" id="cat" required>
-        <?php 
-        $query="Select categoryname from category";
-        $res=$con->query($query);
-        while($row=$res->fetch_assoc())
-        {
-            $cat=$row['categoryname'];
-            echo "<option  value='$cat'>$cat</option>";
-        }
-        ?>
-        </select>
-        <input type="submit" value="Create Quiz">
-    </form>
+    <div class="create-quiz-container">
+        <h1 class="page-title">Create New Quiz</h1>
+        
+        <form action="./createquiz.php" method="POST" class="create-form">
+            <div class="form-group">
+                <label for="quizname">Quiz Name</label>
+                <input type="text" 
+                       name="quizname" 
+                       id="quizname" 
+                       class="form-control"
+                       placeholder="Enter a unique quiz name" 
+                       required>
+            </div>
+
+            <div class="form-group">
+                <label for="cat">Select Category</label>
+                <select name="category" id="cat" class="select-category" required>
+                    <?php 
+                    $query="Select categoryname from category";
+                    $res=$con->query($query);
+                    while($row=$res->fetch_assoc())
+                    {
+                        $cat=$row['categoryname'];
+                        echo "<option  value='$cat'>$cat</option>";
+                    }
+                    ?>
+                </select>
+            </div>
+
+            <button type="submit" class="create-btn">Create Quiz</button>
+        </form>
+    </div>
 </body>
 </html>

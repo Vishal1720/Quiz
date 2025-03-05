@@ -55,6 +55,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 }
+$current_page = 'edit'; // Set this variable according to the current page
+// Add class="active" to the corresponding navigation link
 ?>
 <!DOCTYPE html>
 <html lang='en'>
@@ -116,82 +118,186 @@ nav .logout,a:nth-child(5):hover~.animation {
 	left:490px;
 	background-color:rgb(185, 91, 51);
 }
+        .edit-container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+        }
+
+        .page-title {
+            color: #fff;
+            text-align: center;
+            font-size: 2rem;
+            margin: 2rem 0;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .quiz-selector {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .quiz-selector select {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        .questions-container {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .question-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .question-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .question-form {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            gap: 1rem;
+            align-items: start;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .update-btn {
+            background: linear-gradient(45deg, #4a90e2, #357abd);
+        }
+
+        .delete-btn {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .question-form {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
-<nav >
-
-<a href='./index.php'>Home</a>
-	<a href='./quizmanip.php'>Edit</a>
-    <a href='./createquiz.php'>Create </a>
-    <a href='./quizform.php'>Insert </a>
-	<a style='width:100px' href='./logout.php'>Logout</a>
-	<div class='animation edit' ></div>
+<nav>
+    <a href="./index.php">Home</a>
+    <a href="./quizmanip.php" class="active">Edit</a>
+    <a href="./createquiz.php">Create</a>
+    <a href="./quizform.php">Insert</a>
+    <a style="width:100px" href="./logout.php">Logout</a>
+    <div class="animation <?php echo $current_page; ?>"></div>
 </nav>
 
-            <?php 
-            $query="select * from quizdetails where email='{$_SESSION['email']}'";
+<div class="edit-container">
+    <h1 class="page-title">Edit Quiz</h1>
+    <?php 
+    $query="select * from quizdetails where email='{$_SESSION['email']}'";
 
-            $res=$con->query($query);
-            
-            if($res->num_rows==0)
-            {
-            echo "<script>alert('First create a quiz')</script>";
-            header("Location: createquiz.php");
-            exit();
-            }
-            else{
-                
-            }?>
-            <form method="POST" action="quizmanip.php">
-                <select name="quizid" required>
+    $res=$con->query($query);
+    
+    if($res->num_rows==0)
+    {
+    echo "<script>alert('First create a quiz')</script>";
+    header("Location: createquiz.php");
+    exit();
+    }
+    else{
+        
+    }?>
+    <form method="POST" action="quizmanip.php" class="quiz-selector">
+        <select name="quizid" required>
+    <?php
+    foreach($res as $row)
+    {
+        echo "<option value='".$row['quizid']."'>".$row['quizname']."</option>";
+    }?>
+    </select>
+    <input type="submit" value="Refresh" name="refresh" class="action-btn update-btn">
+    </form>
+    <?php 
+    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['refresh'])) 
+    {
+        $quizid=$_POST['quizid'];
+        $query="select * from quizes where quizid='$quizid'";
+        $res2=$con->query($query);
+        if($res2->num_rows==0)
+        {
+            echo "<script>alert('No questions found')</script>";
+        }
+        else{
+            echo '<div class="questions-container">';
+            while($res3=$res2->fetch_assoc())
+            {?>
+            <div class="question-card">
+                <form method='POST' action='quizmanip.php' class='question-form'>                
+                    <input type="text" name="question" class="form-control" value="<?= $res3['question'] ?>">
+                    
+                    <input type="text" onkeyup="changenow(<?=$res3['ID']?>,0,4)" class="form-control <?=$res3['ID']?>"  required name="option1" value="<?=$res3['option1']?>">
+                    <input type="text" onkeyup="changenow(<?=$res3['ID']?>,1,5)" class="form-control <?=$res3['ID']?>" required name="option2" value="<?=$res3['option2']?>">
+                    <input type="text" onkeyup="changenow(<?=$res3['ID']?>,2,6)" class="form-control <?=$res3['ID']?>" required name="option3" value="<?=$res3['option3']?>">
+                    <input type="text" onkeyup="changenow(<?=$res3['ID']?>,3,7)" class="form-control <?=$res3['ID']?>" required name="option4" value="<?=$res3['option4']?>">
+                    <select class="form-control">
+                        <option value="1"  class="<?=$res3['ID']?>" <?php if($res3['answer']==$res3['option1']) echo "selected";?>><?=$res3['option1']?></option>
+                        <option value="2" class="<?=$res3['ID']?>" <?php if($res3['answer']==$res3['option2']) echo "selected";?>><?=$res3['option2']?></option>
+                        <option value="3" class="<?=$res3['ID']?>" <?php if($res3['answer']==$res3['option3']) echo "selected";?>><?=$res3['option3']?></option>
+                        <option value="4" class="<?=$res3['ID']?>" <?php if($res3['answer']==$res3['option4']) echo "selected";?>><?=$res3['option4']?></option>
+                    </select>
+                    <input type="hidden" required name="quizid" value="<?=$res3['quizid']?>"> 
+                    <input type="hidden" required name="qid" value="<?=$res3['ID']?>"> 
+                    <input type="submit" value="Update" name="update" class="action-btn update-btn">
+                    <input type='submit' value='Delete' name='delete' class="action-btn delete-btn">
+                </form>
+            </div>
             <?php
-            foreach($res as $row)
-            {
-                echo "<option value='".$row['quizid']."'>".$row['quizname']."</option>";
-            }?>
-            </select>
-            <input type="submit" value="Refresh" name="refresh">
-
-            </form>
-            <?php 
-            if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['refresh'])) 
-            {
-                $quizid=$_POST['quizid'];
-                $query="select * from quizes where quizid='$quizid'";
-                $res2=$con->query($query);
-                if($res2->num_rows==0)
-                {
-                    echo "<script>alert('No questions found')</script>";
-                }
-                else{
-                    while($res3=$res2->fetch_assoc())
-                    {?>
-                    <form method='POST' action='quizmanip.php' style='max-width:100%;display:flex;flex-direction:row;'>                
-        <input type="text" name="question" style="width:fit-content" value="<?= $res3['question'] ?>">
-        
-        <input type="text" onkeyup="changenow(<?=$res3['ID']?>,0,4)" class="<?=$res3['ID']?>"  required name="option1" style="width:fit-content" value="<?=$res3['option1']?>">
-        <input type="text" onkeyup="changenow(<?=$res3['ID']?>,1,5)" class="<?=$res3['ID']?>" required name="option2" style="width:fit-content" value="<?=$res3['option2']?>">
-        <input type="text" onkeyup="changenow(<?=$res3['ID']?>,2,6)" class="<?=$res3['ID']?>" required name="option3" style="width:fit-content" value="<?=$res3['option3']?>">
-        <input type="text" onkeyup="changenow(<?=$res3['ID']?>,3,7)" class="<?=$res3['ID']?>" required name="option4" style="width:fit-content" value="<?=$res3['option4']?>">
-        <select>
-            <option value="1"  class="<?=$res3['ID']?>" <?php if($res3['answer']==$res3['option1']) echo "selected";?>><?=$res3['option1']?></option>
-            <option value="2" class="<?=$res3['ID']?>" <?php if($res3['answer']==$res3['option2']) echo "selected";?>><?=$res3['option2']?></option>
-            <option value="3" class="<?=$res3['ID']?>" <?php if($res3['answer']==$res3['option3']) echo "selected";?>><?=$res3['option3']?></option>
-            <option value="4" class="<?=$res3['ID']?>" <?php if($res3['answer']==$res3['option4']) echo "selected";?>><?=$res3['option4']?></option>
-        </select>
-        <input type="hidden" required name="quizid" style="width:fit-content" value="<?=$res3['quizid']?>"> 
-        <input type="hidden" required name="qid" style="width:fit-content" value="<?=$res3['ID']?>"> 
-        <input type="submit" value="Update" name="update">
-        <input type='submit' value='Delete' name='delete'>
-        </form>
-                    <?php
-                    }
-                }
             }
-            ?>
-        
-            <script>
+            echo '</div>';
+        }
+    }
+    ?>
+</div>
+<script>
 function changenow(classname,num1,num2)
 {
     var x=document.getElementsByClassName(classname);
@@ -200,5 +306,5 @@ function changenow(classname,num1,num2)
 }
 
 </script>
-        </body>
-        </html>
+</body>
+</html>
