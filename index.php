@@ -256,7 +256,7 @@ if($_SESSION['status']=="loggedout" || $_SESSION['status']=="" || empty($_SESSIO
             while($row2 = $res2->fetch_assoc()) {
                 echo "<div class='quiz-card'>";
                 echo "<h3 class='quiz-title'>{$row2['quizname']}</h3>";
-                echo "<form method='GET' action='/takequiz.php'>";
+                echo "<form method='GET' action='takequiz.php'>";
                 echo "<input type='hidden' name='quizid' value='{$row2['quizid']}'>";
                 echo "<button type='submit' class='take-quiz-btn'>Take Quiz</button>";
                 echo "</form>";
