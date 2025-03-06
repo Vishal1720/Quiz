@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 23, 2025 at 04:53 AM
+-- Generation Time: Mar 06, 2025 at 04:58 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -85,17 +85,21 @@ CREATE TABLE `quizes` (
 --
 
 INSERT INTO `quizes` (`ID`, `question`, `quizid`, `option1`, `option2`, `option3`, `option4`, `answer`) VALUES
-(1, 'What is the correct way to declare an integer variable in C++?', 1, 'int num;', 'integer num;', 'num int;', 'var num;', 'int num;'),
-(2, 'Which of the following is used to output text in C++?', 2, 'print()', 'echo', 'cout <<', 'display()', 'cout <<'),
-(3, 'Which symbol is used for single-line comments in C++?', 3, '#', '//', '/* */', '--', '//'),
-(4, 'Which of these is a correct for loop syntax in C++?', 4, 'for (i = 0; i < 5; i++)', 'for (int i = 0; i < 5; i++)', 'for i = 0; i < 5; i++', 'loop for (int i = 0; i < 5; i++)', 'for (int i = 0; i < 5; i++)'),
-(5, 'What is the output of 5 / 2 in C++ (assuming both are integers)?', 5, '2.5', '2', '3', 'Error', '2'),
-(6, 'Which header file is needed for input and output operations in C++?', 6, '<stdio.h>', '<iostream>', '<conio.h>', '<fstream>', '<iostream>'),
-(7, 'What does new do in C++?', 7, 'Declares a new variable', 'Allocates memory dynamically', 'Deletes a variable', 'Creates a new function', 'Allocates memory dynamically'),
-(8, 'What will sizeof(int) return in most systems?', 8, '2', '4', '8', 'Depends on system', 'Depends on system'),
-(9, 'Which keyword is used to define a constant variable?', 9, 'constant', 'const', 'define', 'let', 'const'),
-(10, 'Which of these is NOT a valid C++ data type?', 10, 'double', 'char', 'real', 'bool', 'real');
-                                                                                                                                                                                                                                           
+(12, 'Who developed C++?', 5, 'Bjarne Stroustrup', 'Dennis Ritchie', 'James Goslings', 'Guido van Rossum', 'Bjarne Stroustrup'),
+(18, 'What is the correct way to declare an integer variable in C++?', 5, ' int num', ' integer num', 'num int', 'var num', ' int num'),
+(19, 'Which of the following is used to output text in C++?', 5, ' print()', 'echo', 'cout <<', ' display()', 'cout <<'),
+(20, 'Which symbol is used for single-line comments in C++?', 5, '# ', '// ', ' /* */ ', ' --', '// '),
+(21, 'What is the output of 5 / 2 in C++ (assuming both are integers)?', 5, '2.5 ', ' 2 ', '3 ', 'Error', ' 2 '),
+(22, 'Which header file is needed for input and output operations in C++?', 5, 'a) <stdio.h>  ', '<iostream>', '<conio.h> ', '<fstream>', '<iostream>'),
+(23, 'What does new do in C++?', 5, 'Declares a new variable', ' Allocates memory dynamically', 'Deletes a variable', 'Creates a new function', ' Allocates memory dynamically'),
+(24, 'Which keyword is used to define a constant variable?', 5, ' constant', 'const', 'define', 'let', 'const'),
+(25, 'Which of these is NOT a valid C++ data type?', 5, 'double', 'char', ' real', 'bool', ' real'),
+(27, 'Which movie features the famous line \"I’m the king of the world!\"?', 2, ' The Lion King', 'Titanic', 'Gladiator', 'Avatar', 'Titanic'),
+(28, 'Who played the role of Iron Man in the Marvel Cinematic Universe?', 2, 'Chris Evans', 'Mark Ruffalo', 'Chris Hemsworth', 'Robert Downey Jr. ', 'Robert Downey Jr. '),
+(29, 'What is the name of the coffee shop in the TV series \"Friends\"?', 2, 'Central Perk ', 'Cafe Perk', 'Coffee Central', 'The Coffee House', 'Cafe Perk'),
+(30, 'Which animated movie features a talking snowman named Olaf', 2, 'Brave', 'Frozen', 'Moana', 'Tangled', 'Frozen'),
+(31, 'Which actor played Jack Sparrow in the \"Pirates of the Caribbean\" series?', 2, 'Brad Pitt', ' Johnny Depp ', 'Leonardo DiCaprio', 'Tom Cruise', ' Johnny Depp ');
+
 -- --------------------------------------------------------
 
 --
@@ -163,7 +167,7 @@ ALTER TABLE `quizdetails`
 -- AUTO_INCREMENT for table `quizes`
 --
 ALTER TABLE `quizes`
-  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
+  MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- Constraints for dumped tables
