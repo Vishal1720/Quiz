@@ -110,16 +110,17 @@ CREATE TABLE `users` (
   `email` varchar(222) NOT NULL,
   `name` text NOT NULL,
   `password` varchar(222) NOT NULL,
-  `contact` varchar(10) NOT NULL
+  `contact` varchar(10) NOT NULL,
+  `role` varchar(10) NOT NULL DEFAULT 'user'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `users`
 --
 
-INSERT INTO `users` (`email`, `name`, `password`, `contact`) VALUES
-('aneesh@gmail.com', 'Aneesh Bhat', 'aneesh123', '9145314131'),
-('vishal198shetty@gmail.com', 'Vishal Shetty', 'Vishal1720', '8088835539');
+INSERT INTO `users` (`email`, `name`, `password`, `contact`, `role`) VALUES
+('aneesh@gmail.com', 'Aneesh Bhat', 'aneesh123', '9145314131', 'user'),
+('vishal198shetty@gmail.com', 'Vishal Shetty', 'Vishal1720', '8088835539', 'admin');
 
 --
 -- Indexes for dumped tables
@@ -185,6 +186,22 @@ ALTER TABLE `quizdetails`
 --
 ALTER TABLE `quizes`
   ADD CONSTRAINT `quizes_ibfk_1` FOREIGN KEY (`quizid`) REFERENCES `quizdetails` (`quizid`);
+
+
+
+CREATE TABLE `quiz_attempts` (
+  `attempt_id` int(11) NOT NULL AUTO_INCREMENT,
+  `email` varchar(222) NOT NULL,
+  `quizid` int(5) NOT NULL,
+  `score` int(11) NOT NULL,
+  `total_questions` int(11) NOT NULL,
+  `attempt_date` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`attempt_id`),
+  KEY `email` (`email`),
+  KEY `quizid` (`quizid`),
+  CONSTRAINT `quiz_attempts_ibfk_1` FOREIGN KEY (`email`) REFERENCES `users` (`email`),
+  CONSTRAINT `quiz_attempts_ibfk_2` FOREIGN KEY (`quizid`) REFERENCES `quizdetails` (`quizid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -122,39 +122,13 @@ nav .logout,a:nth-child(5):hover~.animation {
             max-width: 1000px;
             margin: 2rem auto;
             padding: 0 1rem;
-        }
-
-        .page-title {
-            color: #fff;
-            text-align: center;
-            font-size: 2rem;
-            margin: 2rem 0;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .quiz-selector {
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .quiz-selector select {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 1rem;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            color: #fff;
-            font-size: 1rem;
+            width: fit-content;
         }
 
         .questions-container {
             display: grid;
             gap: 1.5rem;
+            width: fit-content;
         }
 
         .question-card {
@@ -164,33 +138,51 @@ nav .logout,a:nth-child(5):hover~.animation {
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             transition: transform 0.3s ease;
+            margin-bottom: 20px;
+            width: fit-content;
+            min-width: 600px;
         }
-
         .question-card:hover {
             transform: translateY(-5px);
         }
-
         .question-form {
-            display: grid;
-            grid-template-columns: 1fr auto auto;
+            display: flex;
+            flex-direction: column;
             gap: 1rem;
-            align-items: start;
         }
-
         .form-group {
             margin-bottom: 1rem;
+            width: 100%;
         }
-
-        .form-control {
+        .question-input {
             width: 100%;
             padding: 12px;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 8px;
             color: #fff;
-            transition: all 0.3s ease;
+            font-size: 1.1em;
+            margin-bottom: 15px;
         }
-
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .option-input {
+            width: 100%;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: #fff;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
         .action-btn {
             padding: 10px 20px;
             border: none;
@@ -198,21 +190,16 @@ nav .logout,a:nth-child(5):hover~.animation {
             color: #fff;
             cursor: pointer;
             transition: all 0.3s ease;
+            background: #4CAF50;
         }
-
-        .update-btn {
-            background: linear-gradient(45deg, #4a90e2, #357abd);
+        .action-btn.delete {
+            background: #f44336;
         }
-
-        .delete-btn {
-            background: linear-gradient(45deg, #e74c3c, #c0392b);
-        }
-
         .action-btn:hover {
+            opacity: 0.9;
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
-
         @media (max-width: 768px) {
             .question-form {
                 grid-template-columns: 1fr;
@@ -271,23 +258,30 @@ nav .logout,a:nth-child(5):hover~.animation {
             while($res3=$res2->fetch_assoc())
             {?>
             <div class="question-card">
-                <form method='POST' action='quizmanip.php' class='question-form'>                
-                    <input type="text" name="question" class="form-control" value="<?= $res3['question'] ?>">
+                <form method='POST' action='quizmanip.php' class='question-form'>
+                    <input type="text" name="question" class="question-input" value="<?= $res3['question'] ?>" placeholder="Question">
                     
-                    <input type="text" onkeyup="changenow(<?=$res3['ID']?>,0,4)" class="form-control <?=$res3['ID']?>"  required name="option1" value="<?=$res3['option1']?>">
-                    <input type="text" onkeyup="changenow(<?=$res3['ID']?>,1,5)" class="form-control <?=$res3['ID']?>" required name="option2" value="<?=$res3['option2']?>">
-                    <input type="text" onkeyup="changenow(<?=$res3['ID']?>,2,6)" class="form-control <?=$res3['ID']?>" required name="option3" value="<?=$res3['option3']?>">
-                    <input type="text" onkeyup="changenow(<?=$res3['ID']?>,3,7)" class="form-control <?=$res3['ID']?>" required name="option4" value="<?=$res3['option4']?>">
-                    <select class="form-control">
-                        <option value="1"  class="<?=$res3['ID']?>" <?php if($res3['answer']==$res3['option1']) echo "selected";?>><?=$res3['option1']?></option>
+                    <div class="options-grid">
+                        <input type="text" onkeyup="changenow(<?=$res3['ID']?>,0,4)" class="option-input <?=$res3['ID']?>" required name="option1" value="<?=$res3['option1']?>" placeholder="Option 1">
+                        <input type="text" onkeyup="changenow(<?=$res3['ID']?>,1,5)" class="option-input <?=$res3['ID']?>" required name="option2" value="<?=$res3['option2']?>" placeholder="Option 2">
+                        <input type="text" onkeyup="changenow(<?=$res3['ID']?>,2,6)" class="option-input <?=$res3['ID']?>" required name="option3" value="<?=$res3['option3']?>" placeholder="Option 3">
+                        <input type="text" onkeyup="changenow(<?=$res3['ID']?>,3,7)" class="option-input <?=$res3['ID']?>" required name="option4" value="<?=$res3['option4']?>" placeholder="Option 4">
+                    </div>
+                    
+                    <select class="option-input">
+                        <option value="1" class="<?=$res3['ID']?>" <?php if($res3['answer']==$res3['option1']) echo "selected";?>><?=$res3['option1']?></option>
                         <option value="2" class="<?=$res3['ID']?>" <?php if($res3['answer']==$res3['option2']) echo "selected";?>><?=$res3['option2']?></option>
                         <option value="3" class="<?=$res3['ID']?>" <?php if($res3['answer']==$res3['option3']) echo "selected";?>><?=$res3['option3']?></option>
                         <option value="4" class="<?=$res3['ID']?>" <?php if($res3['answer']==$res3['option4']) echo "selected";?>><?=$res3['option4']?></option>
                     </select>
+                    
                     <input type="hidden" required name="quizid" value="<?=$res3['quizid']?>"> 
                     <input type="hidden" required name="qid" value="<?=$res3['ID']?>"> 
-                    <input type="submit" value="Update" name="update" class="action-btn update-btn">
-                    <input type='submit' value='Delete' name='delete' class="action-btn delete-btn">
+                    
+                    <div class="action-buttons">
+                        <input type="submit" value="Update" name="update" class="action-btn">
+                        <input type='submit' value='Delete' name='delete' class="action-btn delete">
+                    </div>
                 </form>
             </div>
             <?php

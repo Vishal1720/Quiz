@@ -51,6 +51,12 @@ while ($row = $result->fetch_assoc()) {
 }
 
 $percentage = ($score / $totalQuestions) * 100;
+
+// Store quiz attempt in database
+$insertQuery = "INSERT INTO quiz_attempts (email, quizid, score, total_questions) VALUES (?, ?, ?, ?)";
+$stmtInsert = $con->prepare($insertQuery);
+$stmtInsert->bind_param("siii", $_SESSION['email'], $quizid, $score, $totalQuestions);
+$stmtInsert->execute();
 ?>
 
 <!DOCTYPE html>
