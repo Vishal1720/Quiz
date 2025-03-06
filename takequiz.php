@@ -1,9 +1,24 @@
-
 <?php
 include "dbconnect.php";
 
 if ($_SESSION['status'] == "loggedout" || $_SESSION['status'] == "" || empty($_SESSION['status'])) {
     header("Location: login.php");
+    exit();
+}
+
+// Initialize timer if not set
+if (!isset($_SESSION['quiz_start_time'])) {
+    $_SESSION['quiz_start_time'] = time();
+}
+
+// Set quiz duration (30 minutes = 1800 seconds)
+$quizDuration = 1800;
+$timeRemaining = $quizDuration - (time() - $_SESSION['quiz_start_time']);
+
+if ($timeRemaining <= 0) {
+    // Time's up - redirect to results
+    unset($_SESSION['quiz_start_time']);
+    header("Location: results.php");
     exit();
 }
 
@@ -136,14 +151,31 @@ while ($row = $result->fetch_assoc()) {
             background: rgba(74, 144, 226, 0.3);
             border: 1px solid #4a90e2;
         }
+
+        /* Add timer styles */
+        .timer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            color: white;
+            font-size: 1.2rem;
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+        }
     </style>
 </head>
 <body>
+    <div class="timer" id="timer">Time remaining: --:--</div>
     <nav>
         <a href="./index.php">Home</a>
-        <a href="./quizmanip.php">Edit</a>
-        <a href="./createquiz.php">Create</a>
-        <a href="./quizform.php">Insert</a>
+        <?php if(isAdmin()): ?>
+            <a href="./quizmanip.php">Edit</a>
+            <a href="./createquiz.php">Create</a>
+            <a href="./quizform.php">Insert</a>
+        <?php endif; ?>
         <a style="width:100px" href="./logout.php">Logout</a>
         <div class="animation start-home"></div>
     </nav>
@@ -188,5 +220,30 @@ while ($row = $result->fetch_assoc()) {
             <button type="submit" class="submit-btn">Submit Quiz</button>
         </form>
     </div>
+
+    <script>
+        // Timer implementation
+        let timeLeft = <?php echo $timeRemaining; ?>;
+        
+        function updateTimer() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timer').innerHTML = `Time remaining: ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+            
+            if (timeLeft <= 0) {
+                document.getElementById('quizForm').submit();
+            } else {
+                timeLeft--;
+                setTimeout(updateTimer, 1000);
+            }
+        }
+
+        updateTimer();
+
+        // Prevent form resubmission on page refresh
+        if (window.history.replaceState) {
+            window.history.replaceState(null, null, window.location.href);
+        }
+    </script>
 </body>
 </html>
