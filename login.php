@@ -1,40 +1,50 @@
 <?php
 require "dbconnect.php";
 
-if(isset($_POST['email']) && isset($_POST['password'])) 
+// Enable error reporting for debugging
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+if(isset($_POST['login_type']) && isset($_POST['username']) && isset($_POST['password'])) 
 {
-$email=$_POST['email'];
-$pwd=$_POST['password'];
-$query="Select email, role from users where email='$email' and password='$pwd' ";
-$result=$con->query($query);
-if($result->num_rows>0)
-{
-    $row = $result->fetch_assoc();
-    $_SESSION['status']="loggedin";
-    $_SESSION['email']=$email;
-    $_SESSION['role']=$row['role'];
-    if($row['role'] == 'admin') {
-        header("Location: admin/dashboard.php");
+    if($_POST['login_type'] === 'admin') {
+        // Admin login
+        if($_POST['username'] === 'admin' && $_POST['password'] === 'admin123') {
+            $_SESSION['status'] = "admin";
+            $_SESSION['username'] = 'admin';
+            header("Location: index.php");
+            exit();
+        } else {
+            $error = "Invalid admin credentials";
+        }
     } else {
-        header("Location: takequiz.php");
+        // Regular user login
+        $email = $_POST['username'];
+        $pwd = $_POST['password'];
+        
+        // First get the hashed password for this email
+        $query = "SELECT email, password FROM users WHERE email = ?";
+        $stmt = $con->prepare($query);
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        if($result->num_rows > 0) {
+            $user = $result->fetch_assoc();
+            // Verify the password
+            if(password_verify($pwd, $user['password'])) {
+                $_SESSION['status'] = "loggedin";
+                $_SESSION['email'] = $email;
+                header("Location: index.php");
+                exit();
+            } else {
+                $error = "Incorrect password";
+            }
+        } else {
+            $error = "Email is not registered";
+            $_SESSION['status'] = 'loggedout';
+        }
     }
-    exit();
-}
-else
-{
-    $res2=$con->query("Select email from `users` where  `email`='$email'");
-    $_SESSION['status']='loggedout';
-if($res2->num_rows>=1)
-{
-    echo "<script>
-   alert('password is not correct')</script>";
-}
-else
-{
-    echo "<script>alert(' $email is not registered');</script>";}
-}
-
-
 }
 ?>
 <!DOCTYPE html>
@@ -107,6 +117,16 @@ else
             margin-bottom: 1.5rem;
             font-size: 0.9rem;
         }
+
+        .error-message {
+            background: rgba(255, 87, 87, 0.1);
+            border: 1px solid rgba(255, 87, 87, 0.3);
+            color: #ff5757;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -121,9 +141,13 @@ else
         <div class="login-section">
             <h2 class="section-title">User Login</h2>
             <p class="login-description">Access your account to take quizzes and track your progress</p>
+            <?php if(isset($error) && $_POST['login_type'] === 'user'): ?>
+                <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
+            <?php endif; ?>
             <form action="./login.php" method="post">
+                <input type="hidden" name="login_type" value="user">
                 <label for="user-email">Email</label>
-                <input type="email" name="email" maxlength="222" id="user-email" placeholder="Enter your email" required>
+                <input type="email" name="username" maxlength="222" id="user-email" placeholder="Enter your email" required>
                 <label for="user-password">Password</label>
                 <input type="password" name="password" maxlength="222" id="user-password" placeholder="Enter your password" required>
                 <button type="submit">Login as User</button>
@@ -134,9 +158,13 @@ else
         <div class="login-section admin-section">
             <h2 class="section-title">Admin Login</h2>
             <p class="login-description">Access the admin dashboard to manage quizzes and users</p>
+            <?php if(isset($error) && $_POST['login_type'] === 'admin'): ?>
+                <div class="error-message"><?php echo htmlspecialchars($error); ?></div>
+            <?php endif; ?>
             <form action="./login.php" method="post">
-                <label for="admin-email">Email</label>
-                <input type="email" name="email" maxlength="222" id="admin-email" placeholder="Enter admin email" required>
+                <input type="hidden" name="login_type" value="admin">
+                <label for="admin-username">Username</label>
+                <input type="text" name="username" maxlength="222" id="admin-username" placeholder="Enter admin username" required>
                 <label for="admin-password">Password</label>
                 <input type="password" name="password" maxlength="222" id="admin-password" placeholder="Enter admin password" required>
                 <button type="submit">Login as Admin</button>

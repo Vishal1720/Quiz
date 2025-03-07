@@ -1,304 +1,412 @@
 <?php
- include "dbconnect.php" ;
- 
-if($_SESSION['status']=="loggedout" || $_SESSION['status']=="" || empty($_SESSION['status'])) 
-{
+include "dbconnect.php";
+
+if($_SESSION['status'] !== "admin") {
     header("Location: login.php");
     exit();
 }
+
+$success = $error = '';
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (!empty($_POST['quizid']) && !empty($_POST['qid']) && 
-    !empty($_POST['question']) && !empty($_POST['option1']) && 
-    !empty($_POST['option2']) && !empty($_POST['option3']) && !empty($_POST['option4']))
-  {  $quizid = $_POST['quizid'];
-        $id=$_POST['qid'];//this is question id
-        $question = $_POST['question'];
-        $option1 = $_POST['option1'];
-        $option2 = $_POST['option2'];
-        $option3 = $_POST['option3'];
-        $option4 = $_POST['option4'];
+        !empty($_POST['question']) && !empty($_POST['option1']) && 
+        !empty($_POST['option2']) && !empty($_POST['option3']) && 
+        !empty($_POST['option4']) && !empty($_POST['answer']))
+    {  
+        $quizid = mysqli_real_escape_string($con, $_POST['quizid']);
+        $id = mysqli_real_escape_string($con, $_POST['qid']);
+        $question = mysqli_real_escape_string($con, $_POST['question']);
+        $option1 = mysqli_real_escape_string($con, $_POST['option1']);
+        $option2 = mysqli_real_escape_string($con, $_POST['option2']);
+        $option3 = mysqli_real_escape_string($con, $_POST['option3']);
+        $option4 = mysqli_real_escape_string($con, $_POST['option4']);
+        $answer = mysqli_real_escape_string($con, $_POST['answer']);
 
-    if (isset($_POST['update'])) {  
-        
-
-        // Check if quizid is valid
-        if (!empty($quizid)) {
-            $query = "UPDATE quizes SET 
-                        question='$question', 
-                        option1='$option1', 
-                        option2='$option2', 
-                        option3='$option3', 
-                        option4='$option4' 
-                      WHERE quizid='$quizid' and id='$id'";
-
-            if ($con->query($query)) {
-                echo "<script>alert('Question Updated Successfully');</script>";
+        if (isset($_POST['update'])) {
+            $stmt = $con->prepare("UPDATE quizes SET question=?, option1=?, option2=?, option3=?, option4=?, answer=? WHERE quizid=? AND id=?");
+            $stmt->bind_param("ssssssss", $question, $option1, $option2, $option3, $option4, $answer, $quizid, $id);
+            
+            if ($stmt->execute()) {
+                $success = "Question Updated Successfully";
             } else {
-                echo "<script>alert('Error updating question: " . $con->error . "');</script>";
+                $error = "Error updating question: " . $con->error;
             }
-        } else {
-            echo "<script>alert('Invalid question ID');</script>";
         }
-    }
 
-    if (isset($_POST['delete'])) {  // When "Delete" is clicked
-        if (isset($quizid)) {
-            $deleteQuery = "DELETE FROM quizes WHERE quizid='$quizid' and id='$id'";
-            if ($con->query($deleteQuery)) {
-                echo "<script>alert('Question Deleted Successfully');</script>";
+        if (isset($_POST['delete'])) {
+            $stmt = $con->prepare("DELETE FROM quizes WHERE quizid=? AND id=?");
+            $stmt->bind_param("ss", $quizid, $id);
+            
+            if ($stmt->execute()) {
+                $success = "Question Deleted Successfully";
             } else {
-                echo "<script>alert('Error deleting question: " . $con->error . "');</script>";
+                $error = "Error deleting question: " . $con->error;
             }
-        } else {
-            echo "<script>alert('Invalid question ID');</script>";
         }
+    } else {
+        $error = "Please fill in all fields including the correct answer";
     }
 }
-}
-$current_page = 'edit'; // Set this variable according to the current page
-// Add class="active" to the corresponding navigation link
+
+// Get quizzes
+$query = "SELECT quizid, quizname, category FROM quizdetails ORDER BY quizname ASC";
+$quizzes = $con->query($query);
 ?>
 <!DOCTYPE html>
 <html lang='en'>
 <head>
     <meta charset='UTF-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    <title>Quiz</title>
+    <title>Edit Quiz - Admin Dashboard</title>
     <link rel="shortcut icon" href="quiz.png" type="image/x-icon">
     <link rel='stylesheet' href='nav.css'>
-    <link rel='stylesheet' href='form.css'>
     <style>
-        select{
-            width: 100%;
-            padding: 5px;
-            margin-bottom: 5px;
-            font-size: 15px;
-            text-align: center;
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #357abd;
+            --success-color: #2ecc71;
+            --error-color: #e74c3c;
+            --background-dark: #1a1a2e;
         }
-        nav{
-              width:43%;
-              height:50px;
-              
-         }
-         nav a{
-            text-align: center;
-         }
-         a:nth-child(1) {
-	width: 110px;
-}
-a:nth-child(2) {
-	width: 130px;
-    
-}
-a:nth-child(3) {
-	width: 100px;
-}
-nav .home,a:nth-child(1):hover~.animation {
-	width: 110px;
-	left: 0;
-	background-color: #1abc9c;
-}
-nav .edit,a:nth-child(2):hover~.animation {
-	width: 140px;
-	left: 110px;
-	background-color:rgb(26, 61, 188);
-}
-nav .create,a:nth-child(3):hover~.animation {
-	width: 110px;
-	left:250px;
-	background-color:rgb(42, 148, 177);
-}
-nav .update,a:nth-child(4):hover~.animation {
-	width: 120px;
-	left:370px;
-	background-color:rgb(70, 83, 196);
-}
-nav .logout,a:nth-child(5):hover~.animation {
-	width: 150px;
-	left:490px;
-	background-color:rgb(185, 91, 51);
-}
+
         .edit-container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 2rem auto;
-            padding: 0 1rem;
-            width: fit-content;
+            padding: 0 1.5rem;
         }
 
-        .questions-container {
-            display: grid;
-            gap: 1.5rem;
-            width: fit-content;
-        }
-
-        .question-card {
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
-            padding: 1.5rem;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: transform 0.3s ease;
-            margin-bottom: 20px;
-            width: fit-content;
-            min-width: 600px;
-        }
-        .question-card:hover {
-            transform: translateY(-5px);
-        }
-        .question-form {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-        .form-group {
+        .page-title {
+            font-size: 2.5rem;
+            text-align: center;
             margin-bottom: 1rem;
-            width: 100%;
+            background: linear-gradient(135deg, #fff, var(--primary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
         }
-        .question-input {
+
+        .page-subtitle {
+            color: #a0a0a0;
+            text-align: center;
+            margin-bottom: 2.5rem;
+            font-size: 1.1rem;
+        }
+
+        .message {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .success {
+            background: rgba(46, 204, 113, 0.1);
+            border: 1px solid rgba(46, 204, 113, 0.3);
+            color: var(--success-color);
+        }
+
+        .error {
+            background: rgba(231, 76, 60, 0.1);
+            border: 1px solid rgba(231, 76, 60, 0.3);
+            color: var(--error-color);
+        }
+
+        .select-quiz {
+            margin-bottom: 2rem;
+            background: rgba(74, 144, 226, 0.05);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(74, 144, 226, 0.2);
+        }
+
+        .select-quiz label {
+            display: block;
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+            color: var(--primary-color);
+        }
+
+        .select-quiz select {
             width: 100%;
-            padding: 12px;
+            padding: 1rem;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 8px;
             color: #fff;
-            font-size: 1.1em;
-            margin-bottom: 15px;
+            font-size: 1rem;
+            cursor: pointer;
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1em;
+            padding-right: 2.5rem;
         }
-        .options-grid {
+
+        .select-quiz select option {
+            background: #1a1a2e;
+            color: #fff;
+            padding: 1rem;
+        }
+
+        .questions-container {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-bottom: 15px;
+            gap: 2rem;
         }
-        .option-input {
+
+        .question-card {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            animation: slideUp 0.5s ease;
+        }
+
+        .question-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.8rem;
+            color: #fff;
+            font-size: 1.1rem;
+        }
+
+        .form-control {
             width: 100%;
-            padding: 10px;
+            padding: 1rem;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 6px;
+            border-radius: 8px;
             color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
         }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+            outline: none;
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .answer-section {
+            background: rgba(46, 204, 113, 0.05);
+            border: 1px solid rgba(46, 204, 113, 0.2);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+
+        .answer-section label {
+            color: var(--success-color);
+        }
+
         .action-buttons {
             display: flex;
-            gap: 10px;
+            gap: 1rem;
             justify-content: flex-end;
+            margin-top: 1.5rem;
         }
-        .action-btn {
-            padding: 10px 20px;
+
+        .btn {
+            padding: 0.8rem 1.5rem;
             border: none;
-            border-radius: 6px;
-            color: #fff;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            background: #4CAF50;
+            text-transform: uppercase;
         }
-        .action-btn.delete {
-            background: #f44336;
+
+        .btn-update {
+            background: var(--primary-color);
+            color: white;
         }
-        .action-btn:hover {
-            opacity: 0.9;
+
+        .btn-delete {
+            background: var(--error-color);
+            color: white;
+        }
+
+        .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
+
+        .no-questions {
+            text-align: center;
+            padding: 3rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            color: #a0a0a0;
+            font-size: 1.2rem;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
         @media (max-width: 768px) {
-            .question-form {
+            .edit-container {
+                padding: 0 1rem;
+            }
+
+            .options-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
             }
         }
     </style>
 </head>
 <body>
-<nav>
-    <a href="./index.php">Home</a>
-    <a href="./quizmanip.php" class="active">Edit</a>
-    <a href="./createquiz.php">Create</a>
-    <a href="./quizform.php">Insert</a>
-    <a style="width:100px" href="./logout.php">Logout</a>
-    <div class="animation <?php echo $current_page; ?>"></div>
-</nav>
+    <nav>
+        <a href='./index.php'>Home</a>
+        <a href='./quizmanip.php' class="active">Edit</a>
+        <a href='./createquiz.php'>Create</a>
+        <a href='./quizform.php'>Insert</a>
+        <a href='./logout.php'>Logout</a>
+        <div class='animation'></div>
+    </nav>
 
-<div class="edit-container">
-    <h1 class="page-title">Edit Quiz</h1>
-    <?php 
-    $query="select * from quizdetails where email='{$_SESSION['email']}'";
+    <div class="edit-container">
+        <h1 class="page-title">Edit Quiz Questions</h1>
+        <p class="page-subtitle">Select a quiz and modify its questions</p>
 
-    $res=$con->query($query);
-    
-    if($res->num_rows==0)
-    {
-    echo "<script>alert('First create a quiz')</script>";
-    header("Location: createquiz.php");
-    exit();
-    }
-    else{
-        
-    }?>
-    <form method="POST" action="quizmanip.php" class="quiz-selector">
-        <select name="quizid" required>
-    <?php
-    foreach($res as $row)
-    {
-        echo "<option value='".$row['quizid']."'>".$row['quizname']."</option>";
-    }?>
-    </select>
-    <input type="submit" value="Refresh" name="refresh" class="action-btn update-btn">
-    </form>
-    <?php 
-    if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['refresh'])) 
-    {
-        $quizid=$_POST['quizid'];
-        $query="select * from quizes where quizid='$quizid'";
-        $res2=$con->query($query);
-        if($res2->num_rows==0)
-        {
-            echo "<script>alert('No questions found')</script>";
-        }
-        else{
-            echo '<div class="questions-container">';
-            while($res3=$res2->fetch_assoc())
-            {?>
-            <div class="question-card">
-                <form method='POST' action='quizmanip.php' class='question-form'>
-                    <input type="text" name="question" class="question-input" value="<?= $res3['question'] ?>" placeholder="Question">
-                    
-                    <div class="options-grid">
-                        <input type="text" onkeyup="changenow(<?=$res3['ID']?>,0,4)" class="option-input <?=$res3['ID']?>" required name="option1" value="<?=$res3['option1']?>" placeholder="Option 1">
-                        <input type="text" onkeyup="changenow(<?=$res3['ID']?>,1,5)" class="option-input <?=$res3['ID']?>" required name="option2" value="<?=$res3['option2']?>" placeholder="Option 2">
-                        <input type="text" onkeyup="changenow(<?=$res3['ID']?>,2,6)" class="option-input <?=$res3['ID']?>" required name="option3" value="<?=$res3['option3']?>" placeholder="Option 3">
-                        <input type="text" onkeyup="changenow(<?=$res3['ID']?>,3,7)" class="option-input <?=$res3['ID']?>" required name="option4" value="<?=$res3['option4']?>" placeholder="Option 4">
-                    </div>
-                    
-                    <select class="option-input">
-                        <option value="1" class="<?=$res3['ID']?>" <?php if($res3['answer']==$res3['option1']) echo "selected";?>><?=$res3['option1']?></option>
-                        <option value="2" class="<?=$res3['ID']?>" <?php if($res3['answer']==$res3['option2']) echo "selected";?>><?=$res3['option2']?></option>
-                        <option value="3" class="<?=$res3['ID']?>" <?php if($res3['answer']==$res3['option3']) echo "selected";?>><?=$res3['option3']?></option>
-                        <option value="4" class="<?=$res3['ID']?>" <?php if($res3['answer']==$res3['option4']) echo "selected";?>><?=$res3['option4']?></option>
-                    </select>
-                    
-                    <input type="hidden" required name="quizid" value="<?=$res3['quizid']?>"> 
-                    <input type="hidden" required name="qid" value="<?=$res3['ID']?>"> 
-                    
-                    <div class="action-buttons">
-                        <input type="submit" value="Update" name="update" class="action-btn">
-                        <input type='submit' value='Delete' name='delete' class="action-btn delete">
-                    </div>
-                </form>
-            </div>
-            <?php
+        <?php if($success): ?>
+            <div class="message success"><?php echo htmlspecialchars($success); ?></div>
+        <?php endif; ?>
+
+        <?php if($error): ?>
+            <div class="message error"><?php echo htmlspecialchars($error); ?></div>
+        <?php endif; ?>
+
+        <div class="select-quiz">
+            <label for="quiz-select">Select Quiz to Edit</label>
+            <select id="quiz-select" class="form-control" onchange="loadQuestions(this.value)">
+                <option value="">Choose a quiz...</option>
+                <?php while($quiz = $quizzes->fetch_assoc()): ?>
+                    <option value="<?php echo htmlspecialchars($quiz['quizid']); ?>">
+                        <?php echo htmlspecialchars($quiz['quizname'] . ' (' . $quiz['category'] . ')'); ?>
+                    </option>
+                <?php endwhile; ?>
+            </select>
+        </div>
+
+        <div id="questions-container" class="questions-container">
+            <!-- Questions will be loaded here -->
+        </div>
+    </div>
+
+    <script>
+        function loadQuestions(quizId) {
+            if (!quizId) {
+                document.getElementById('questions-container').innerHTML = '';
+                return;
             }
-            echo '</div>';
-        }
-    }
-    ?>
-</div>
-<script>
-function changenow(classname,num1,num2)
-{
-    var x=document.getElementsByClassName(classname);
-    x[num2].textContent=x[num1].value;
-    console.log("in");
-}
+            
+            fetch(`get_questions.php?quizid=${quizId}`)
+                .then(response => response.json())
+                .then(questions => {
+                    const container = document.getElementById('questions-container');
+                    
+                    if (questions.length === 0) {
+                        container.innerHTML = '<div class="no-questions">No questions found for this quiz. Add some questions first!</div>';
+                        return;
+                    }
+                    
+                    container.innerHTML = questions.map((q, index) => `
+                        <div class="question-card">
+                            <form method="POST" class="question-form">
+                                <input type="hidden" name="quizid" value="${quizId}">
+                                <input type="hidden" name="qid" value="${q.id}">
+                                
+                                <div class="form-group">
+                                    <label for="question-${q.id}">Question ${index + 1}</label>
+                                    <textarea name="question" id="question-${q.id}" class="form-control" required>${q.question}</textarea>
+                                </div>
+                                
+                                <div class="options-grid">
+                                    <div class="form-group">
+                                        <label for="option1-${q.id}">Option 1</label>
+                                        <input type="text" name="option1" id="option1-${q.id}" class="form-control" value="${q.option1}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="option2-${q.id}">Option 2</label>
+                                        <input type="text" name="option2" id="option2-${q.id}" class="form-control" value="${q.option2}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="option3-${q.id}">Option 3</label>
+                                        <input type="text" name="option3" id="option3-${q.id}" class="form-control" value="${q.option3}" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="option4-${q.id}">Option 4</label>
+                                        <input type="text" name="option4" id="option4-${q.id}" class="form-control" value="${q.option4}" required>
+                                    </div>
+                                </div>
 
-</script>
+                                <div class="answer-section">
+                                    <label for="answer-${q.id}">Correct Answer</label>
+                                    <select name="answer" id="answer-${q.id}" class="form-control" required>
+                                        <option value="${q.option1}" ${q.answer === q.option1 ? 'selected' : ''}>Option 1</option>
+                                        <option value="${q.option2}" ${q.answer === q.option2 ? 'selected' : ''}>Option 2</option>
+                                        <option value="${q.option3}" ${q.answer === q.option3 ? 'selected' : ''}>Option 3</option>
+                                        <option value="${q.option4}" ${q.answer === q.option4 ? 'selected' : ''}>Option 4</option>
+                                    </select>
+                                </div>
+
+                                <div class="action-buttons">
+                                    <button type="submit" name="update" class="btn btn-update">Update Question</button>
+                                    <button type="submit" name="delete" class="btn btn-delete" onclick="return confirm('Are you sure you want to delete this question?')">Delete Question</button>
+                                </div>
+                            </form>
+                        </div>
+                    `).join('');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('questions-container').innerHTML = `
+                        <div class="message error">
+                            Error loading questions. Please try again.
+                        </div>
+                    `;
+                });
+        }
+
+        // Add smooth scrolling to form after submission
+        if(window.location.href.includes('quizmanip.php')) {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
 </body>
 </html>
