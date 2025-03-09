@@ -9,11 +9,23 @@ if($_SESSION['status'] !== "admin") {
 $success = $error = '';
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (!empty($_POST['quizid']) && !empty($_POST['qid']) && 
+    if (isset($_POST['delete']) && !empty($_POST['quizid']) && !empty($_POST['qid'])) {
+        $quizid = mysqli_real_escape_string($con, $_POST['quizid']);
+        $id = mysqli_real_escape_string($con, $_POST['qid']);
+        
+        $stmt = $con->prepare("DELETE FROM quizes WHERE quizid=? AND id=?");
+        $stmt->bind_param("ss", $quizid, $id);
+        
+        if ($stmt->execute()) {
+            $success = "Question Deleted Successfully";
+        } else {
+            $error = "Error deleting question: " . $con->error;
+        }
+    } elseif (!empty($_POST['quizid']) && !empty($_POST['qid']) && 
         !empty($_POST['question']) && !empty($_POST['option1']) && 
         !empty($_POST['option2']) && !empty($_POST['option3']) && 
         !empty($_POST['option4']) && !empty($_POST['answer']))
-    {  
+    {
         $quizid = mysqli_real_escape_string($con, $_POST['quizid']);
         $id = mysqli_real_escape_string($con, $_POST['qid']);
         $question = mysqli_real_escape_string($con, $_POST['question']);
