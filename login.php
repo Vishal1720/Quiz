@@ -47,94 +47,148 @@ if(isset($_POST['login_type']) && isset($_POST['username']) && isset($_POST['pas
     }
 }
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz - Login</title>
-    <link rel="shortcut icon" href="quiz.png" type="image/x-icon">
-    <link rel="stylesheet" href="form.css">
-    <link rel="stylesheet" href="nav.css">
+<?php include "components/header.php"; ?>
     <style>
-        nav {
-            width: 250px;
-            height: 50px;
-            line-height: 20px;
-        }
-
         .auth-container {
             width: 100%;
-            max-width: 800px;
+            max-width: 1000px;
             margin: 2rem auto;
             display: flex;
             justify-content: space-between;
-            gap: 2rem;
+            gap: 3rem;
             animation: fadeIn 0.5s ease;
+            padding: 0 1rem;
         }
 
         .login-section {
             flex: 1;
-            background: rgba(255, 255, 255, 0.08);
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background: var(--quiz-card-bg);
+            padding: 2.5rem;
+            border-radius: 15px;
+            border: 1px solid var(--quiz-card-border);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(236, 72, 153, 0.1) 0%, transparent 50%);
+            z-index: 0;
+        }
+
+        .login-section > * {
+            position: relative;
+            z-index: 1;
         }
 
         .section-title {
-            color: #fff;
+            font-size: 2rem;
+            margin-bottom: 1rem;
             text-align: center;
-            font-size: 1.5rem;
-            margin-bottom: 1.5rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #fff, var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
         }
 
         .admin-section {
-            border-left: 2px solid rgba(255, 255, 255, 0.1);
-        }
-
-        body {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            border-left: 2px solid var(--quiz-card-border);
         }
 
         form {
             background: transparent;
-            margin-top: 1rem;
+            margin-top: 1.5rem;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--quiz-card-border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        }
+
+        button {
+            width: 100%;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
         }
 
         .login-description {
-            color: #a0a0a0;
+            color: var(--text-muted);
             text-align: center;
-            margin-bottom: 1.5rem;
-            font-size: 0.9rem;
+            margin-bottom: 2rem;
+            font-size: 1rem;
+            line-height: 1.6;
         }
 
         .error-message {
-            background: rgba(255, 87, 87, 0.1);
-            border: 1px solid rgba(255, 87, 87, 0.3);
-            color: #ff5757;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 15px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
             text-align: center;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 768px) {
+            .auth-container {
+                flex-direction: column;
+                gap: 2rem;
+            }
+
+            .admin-section {
+                border-left: none;
+                border-top: 2px solid var(--quiz-card-border);
+                padding-top: 2rem;
+            }
         }
     </style>
 </head>
 <body>
-    <nav class="two-items">
-        <a href="./login.php" class="active">Login</a>
-        <a href="./register.php">Register</a>
-        <div class="animation login"></div>
-    </nav>
+
 
     <div class="auth-container">
         <!-- User Login Section -->
@@ -146,10 +200,14 @@ if(isset($_POST['login_type']) && isset($_POST['username']) && isset($_POST['pas
             <?php endif; ?>
             <form action="./login.php" method="post">
                 <input type="hidden" name="login_type" value="user">
-                <label for="user-email">Email</label>
-                <input type="email" name="username" maxlength="222" id="user-email" placeholder="Enter your email" required>
-                <label for="user-password">Password</label>
-                <input type="password" name="password" maxlength="222" id="user-password" placeholder="Enter your password" required>
+                <div class="form-group">
+                    <label for="user-email">Email</label>
+                    <input type="email" name="username" maxlength="222" id="user-email" placeholder="Enter your email" required>
+                </div>
+                <div class="form-group">
+                    <label for="user-password">Password</label>
+                    <input type="password" name="password" maxlength="222" id="user-password" placeholder="Enter your password" required>
+                </div>
                 <button type="submit">Login as User</button>
             </form>
         </div>
@@ -163,13 +221,16 @@ if(isset($_POST['login_type']) && isset($_POST['username']) && isset($_POST['pas
             <?php endif; ?>
             <form action="./login.php" method="post">
                 <input type="hidden" name="login_type" value="admin">
-                <label for="admin-username">Username</label>
-                <input type="text" name="username" maxlength="222" id="admin-username" placeholder="Enter admin username" required>
-                <label for="admin-password">Password</label>
-                <input type="password" name="password" maxlength="222" id="admin-password" placeholder="Enter admin password" required>
+                <div class="form-group">
+                    <label for="admin-username">Username</label>
+                    <input type="text" name="username" maxlength="222" id="admin-username" placeholder="Enter admin username" required>
+                </div>
+                <div class="form-group">
+                    <label for="admin-password">Password</label>
+                    <input type="password" name="password" maxlength="222" id="admin-password" placeholder="Enter admin password" required>
+                </div>
                 <button type="submit">Login as Admin</button>
             </form>
         </div>
     </div>
-</body>
-</html>
+<?php include "components/footer.php"; ?>

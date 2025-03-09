@@ -31,81 +31,156 @@ if(isset($_POST['email']) && isset($_POST['name']) && isset($_POST['contact']) &
     }
 }
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register - Quiz System</title>
-    <link rel="shortcut icon" href="quiz.png" type="image/x-icon">
-    <link rel="stylesheet" href="form.css">
-    <link rel="stylesheet" href="nav.css">
+<?php include "components/header.php"; ?>
     <style>
-        nav {
-            width: 20%;
-            height: 50px;
-            line-height: 20px;
-            min-width: 300px;
-        }
-        
-        nav a {
-            text-align: center;
-            width: 50% !important;
+        .register-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            animation: fadeIn 0.5s ease;
         }
 
-        .animation {
-            width: 50%;
+        .register-section {
+            background: var(--quiz-card-bg);
+            padding: 2.5rem;
+            border-radius: 15px;
+            border: 1px solid var(--quiz-card-border);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
         }
 
-        nav a:nth-child(1):hover ~ .animation {
-            width: 50%;
+        .register-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
             left: 0;
-            background-color: #1abc9c;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 100% 100%, rgba(236, 72, 153, 0.1) 0%, transparent 50%);
+            z-index: 0;
         }
 
-        nav .register, nav a:nth-child(2):hover ~ .animation {
-            width: 50%;
-            left: 50%;
-            background-color: rgb(26, 61, 188);
+        .register-section > * {
+            position: relative;
+            z-index: 1;
         }
 
-        .password-requirements {
-            font-size: 0.8em;
-            color: #666;
-            margin-top: 5px;
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            background: linear-gradient(135deg, #fff, var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        .section-description {
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 1rem;
+            line-height: 1.6;
         }
 
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 1.5rem;
         }
 
-        .error {
-            color: #ff4444;
-            font-size: 0.8em;
-            margin-top: 5px;
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--quiz-card-border);
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        }
+
+        .error, .password-match-error {
+            color: #ef4444;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
             display: none;
+            padding: 0.5rem;
+            border-radius: 4px;
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
         }
 
         input:invalid + .error {
             display: block;
+            animation: shake 0.5s;
         }
 
-        .password-match-error {
-            display: none;
-            color: #ff4444;
-            font-size: 0.8em;
-            margin-top: 5px;
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .password-requirements {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+        }
+
+        .password-requirements ul {
+            margin: 0.5rem 0 0 1.5rem;
+            padding: 0;
+        }
+
+        .password-requirements li {
+            margin-bottom: 0.25rem;
+        }
+
+        button {
+            width: 100%;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: 8px;
+            color: var(--text);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
         }
     </style>
 </head>
 <body>
-    <nav>
-        <a href="./login.php">Login</a>
-        <a href="./register.php">Register</a>
-        <div class="animation register"></div>
-    </nav>
-
-    <form action="./register.php" id="regform" method="post" style="margin-top: 50px;font-size:15px;">
+    <div class="register-container">
+        <div class="register-section">
+            <h2 class="section-title">Create Account</h2>
+            <p class="section-description">Join our quiz platform and start testing your knowledge</p>
+            <form action="./register.php" id="regform" method="post">
         <div class="form-group">
             <label for="email">Email</label>
             <input type="email" name="email" id="email" placeholder="Enter your email" required>
@@ -147,14 +222,17 @@ if(isset($_POST['email']) && isset($_POST['name']) && isset($_POST['contact']) &
             <div class="password-match-error">Passwords do not match</div>
         </div>
 
-        <input type="submit" class="button" value="Register">
-    </form>
+        <button type="submit">Create Account</button>
+            </form>
+        </div>
+    </div>
 
     <script>
         const form = document.getElementById("regform");
         const password = document.getElementById("password");
         const confirm = document.getElementById("conf");
         const matchError = document.querySelector(".password-match-error");
+        const inputs = form.querySelectorAll('input');
 
         function validatePasswords() {
             if (password.value !== confirm.value) {
@@ -166,6 +244,25 @@ if(isset($_POST['email']) && isset($_POST['name']) && isset($_POST['contact']) &
             }
         }
 
+        // Add validation feedback for all inputs
+        inputs.forEach(input => {
+            input.addEventListener('invalid', () => {
+                const error = input.nextElementSibling;
+                if (error && error.classList.contains('error')) {
+                    error.style.display = 'block';
+                }
+            });
+
+            input.addEventListener('input', () => {
+                const error = input.nextElementSibling;
+                if (error && error.classList.contains('error')) {
+                    if (input.validity.valid) {
+                        error.style.display = 'none';
+                    }
+                }
+            });
+        });
+
         password.addEventListener("input", validatePasswords);
         confirm.addEventListener("input", validatePasswords);
 
@@ -173,10 +270,21 @@ if(isset($_POST['email']) && isset($_POST['name']) && isset($_POST['contact']) &
             e.preventDefault();
             validatePasswords();
             
+            // Check form validity and show all errors
+            if (!form.checkValidity()) {
+                inputs.forEach(input => {
+                    if (!input.validity.valid) {
+                        const error = input.nextElementSibling;
+                        if (error && error.classList.contains('error')) {
+                            error.style.display = 'block';
+                        }
+                    }
+                });
+            }
+            
             if (form.checkValidity() && password.value === confirm.value) {
                 form.submit();
             }
         });
     </script>
-</body>
-</html>
+<?php include "components/footer.php"; ?>

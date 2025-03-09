@@ -88,15 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit();
 }
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Take Quiz</title>
-    <link rel="shortcut icon" href="quiz.png" type="image/x-icon">
-    <link rel="stylesheet" href="nav.css">
-    <link rel="stylesheet" href="css/responsive.css">
+<?php include 'components/header.php'; ?>
     <style>
         :root {
             --primary-color: #4a90e2;
@@ -202,26 +194,115 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             background: linear-gradient(135deg, #357abd, #4a90e2);
         }
 
-        .timer {
-            position: fixed;
-            top: var(--spacing-md);
-            right: var(--spacing-md);
-            background: rgba(52, 73, 94, 0.95);
-            padding: var(--spacing-md) var(--spacing-lg);
-            border-radius: 10px;
-            color: white;
-            font-size: clamp(1rem, 2.5vw, 1.2rem);
-            backdrop-filter: blur(10px);
-            z-index: 1000;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        .quiz-header {
+            margin-bottom: 2rem;
+            text-align: center;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 2rem;
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 16px;
             border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .quiz-header h1 {
+            font-size: 2rem;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0;
+        }
+
+        .quiz-header p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        .quiz-info {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-top: 1.5rem;
+            padding: 1rem 2rem;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            min-width: 280px;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .timer {
+            color: var(--text);
+            font-weight: 600;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .timer i {
+            color: var(--primary-color);
+        }
+
+        .timer.warning {
+            color: var(--error);
+            animation: pulse 2s infinite;
+            background: rgba(239, 68, 68, 0.1);
+            padding: 0.5rem 1rem;
+        }
+
+        .timer.warning i {
+            color: var(--error);
+            animation: spin 10s linear infinite;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.8; }
+            100% { opacity: 1; }
         }
 
         @media screen and (max-width: 768px) {
             .quiz-container {
                 width: 95%;
+                margin: 2rem auto;
                 padding: var(--spacing-md);
-                margin: var(--spacing-md) auto;
+            }
+
+            .quiz-header {
+                padding: 1rem;
+            }
+
+            .quiz-info {
+                padding: 0.5rem 1rem;
+                gap: 1rem;
+                flex-direction: column;
+            }
+
+            .timer {
+                font-size: 1rem;
+            }
+
+            .quiz-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .quiz-header p {
+                font-size: 1rem;
             }
 
             .question-card {
@@ -244,21 +325,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </style>
 </head>
 <body>
-    <div class="timer" id="timer">Time remaining: --:--</div>
-    
-    <nav>
-        <a href="index.php">Home</a>
-        <a href="quizmanip.php">Edit</a>
-        <a href="createquiz.php">Create</a>
-        <a href="quizform.php">Insert</a>
-        <a href="logout.php">Logout</a>
-        <div class="animation"></div>
-    </nav>
-
     <div class="quiz-container">
         <div class="quiz-header">
             <h1><?php echo htmlspecialchars($quizName); ?></h1>
             <p><?php echo htmlspecialchars($category); ?></p>
+            <div class="quiz-info">
+                <div class="timer" id="timer">
+                    <i class="fas fa-clock"></i>
+                    <span>Time remaining: --:--</span>
+                </div>
+            </div>
         </div>
 
         <form method="POST" id="quiz-form">
@@ -295,27 +371,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         const timerElement = document.getElementById('timer');
         const quizForm = document.getElementById('quiz-form');
         let timeRemaining = <?php echo $timeRemaining; ?>;
+        let timerInterval;
+
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+        }
 
         function updateTimer() {
-            const minutes = Math.floor(timeRemaining / 60);
-            const seconds = timeRemaining % 60;
-            
-            timerElement.textContent = `Time remaining: ${minutes}:${seconds.toString().padStart(2, '0')}`;
-            
-            if (timeRemaining <= 300) { // 5 minutes warning
-                timerElement.classList.add('warning');
-            }
-            
             if (timeRemaining <= 0) {
+                clearInterval(timerInterval);
+                timerElement.querySelector('span').textContent = 'Time is up!';
                 quizForm.submit();
                 return;
             }
+
+            timerElement.querySelector('span').textContent = `Time remaining: ${formatTime(timeRemaining)}`;
+            
+            // Add warning class at 5 minutes remaining
+            if (timeRemaining <= 300 && !timerElement.classList.contains('warning')) {
+                timerElement.classList.add('warning');
+                // Optional: Add sound effect or vibration here
+            }
+
+            // Make timer more prominent in last minute
+            if (timeRemaining <= 60) {
+                timerElement.style.transform = timeRemaining % 2 ? 'scale(1.05)' : 'scale(1)';
+            }
             
             timeRemaining--;
-            setTimeout(updateTimer, 1000);
         }
 
+        // Start timer immediately
         updateTimer();
+        // Update every second
+        timerInterval = setInterval(updateTimer, 1000);
 
         // Form submission handling
         quizForm.addEventListener('submit', function(e) {
@@ -324,6 +415,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 alert('Time is up! Your answers will be submitted automatically.');
                 window.location.href = 'results.php?quizid=<?php echo $quizid; ?>';
             }
+        });
+
+        // Cleanup interval on page unload
+        window.addEventListener('unload', function() {
+            clearInterval(timerInterval);
         });
     </script>
 </body>
