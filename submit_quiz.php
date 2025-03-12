@@ -144,9 +144,56 @@ $stmtInsert->execute();
             color: #dc3545;
         }
 
-        .answer-detail {
-            color: rgba(255, 255, 255, 0.8);
+        .answer-details {
+            margin: 1rem 0;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .user-answer, .correct-answer {
             margin: 0.5rem 0;
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .correct-text {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .incorrect-text {
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        .options-list {
+            margin-top: 1rem;
+        }
+
+        .option {
+            padding: 0.8rem 1rem;
+            margin: 0.5rem 0;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.9);
+            position: relative;
+        }
+
+        .option.correct-answer {
+            background: rgba(40, 167, 69, 0.2);
+            border: 1px solid rgba(40, 167, 69, 0.4);
+        }
+
+        .option.incorrect-answer {
+            background: rgba(220, 53, 69, 0.2);
+            border: 1px solid rgba(220, 53, 69, 0.4);
+        }
+
+        .answer-indicator {
+            float: right;
+            font-style: italic;
+            color: rgba(255, 255, 255, 0.7);
         }
 
         .back-btn {
@@ -199,21 +246,52 @@ $stmtInsert->execute();
                 <div class="question-card">
                     <p class="question-text"><?php echo htmlspecialchars($question['question']); ?></p>
                     <?php
-                    $isCorrect = isset($userAnswers[$id]) && $userAnswers[$id] === $question['answer'];
-                    $statusClass = $isCorrect ? 'correct' : 'incorrect';
-                    $statusText = $isCorrect ? 'Correct' : 'Incorrect';
+                    $selectedAnswer = isset($userAnswers[$id]) ? $userAnswers[$id] : 'Not answered';
+                    $isCorrect = $selectedAnswer === $question['answer'];
                     ?>
-                    <div class="answer-status <?php echo $statusClass; ?>">
-                        <?php echo $statusText; ?>
+                    <div class="answer-status <?php echo $isCorrect ? 'correct' : 'incorrect'; ?>">
+                        <?php echo $isCorrect ? 'Correct' : 'Incorrect'; ?>
                     </div>
-                    <p class="answer-detail">
-                        Your answer: <?php echo isset($userAnswers[$id]) ? htmlspecialchars($userAnswers[$id]) : 'Not answered'; ?>
-                    </p>
-                    <?php if (!$isCorrect): ?>
-                        <p class="answer-detail">
-                            Correct answer: <?php echo htmlspecialchars($question['answer']); ?>
+                    <div class="answer-details">
+                        <p class="user-answer">
+                            <strong>Your Answer:</strong> 
+                            <span class="<?php echo $isCorrect ? 'correct-text' : 'incorrect-text'; ?>">
+                                <?php echo htmlspecialchars($selectedAnswer); ?>
+                            </span>
                         </p>
-                    <?php endif; ?>
+                        <?php if (!$isCorrect): ?>
+                            <p class="correct-answer">
+                                <strong>Correct Answer:</strong> 
+                                <span class="correct-text"><?php echo htmlspecialchars($question['answer']); ?></span>
+                            </p>
+                        <?php endif; ?>
+                    </div>
+                    <div class="options-list">
+                        <?php
+                        $options = array(
+                            'option1' => $question['option1'],
+                            'option2' => $question['option2'],
+                            'option3' => $question['option3'],
+                            'option4' => $question['option4']
+                        );
+                        foreach ($options as $optionKey => $optionValue): 
+                            $optionClass = '';
+                            if ($optionValue === $question['answer']) {
+                                $optionClass = 'correct-answer';
+                            } elseif ($optionValue === $selectedAnswer && !$isCorrect) {
+                                $optionClass = 'incorrect-answer';
+                            }
+                        ?>
+                            <div class="option <?php echo $optionClass; ?>">
+                                <?php echo htmlspecialchars($optionValue); ?>
+                                <?php if ($optionValue === $question['answer']): ?>
+                                    <span class="answer-indicator">(Correct Answer)</span>
+                                <?php elseif ($optionValue === $selectedAnswer && !$isCorrect): ?>
+                                    <span class="answer-indicator">(Your Answer)</span>
+                                <?php endif; ?>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
             <?php endforeach; ?>
         </div>

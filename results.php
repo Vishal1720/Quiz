@@ -190,99 +190,150 @@ unset($_SESSION["quiz_start_time"]);
         }
 
         .answer-item {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            padding: var(--spacing-md);
-            margin-bottom: var(--spacing-md);
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: var(--spacing-lg);
+            margin-bottom: var(--spacing-lg);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+
+        .answer-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .question-text {
-            font-size: clamp(1rem, 2.5vw, 1.1rem);
+            font-size: 1.2rem;
             color: var(--text-light);
-            margin-bottom: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+            font-weight: 500;
+            line-height: 1.4;
+            padding-bottom: var(--spacing-md);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .answer-text {
-            font-size: clamp(0.9rem, 2vw, 1rem);
+        .answer-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-md);
+        }
+
+        .answer-label {
+            font-size: 0.9rem;
             color: var(--text-muted);
-            margin-bottom: var(--spacing-sm);
+            margin-bottom: 0.5rem;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .user-answer, .correct-answer {
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .user-answer {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .user-answer.correct {
+            background: rgba(46, 204, 113, 0.15);
+            border-color: rgba(46, 204, 113, 0.3);
+            color: var(--success-color);
+            box-shadow: 0 0 15px rgba(46, 204, 113, 0.1);
+        }
+
+        .user-answer.incorrect {
+            background: rgba(231, 76, 60, 0.15);
+            border-color: rgba(231, 76, 60, 0.3);
+            color: var(--danger-color);
+            box-shadow: 0 0 15px rgba(231, 76, 60, 0.1);
         }
 
         .correct-answer {
+            background: rgba(46, 204, 113, 0.15);
+            border: 1px solid rgba(46, 204, 113, 0.3);
             color: var(--success-color);
-        }
-
-        .wrong-answer {
-            color: var(--danger-color);
-        }
-
-        @media screen and (max-width: 768px) {
-            .results-container {
-                width: 95%;
-                margin: var(--spacing-md) auto;
-                padding: var(--spacing-md);
-            }
-
-            .score-section {
-                padding: var(--spacing-md);
-            }
-
-            .action-buttons {
-                flex-direction: column;
-            }
-
-            .action-btn {
-                width: 100%;
-            }
-
-            .answer-item {
-                padding: var(--spacing-sm);
-            }
-        }
-
-        @media screen and (max-width: 480px) {
-            .score-display {
-                font-size: 3rem;
-            }
-
-            .feedback-message {
-                font-size: 1rem;
-                padding: var(--spacing-sm);
-            }
+            box-shadow: 0 0 15px rgba(46, 204, 113, 0.1);
         }
     </style>
 </head>
 <body>
     <nav>
-        <a href="index.php">Home</a>
-        <a href="logout.php">Logout</a>
+        <a href="./index.php">Home</a>
+        <a style="width:100px" href="./logout.php">Logout</a>
         <div class="animation start-home"></div>
     </nav>
-
     <div class="results-container">
         <div class="score-section">
-            <div class="score-title">Quiz Results</div>
-            <div class="score-display">Score: <?php echo $score; ?>/<?php echo $totalQuestions; ?></div>
+            <h1 class="score-title">Quiz Results</h1>
+            <div class="score-display"><?php echo $score; ?>/<?php echo $totalQuestions; ?></div>
             <div class="score-percentage"><?php echo number_format($percentage, 1); ?>%</div>
-        </div>
-
-        <div class="feedback-section">
-            <div class="feedback-message <?php if ($percentage >= 80) echo 'excellent'; elseif ($percentage >= 60) echo 'good'; else echo 'needs-improvement'; ?>">
+            <div class="feedback-message <?php 
+                if ($percentage >= 80) echo 'excellent';
+                elseif ($percentage >= 60) echo 'good';
+                else echo 'needs-improvement';
+            ?>">
                 <?php
-                if ($percentage >= 80) {
-                    echo "Excellent! You scored " . number_format($percentage, 1) . "%.";
-                } elseif ($percentage >= 60) {
-                    echo "Good effort! You scored " . number_format($percentage, 1) . "%.";
-                } else {
-                    echo "Keep practicing! You scored " . number_format($percentage, 1) . "%.";
-                }
+                if ($percentage >= 80) echo "Excellent! You scored {$percentage}%.";
+                elseif ($percentage >= 60) echo "Good job! You scored {$percentage}%.";
+                else echo "Keep practicing! You scored {$percentage}%.";
                 ?>
             </div>
         </div>
 
+        <div class="feedback-section">
+            <div class="feedback-message <?php 
+                if ($percentage >= 80) echo 'excellent';
+                elseif ($percentage >= 60) echo 'good';
+                else echo 'needs-improvement';
+            ?>">
+                <?php
+                if ($percentage >= 80) echo "Excellent! You scored {$percentage}%.";
+                elseif ($percentage >= 60) echo "Good job! You scored {$percentage}%.";
+                else echo "Keep practicing! You scored {$percentage}%.";
+                ?>
+            </div>
+        </div>
+
+        <div class="answers-section">
+            <h2 style="color: var(--text-light); margin-bottom: var(--spacing-md);">Review Your Answers</h2>
+            <?php foreach ($questions as $index => $question): ?>
+                <div class="answer-item">
+                    <div class="question-text"><?php echo ($index + 1) . ". " . htmlspecialchars($question["question"]); ?></div>
+                    <div class="answer-details">
+                        <div class="answer-card">
+                            <span class="answer-label">Your Answer:</span>
+                            <div class="user-answer <?php echo (isset($userAnswers[$question["ID"]]) && $userAnswers[$question["ID"]] === $question["answer"]) ? 'correct' : 'incorrect'; ?>">
+                                <?php echo isset($userAnswers[$question["ID"]]) ? htmlspecialchars($userAnswers[$question["ID"]]) : 'Not answered'; ?>
+                            </div>
+                        </div>
+                        <div class="answer-card">
+                            <span class="answer-label">Correct Answer:</span>
+                            <div class="correct-answer">
+                                <?php echo htmlspecialchars($question["answer"]); ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+
         <div class="action-buttons">
             <a href="index.php" class="action-btn primary-btn">Back to Home</a>
+            <a href="takequiz.php?quizid=<?php echo $quizid; ?>" class="action-btn secondary-btn">Try Again</a>
         </div>
     </div>
 </body>

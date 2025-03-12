@@ -90,6 +90,53 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 <?php include 'components/header.php'; ?>
     <style>
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4rem;
+            background: rgba(15, 23, 42, 0.98);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        nav a {
+            height: calc(4rem - 1rem);
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            position: relative;
+            text-decoration: none;
+            text-transform: uppercase;
+            text-align: center;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 0 1.5rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            border-radius: 8px;
+            margin: 0.5rem 0;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        nav a:hover {
+            color: var(--text-light);
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        nav a:last-child {
+            margin-left: auto;
+        }
+
         :root {
             --primary-color: #4a90e2;
             --secondary-color: #357abd;
@@ -325,6 +372,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </style>
 </head>
 <body>
+    <nav>
+        <a href="./index.php">Home</a>
+        <a style="width:100px" href="./logout.php">Logout</a>
+        <div class="animation start-home"></div>
+    </nav>
     <div class="quiz-container">
         <div class="quiz-header">
             <h1><?php echo htmlspecialchars($quizName); ?></h1>
