@@ -294,20 +294,6 @@ unset($_SESSION["quiz_start_time"]);
             </div>
         </div>
 
-        <div class="feedback-section">
-            <div class="feedback-message <?php 
-                if ($percentage >= 80) echo 'excellent';
-                elseif ($percentage >= 60) echo 'good';
-                else echo 'needs-improvement';
-            ?>">
-                <?php
-                if ($percentage >= 80) echo "Excellent! You scored {$percentage}%.";
-                elseif ($percentage >= 60) echo "Good job! You scored {$percentage}%.";
-                else echo "Keep practicing! You scored {$percentage}%.";
-                ?>
-            </div>
-        </div>
-
         <div class="answers-section">
             <h2 style="color: var(--text-light); margin-bottom: var(--spacing-md);">Review Your Answers</h2>
             <?php foreach ($questions as $index => $question): ?>
