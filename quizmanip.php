@@ -390,10 +390,10 @@ $quizzes = $con->query($query);
                                 <div class="answer-section">
                                     <label for="answer-${q.id}">Correct Answer</label>
                                     <select name="answer" id="answer-${q.id}" class="form-control" required>
-                                        <option value="${q.option1}" ${q.answer === q.option1 ? 'selected' : ''}>Option 1</option>
-                                        <option value="${q.option2}" ${q.answer === q.option2 ? 'selected' : ''}>Option 2</option>
-                                        <option value="${q.option3}" ${q.answer === q.option3 ? 'selected' : ''}>Option 3</option>
-                                        <option value="${q.option4}" ${q.answer === q.option4 ? 'selected' : ''}>Option 4</option>
+                                        <option value="${q.option1}" ${q.answer === q.option1 ? 'selected' : ''}>${q.option1}</option>
+                                        <option value="${q.option2}" ${q.answer === q.option2 ? 'selected' : ''}>${q.option2}</option>
+                                        <option value="${q.option3}" ${q.answer === q.option3 ? 'selected' : ''}>${q.option3}</option>
+                                        <option value="${q.option4}" ${q.answer === q.option4 ? 'selected' : ''}>${q.option4}</option>
                                     </select>
                                 </div>
 
