@@ -32,6 +32,7 @@ if(isset($_POST['email']) && isset($_POST['name']) && isset($_POST['contact']) &
 }
 ?>
 <?php include "components/header.php"; ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style>
         .register-container {
             width: 100%;
@@ -173,6 +174,29 @@ if(isset($_POST['email']) && isset($_POST['name']) && isset($_POST['contact']) &
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(99, 102, 241, 0.3);
         }
+
+        .password-container {
+            position: relative;
+            width: 100%;
+        }
+
+        .password-container input {
+            width: 100%;
+            padding-right: 40px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #666;
+        }
+
+        .toggle-password:hover {
+            color: #333;
+        }
     </style>
 </head>
 <body>
@@ -203,9 +227,12 @@ if(isset($_POST['email']) && isset($_POST['name']) && isset($_POST['contact']) &
 
         <div class="form-group">
             <label for="password">Password</label>
-            <input type="password" name="password" id="password" 
-                   pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$" 
-                   placeholder="Enter your password" required>
+            <div class="password-container">
+                <input type="password" name="password" id="password" 
+                       pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$" 
+                       placeholder="Enter your password" required>
+                <i class="toggle-password fas fa-eye" onclick="togglePassword('password')"></i>
+            </div>
             <div class="password-requirements">
                 Password must be at least 8 characters long and contain:
                 <ul>
@@ -218,7 +245,10 @@ if(isset($_POST['email']) && isset($_POST['name']) && isset($_POST['contact']) &
 
         <div class="form-group">
             <label for="conf">Confirm Password</label>
-            <input type="password" id="conf" placeholder="Confirm your password" required>
+            <div class="password-container">
+                <input type="password" id="conf" placeholder="Confirm your password" required>
+                <i class="toggle-password fas fa-eye" onclick="togglePassword('conf')"></i>
+            </div>
             <div class="password-match-error">Passwords do not match</div>
         </div>
 
@@ -286,5 +316,20 @@ if(isset($_POST['email']) && isset($_POST['name']) && isset($_POST['contact']) &
                 form.submit();
             }
         });
+
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = input.nextElementSibling;
+            
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove("fa-eye");
+                icon.classList.add("fa-eye-slash");
+            } else {
+                input.type = "password";
+                icon.classList.remove("fa-eye-slash");
+                icon.classList.add("fa-eye");
+            }
+        }
     </script>
 <?php include "components/footer.php"; ?>
