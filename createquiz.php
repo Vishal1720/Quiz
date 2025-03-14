@@ -23,15 +23,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if($result->num_rows > 0) {
             $error = "Quiz name already exists. Please choose a different name.";
         } else {
-            $stmt = $con->prepare("INSERT INTO quizdetails (category, quizname, email, timer) VALUES (?, ?, ?, ?)");
-            $stmt->bind_param("sssi", $cat, $quizname, $_SESSION['email'], $timer);
-            
-            if($stmt->execute()) {
-                $_SESSION['qid'] = $con->insert_id;
-                $success = "Quiz created successfully! You can now add questions.";
-                header("refresh:2;url=quizform.php");
-            } else {
-                $error = "Error creating quiz: " . $con->error;
+            try {
+                $stmt = $con->prepare("INSERT INTO quizdetails (category, quizname, email, timer) VALUES (?, ?, ?, ?)");
+                $stmt->bind_param("sssi", $cat, $quizname, $_SESSION['email'], $timer);
+                
+                if($stmt->execute()) {
+                    $_SESSION['qid'] = $con->insert_id;
+                    $success = "Quiz created successfully! You can now add questions.";
+                    header("refresh:2;url=quizform.php");
+                } else {
+                    $error = "Error creating quiz: " . $con->error;
+                }
+            } catch (mysqli_sql_exception $e) {
+                // If timer column doesn't exist, try without it
+                if (strpos($e->getMessage(), "Unknown column 'timer'") !== false) {
+                    $stmt = $con->prepare("INSERT INTO quizdetails (category, quizname, email) VALUES (?, ?, ?)");
+                    $stmt->bind_param("sss", $cat, $quizname, $_SESSION['email']);
+                    
+                    if($stmt->execute()) {
+                        $_SESSION['qid'] = $con->insert_id;
+                        $success = "Quiz created successfully! You can now add questions. Note: Timer feature not available.";
+                        header("refresh:2;url=quizform.php");
+                    } else {
+                        $error = "Error creating quiz: " . $con->error;
+                    }
+                } else {
+                    $error = "Database error: " . $e->getMessage();
+                }
             }
         }
     } else {
@@ -87,6 +105,7 @@ while($row = $result->fetch_assoc()) {
             margin-bottom: 1rem;
             background: linear-gradient(135deg, #fff, var(--primary-color));
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
         }
@@ -188,7 +207,7 @@ while($row = $result->fetch_assoc()) {
             border-radius: 8px;
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            color: var(--text-light);
+            color: var (--text-light);
             font-size: 1rem;
         }
 

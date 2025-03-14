@@ -51,7 +51,7 @@ CREATE TABLE `quizdetails` (
   `quizid` int(5) NOT NULL,
   `category` varchar(200) NOT NULL,
   `quizname` varchar(200) NOT NULL,
-  `email` varchar(222) NOT NULL
+  `email` varchar(222) NOT NULL,
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
