@@ -95,6 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             top: 0;
             left: 0;
             right: 0;
+            background-clip: padding-box;
             height: 4rem;
             background: rgba(15, 23, 42, 0.98);
             backdrop-filter: blur(10px);
@@ -260,6 +261,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .quiz-header h1 {
             font-size: 2rem;
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin: 0;

@@ -95,6 +95,7 @@ if(isset($_POST['login_type']) && isset($_POST['username']) && isset($_POST['pas
             text-align: center;
             background: linear-gradient(135deg, #fff, var(--primary));
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
             font-weight: 700;
         }

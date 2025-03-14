@@ -93,6 +93,7 @@ $quizzes = $con->query($query);
             text-align: center;
             margin-bottom: 1rem;
             background: linear-gradient(135deg, #fff, var(--primary-color));
+            background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);

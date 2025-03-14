@@ -105,6 +105,7 @@ unset($_SESSION["quiz_start_time"]);
             font-size: clamp(2.5rem, 6vw, 4rem);
             font-weight: bold;
             background: linear-gradient(135deg, #fff, var(--primary-color));
+            background-clip: text;
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             margin: var(--spacing-md) 0;
