@@ -371,19 +371,19 @@ $quizzes = $con->query($query);
                                 <div class="options-grid">
                                     <div class="form-group">
                                         <label for="option1-${q.id}">Option 1</label>
-                                        <input type="text" name="option1" id="option1-${q.id}" class="form-control" value="${q.option1}" required>
+                                        <input type="text" name="option1" id="option1-${q.id}" class="form-control" value="${q.option1}" required onchange="updateAnswerOptions(${q.id})">
                                     </div>
                                     <div class="form-group">
                                         <label for="option2-${q.id}">Option 2</label>
-                                        <input type="text" name="option2" id="option2-${q.id}" class="form-control" value="${q.option2}" required>
+                                        <input type="text" name="option2" id="option2-${q.id}" class="form-control" value="${q.option2}" required onchange="updateAnswerOptions(${q.id})">
                                     </div>
                                     <div class="form-group">
                                         <label for="option3-${q.id}">Option 3</label>
-                                        <input type="text" name="option3" id="option3-${q.id}" class="form-control" value="${q.option3}" required>
+                                        <input type="text" name="option3" id="option3-${q.id}" class="form-control" value="${q.option3}" required onchange="updateAnswerOptions(${q.id})">
                                     </div>
                                     <div class="form-group">
                                         <label for="option4-${q.id}">Option 4</label>
-                                        <input type="text" name="option4" id="option4-${q.id}" class="form-control" value="${q.option4}" required>
+                                        <input type="text" name="option4" id="option4-${q.id}" class="form-control" value="${q.option4}" required onchange="updateAnswerOptions(${q.id})">
                                     </div>
                                 </div>
 
@@ -422,3 +422,22 @@ $quizzes = $con->query($query);
     </script>
 </body>
 </html>
+
+    <script>
+        function updateAnswerOptions(questionId) {
+            const option1 = document.getElementById(`option1-${questionId}`).value;
+            const option2 = document.getElementById(`option2-${questionId}`).value;
+            const option3 = document.getElementById(`option3-${questionId}`).value;
+            const option4 = document.getElementById(`option4-${questionId}`).value;
+            const answerSelect = document.getElementById(`answer-${questionId}`);
+            const currentAnswer = answerSelect.value;
+
+            // Update all options in the answer dropdown
+            answerSelect.innerHTML = `
+                <option value="${option1}" ${currentAnswer === option1 ? 'selected' : ''}>${option1}</option>
+                <option value="${option2}" ${currentAnswer === option2 ? 'selected' : ''}>${option2}</option>
+                <option value="${option3}" ${currentAnswer === option3 ? 'selected' : ''}>${option3}</option>
+                <option value="${option4}" ${currentAnswer === option4 ? 'selected' : ''}>${option4}</option>
+            `;
+        }
+    </script>
