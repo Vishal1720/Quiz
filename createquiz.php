@@ -23,8 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if($result->num_rows > 0) {
             $error = "Quiz name already exists. Please choose a different name.";
         } else {
-            $stmt = $con->prepare("INSERT INTO quizdetails (category, quizname, timer) VALUES (?, ?, ?)");
-            $stmt->bind_param("ssi", $cat, $quizname, $timer);
+            $stmt = $con->prepare("INSERT INTO quizdetails (category, quizname, email, timer) VALUES (?, ?, ?, ?)");
+            $stmt->bind_param("sssi", $cat, $quizname, $_SESSION['email'], $timer);
             
             if($stmt->execute()) {
                 $_SESSION['qid'] = $con->insert_id;
