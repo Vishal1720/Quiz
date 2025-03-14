@@ -6,6 +6,11 @@ if($_SESSION['status'] !== "admin") {
     exit();
 }
 
+// Ensure admin email is set
+if (!isset($_SESSION['email'])) {
+    $_SESSION['email'] = 'admin123@gmail.com'; // Set default admin email
+}
+
 $error = $success = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
