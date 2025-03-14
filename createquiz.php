@@ -207,7 +207,7 @@ while($row = $result->fetch_assoc()) {
             border-radius: 8px;
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.2);
-            color: var (--text-light);
+            color: var(--text-light);
             font-size: 1rem;
         }
 
