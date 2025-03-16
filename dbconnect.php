@@ -45,11 +45,28 @@ $createQuizDetailsTable = "CREATE TABLE IF NOT EXISTS quizdetails (
     quizname VARCHAR(255) NOT NULL,
     category VARCHAR(100) NOT NULL,
     email VARCHAR(255),
-    timer INT DEFAULT 0,
+    timer INT NOT NULL DEFAULT 30,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )";
 
 $con->query($createQuizDetailsTable);
+
+// Ensure timer column exists and has correct default
+$checkTimerColumn = "SHOW COLUMNS FROM quizdetails LIKE 'timer'";
+$timerColumnResult = $con->query($checkTimerColumn);
+if ($timerColumnResult->num_rows == 0) {
+    // Timer column doesn't exist, add it
+    $addTimerColumn = "ALTER TABLE quizdetails ADD COLUMN timer INT NOT NULL DEFAULT 30";
+    $con->query($addTimerColumn);
+} else {
+    // Timer column exists, check if it has the correct default
+    $timerColumn = $timerColumnResult->fetch_assoc();
+    if ($timerColumn['Default'] != '30' || $timerColumn['Null'] == 'YES') {
+        // Update the column to have the correct default and NOT NULL constraint
+        $updateTimerColumn = "ALTER TABLE quizdetails MODIFY COLUMN timer INT NOT NULL DEFAULT 30";
+        $con->query($updateTimerColumn);
+    }
+}
 
 // Create quizes table if not exists
 $createQuizesTable = "CREATE TABLE IF NOT EXISTS quizes (
