@@ -18,8 +18,6 @@ function getPageTitle() {
             return 'Edit Quiz';
         case 'createquiz.php':
             return 'Create Quiz';
-        case 'manage_categories.php':
-            return 'Manage Categories';
         default:
             return 'QuizMaster';
     }
@@ -365,12 +363,6 @@ function getPageTitle() {
                         <div class="nav-item">
                             <a href="/Quiz/quizmanip.php" class="nav-link admin-nav-link <?php echo $currentPage === 'quizmanip.php' ? 'active' : ''; ?>">
                                 <i class="fas fa-edit"></i><span>Edit</span>
-                                <div class="admin-badge">Admin</div>
-                            </a>
-                        </div>
-                        <div class="nav-item">
-                            <a href="/Quiz/manage_categories.php" class="nav-link admin-nav-link <?php echo $currentPage === 'manage_categories.php' ? 'active' : ''; ?>">
-                                <i class="fas fa-tags"></i><span>Categories</span>
                                 <div class="admin-badge">Admin</div>
                             </a>
                         </div>

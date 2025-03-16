@@ -211,6 +211,24 @@ if ($quizResult) {
 </style>
 
     <div class="dashboard">
+        <?php if(isset($_SESSION['success'])): ?>
+            <div class="message success" style="background-color: rgba(34, 197, 94, 0.2); color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.3); padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem; font-weight: 500;">
+                <?php 
+                    echo htmlspecialchars($_SESSION['success']); 
+                    unset($_SESSION['success']);
+                ?>
+            </div>
+        <?php endif; ?>
+        
+        <?php if(isset($_SESSION['error'])): ?>
+            <div class="message error" style="background-color: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem; font-weight: 500;">
+                <?php 
+                    echo htmlspecialchars($_SESSION['error']); 
+                    unset($_SESSION['error']);
+                ?>
+            </div>
+        <?php endif; ?>
+
         <section class="welcome-section">
             <h1 class="welcome-title">
                 <?php if($_SESSION['status'] === "admin"): ?>
@@ -248,6 +266,13 @@ if ($quizResult) {
                                 <a href="quizmanip.php?quizid=<?php echo $quiz['quizid']; ?>" class="take-quiz-btn">
                                     Edit Quiz
                                 </a>
+                                <div style="height: 10px;"></div><!-- Spacer between buttons -->
+                                <form method="POST" action="delete_quiz.php" onsubmit="return confirm('Are you sure you want to delete this quiz? This action cannot be undone.');">
+                                    <input type="hidden" name="quizid" value="<?php echo $quiz['quizid']; ?>">
+                                    <button type="submit" class="take-quiz-btn delete-quiz-btn" style="background: linear-gradient(135deg, #ef4444, #b91c1c);">
+                                        Delete Quiz
+                                    </button>
+                                </form>
                             <?php else: ?>
                                 <a href="takequiz.php?quizid=<?php echo $quiz['quizid']; ?>" class="take-quiz-btn">
                                     Take Quiz
