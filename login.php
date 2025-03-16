@@ -12,6 +12,7 @@ if(isset($_POST['login_type']) && isset($_POST['username']) && isset($_POST['pas
         if($_POST['username'] === 'admin' && $_POST['password'] === 'admin123') {
             $_SESSION['status'] = "admin";
             $_SESSION['username'] = 'admin';
+            $_SESSION['email'] = 'admin123@gmail.com';
             header("Location: index.php");
             exit();
         } else {
