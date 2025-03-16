@@ -39,6 +39,7 @@ $timeRemaining = $quizDuration - (time() - $_SESSION['quiz_start_time']);
 // If time's up, save the current answers and redirect to results
 if ($timeRemaining <= 0) {
     $_SESSION['quiz_completed'] = true;
+    $_SESSION['quiz_answers'] = isset($_POST['answers']) ? $_POST['answers'] : array();
     unset($_SESSION['quiz_start_time']);
     header("Location: results.php?quizid=" . $quizid);
     exit();
