@@ -41,7 +41,10 @@ foreach ($questions as $question) {
         $score++;
     }
 }
-
+if($totalQuestions == 0)
+    {
+        header("Location:index.php?error=no_questions");     
+    }
 $percentage = ($score / $totalQuestions) * 100;
 
 // Clear quiz session data
