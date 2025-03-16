@@ -141,17 +141,20 @@ function getPageTitle() {
                         <i class="fas fa-home"></i><span>Home</span>
                     </a>
                 <?php endif; ?>
+               <?php if($_SESSION['status'] === 'admin' || $_SESSION['status'] === 'loggedin') { ?>
+                   
                 <a href="/Quiz/logout.php" class="nav-link">
+
                     <i class="fas fa-sign-out-alt"></i><span>Logout</span>
                 </a>
-            <?php else: ?>
+            <?php } else{ ?>
                 <a href="/Quiz/login.php" class="nav-link <?php echo $currentPage === 'login.php' ? 'active' : ''; ?>">
                     <i class="fas fa-sign-in-alt"></i><span>Login</span>
                 </a>
                 <a href="/Quiz/register.php" class="nav-link <?php echo $currentPage === 'register.php' ? 'active' : ''; ?>">
                     <i class="fas fa-user-plus"></i><span>Register</span>
                 </a>
-            <?php endif; ?>
+            <?php } endif;?>
         </div>
     </nav>
     <main class="main-content <?php echo basename($_SERVER['PHP_SELF']) === 'landing.php' ? 'landing-page' : ''; ?>">
