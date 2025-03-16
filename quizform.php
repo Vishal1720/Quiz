@@ -25,7 +25,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
         $query = "INSERT INTO quizes (question, quizid, option1, option2, option3, option4, answer) 
                  VALUES (?, ?, ?, ?, ?, ?, ?)";
         $stmt = $con->prepare($query);
-        $stmt->bind_param("sssssss", $question, $quizid, $options[0], $options[1], $options[2], $options[3], $answer);
+        $stmt->bind_param("sssssss", $question, $quizid, $options[0], $options[1], $options[2], $options[3], $options[$answer]);
         
         if($stmt->execute()) {
             $success = "Question added successfully!";
@@ -332,10 +332,10 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
                 <h3 class="answer-title">Correct Answer</h3>
                 <select name="answer" class="form-control" required>
                     <option value="">Select correct answer</option>
-                    <option value="option1">Option 1</option>
-                    <option value="option2">Option 2</option>
-                    <option value="option3">Option 3</option>
-                    <option value="option4">Option 4</option>
+                    <option value="0">Option 1</option>
+                    <option value="1">Option 2</option>
+                    <option value="2">Option 3</option>
+                    <option value="3">Option 4</option>
                 </select>
                 <p class="helper-text">Choose which option is the correct answer</p>
             </div>
