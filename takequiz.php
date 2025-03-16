@@ -16,6 +16,17 @@ if (!isset($_GET['quizid'])) {
 
 $quizid = mysqli_real_escape_string($con, $_GET['quizid']);
 
+// Reset timer if this is a new quiz attempt or a different quiz
+if (isset($_SESSION['current_quiz_id']) && $_SESSION['current_quiz_id'] != $quizid) {
+    // User is starting a different quiz, reset timer
+    unset($_SESSION['quiz_start_time']);
+    unset($_SESSION['quiz_duration']);
+    unset($_SESSION['quiz_completed']);
+}
+
+// Store current quiz ID in session
+$_SESSION['current_quiz_id'] = $quizid;
+
 // Get quiz details
 $stmt = $con->prepare("SELECT * FROM quizdetails WHERE quizid = ?");
 $stmt->bind_param("i", $quizid);
@@ -27,13 +38,28 @@ if (!$quizDetails) {
     exit();
 }
 
-// Initialize timer if not set
-if (!isset($_SESSION['quiz_start_time'])) {
-    $_SESSION['quiz_start_time'] = time();
+// Always reset the timer when starting a quiz
+unset($_SESSION['quiz_start_time']);
+
+// Initialize timer
+$_SESSION['quiz_start_time'] = time();
+
+// DIRECTLY use the timer value from the database - no conditions
+$dbTimer = intval($quizDetails['timer']);
+
+// If timer is 0 or not set, use 30 minutes as fallback
+if ($dbTimer <= 0) {
+    $_SESSION['quiz_duration'] = 30; // Default 30 minutes
+    echo "<!-- DEBUG: Timer was 0 or negative, using default 30 minutes -->";
+} else {
+    $_SESSION['quiz_duration'] = $dbTimer;
 }
 
-// Get quiz duration (in minutes), default to 30 minutes if not set
-$quizDuration = (isset($quizDetails['timer']) ? intval($quizDetails['timer']) : 30) * 60; // Convert minutes to seconds
+// Force debug output to browser for troubleshooting
+echo "<!-- DEBUG: Quiz ID: {$quizid}, DB Timer Value: {$quizDetails['timer']}, Using: {$_SESSION['quiz_duration']} minutes -->";
+
+// Convert minutes to seconds
+$quizDuration = $_SESSION['quiz_duration'] * 60;
 $timeRemaining = $quizDuration - (time() - $_SESSION['quiz_start_time']);
 
 // If time's up, save the current answers and redirect to results
@@ -426,6 +452,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         const timerElement = document.getElementById('timer');
         const quizForm = document.getElementById('quiz-form');
         let timeRemaining = <?php echo $timeRemaining; ?>;
+        let quizDuration = <?php echo $quizDuration; ?>; // Store the total quiz duration
         let timerInterval;
 
         function formatTime(seconds) {
@@ -444,8 +471,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             timerElement.querySelector('span').textContent = `Time remaining: ${formatTime(timeRemaining)}`;
             
-            // Add warning class at 5 minutes remaining
-            if (timeRemaining <= 300 && !timerElement.classList.contains('warning')) {
+            // Add warning class at 20% of total time remaining
+            const warningThreshold = Math.min(300, quizDuration * 0.2); // 5 minutes or 20% of total time, whichever is less
+            if (timeRemaining <= warningThreshold && !timerElement.classList.contains('warning')) {
                 timerElement.classList.add('warning');
                 // Optional: Add sound effect or vibration here
             }

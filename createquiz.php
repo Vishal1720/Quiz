@@ -17,7 +17,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if(isset($_POST['category']) && isset($_POST['quizname'])) {
         $cat = mysqli_real_escape_string($con, $_POST['category']);
         $quizname = mysqli_real_escape_string($con, $_POST['quizname']);
-        $timer = isset($_POST['timer']) ? min(max(intval($_POST['timer']), 0), 180) : 0;
+        
+        // Ensure timer is properly processed
+        $timer = isset($_POST['timer']) ? intval($_POST['timer']) : 30;
+        // Ensure timer is within valid range (0-180 minutes)
+        $timer = min(max($timer, 0), 180);
+        
+        // Debug output
+        error_log("Creating quiz with timer: " . $timer . " minutes");
         
         // Check for duplicate quizname
         $stmt = $con->prepare("SELECT quizname FROM quizdetails WHERE quizname = ?");
@@ -29,32 +36,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $error = "Quiz name already exists. Please choose a different name.";
         } else {
             try {
+                // Explicitly include timer in the query
                 $stmt = $con->prepare("INSERT INTO quizdetails (category, quizname, email, timer) VALUES (?, ?, ?, ?)");
                 $stmt->bind_param("sssi", $cat, $quizname, $_SESSION['email'], $timer);
                 
                 if($stmt->execute()) {
                     $_SESSION['qid'] = $con->insert_id;
+                    
+                    // Verify the timer was saved correctly
+                    $verifyStmt = $con->prepare("SELECT timer FROM quizdetails WHERE quizid = ?");
+                    $verifyStmt->bind_param("i", $_SESSION['qid']);
+                    $verifyStmt->execute();
+                    $verifyResult = $verifyStmt->get_result();
+                    $verifyRow = $verifyResult->fetch_assoc();
+                    
+                    error_log("Verified timer value in database: " . $verifyRow['timer']);
+                    
                     $success = "Quiz created successfully! You can now add questions.";
                     header("refresh:2;url=quizform.php");
                 } else {
                     $error = "Error creating quiz: " . $con->error;
                 }
             } catch (mysqli_sql_exception $e) {
-                // If timer column doesn't exist, try without it
-                if (strpos($e->getMessage(), "Unknown column 'timer'") !== false) {
-                    $stmt = $con->prepare("INSERT INTO quizdetails (category, quizname, email) VALUES (?, ?, ?)");
-                    $stmt->bind_param("sss", $cat, $quizname, $_SESSION['email']);
-                    
-                    if($stmt->execute()) {
-                        $_SESSION['qid'] = $con->insert_id;
-                        $success = "Quiz created successfully! You can now add questions. Note: Timer feature not available.";
-                        header("refresh:2;url=quizform.php");
-                    } else {
-                        $error = "Error creating quiz: " . $con->error;
-                    }
-                } else {
-                    $error = "Database error: " . $e->getMessage();
-                }
+                $error = "Database error: " . $e->getMessage();
             }
         }
     } else {
