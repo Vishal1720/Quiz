@@ -372,19 +372,19 @@ $quizzes = $con->query($query);
                                 <div class="options-grid">
                                     <div class="form-group">
                                         <label for="option1-${q.id}">Option 1</label>
-                                        <input type="text" name="option1" id="option1-${q.id}" class="form-control" value="${q.option1}" required onchange="updateAnswerOptions(${q.id})">
+                                        <input type="text" name="option1" id="option1-${q.id}" class="form-control" value="${q.option1}" required onkeyup="updateAnswerOptions(${q.id})">
                                     </div>
                                     <div class="form-group">
                                         <label for="option2-${q.id}">Option 2</label>
-                                        <input type="text" name="option2" id="option2-${q.id}" class="form-control" value="${q.option2}" required onchange="updateAnswerOptions(${q.id})">
+                                        <input type="text" name="option2" id="option2-${q.id}" class="form-control" value="${q.option2}" required onkeyup="updateAnswerOptions(${q.id})">
                                     </div>
                                     <div class="form-group">
                                         <label for="option3-${q.id}">Option 3</label>
-                                        <input type="text" name="option3" id="option3-${q.id}" class="form-control" value="${q.option3}" required onchange="updateAnswerOptions(${q.id})">
+                                        <input type="text" name="option3" id="option3-${q.id}" class="form-control" value="${q.option3}" required onkeyup="updateAnswerOptions(${q.id})">
                                     </div>
                                     <div class="form-group">
                                         <label for="option4-${q.id}">Option 4</label>
-                                        <input type="text" name="option4" id="option4-${q.id}" class="form-control" value="${q.option4}" required onchange="updateAnswerOptions(${q.id})">
+                                        <input type="text" name="option4" id="option4-${q.id}" class="form-control" value="${q.option4}" required onkeyup="updateAnswerOptions(${q.id})">
                                     </div>
                                 </div>
 
