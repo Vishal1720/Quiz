@@ -221,7 +221,7 @@ if ($quizResult) {
             </h1>
             <p class="welcome-subtitle">
                 <?php if($_SESSION['status'] === "admin"): ?>
-                    Manage quizzes and monitor user progress
+                    Manage quizzes and ensure a seamless experience for users
                 <?php else: ?>
                     Choose a quiz from the categories below to test your knowledge
                 <?php endif; ?>
