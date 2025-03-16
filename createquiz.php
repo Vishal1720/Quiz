@@ -74,14 +74,7 @@ while($row = $result->fetch_assoc()) {
     $categories[] = $row['categoryname'];
 }
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Quiz - Admin Dashboard</title>
-    <link rel="shortcut icon" href="quiz.png" type="image/x-icon">
-    <link rel="stylesheet" href="nav.css">
+<?php include "components/header.php"; ?>
     <style>
         :root {
             --primary-color: #4a90e2;
@@ -283,15 +276,6 @@ while($row = $result->fetch_assoc()) {
     </style>
 </head>
 <body>
-    <nav>
-        <a href='./index.php'>Home</a>
-        <a href='./quizmanip.php'>Edit</a>
-        <a href='./createquiz.php' class="active">Create</a>
-        <a href='./quizform.php'>Insert</a>
-        <a href='./logout.php'>Logout</a>
-        <div class='animation'></div>
-    </nav>
-
     <div class="container">
         <h1 class="page-title">Create New Quiz</h1>
         <p class="page-subtitle">Set up your quiz details and timer</p>

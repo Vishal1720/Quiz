@@ -115,7 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit();
 }
 ?>
-<?php include 'components/header.php'; ?>
+<?php include "components/header.php"; ?>
     <style>
         nav {
             position: fixed;
@@ -401,11 +401,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </style>
 </head>
 <body>
-    <nav>
-        <a href="./index.php">Home</a>
-        <a style="width:100px" href="./logout.php">Logout</a>
-        <div class="animation start-home"></div>
-    </nav>
     <div class="quiz-container">
         <div class="quiz-header">
             <h1><?php echo htmlspecialchars($quizName); ?></h1>

@@ -35,14 +35,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 ?>
-<!DOCTYPE html>
-<html lang='en'>
-<head>
-    <meta charset='UTF-8'>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    <title>Add Questions - Admin Dashboard</title>
-    <link rel="shortcut icon" href="quiz.png" type="image/x-icon">
-    <link rel='stylesheet' href='nav.css'>
+<?php include "components/header.php"; ?>
     <style>
         :root {
             --primary-color: #4a90e2;
@@ -263,15 +256,6 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
     </style>
 </head>
 <body>
-    <nav>
-        <a href='./index.php'>Home</a>
-        <a href='./quizmanip.php'>Edit</a>
-        <a href='./createquiz.php'>Create</a>
-        <a href='./quizform.php' class="active">Insert</a>
-        <a href='./logout.php'>Logout</a>
-        <div class='animation'></div>
-    </nav>
-
     <div class="container">
         <h1 class="page-title">Add Questions</h1>
         <p class="page-subtitle">Create engaging questions for your quiz</p>

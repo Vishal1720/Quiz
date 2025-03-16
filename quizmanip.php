@@ -65,14 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 $query = "SELECT quizid, quizname, category FROM quizdetails ORDER BY quizname ASC";
 $quizzes = $con->query($query);
 ?>
-<!DOCTYPE html>
-<html lang='en'>
-<head>
-    <meta charset='UTF-8'>
-    <meta name='viewport' content='width=device-width, initial-scale=1.0'>
-    <title>Edit Quiz - Admin Dashboard</title>
-    <link rel="shortcut icon" href="quiz.png" type="image/x-icon">
-    <link rel='stylesheet' href='nav.css'>
+<?php include "components/header.php"; ?>
     <style>
         :root {
             --primary-color: #4a90e2;
@@ -303,18 +296,9 @@ $quizzes = $con->query($query);
     </style>
 </head>
 <body>
-    <nav>
-        <a href='./index.php'>Home</a>
-        <a href='./quizmanip.php' class="active">Edit</a>
-        <a href='./createquiz.php'>Create</a>
-        <a href='./quizform.php'>Insert</a>
-        <a href='./logout.php'>Logout</a>
-        <div class='animation'></div>
-    </nav>
-
     <div class="edit-container">
         <h1 class="page-title">Edit Quiz Questions</h1>
-        <p class="page-subtitle">Select a quiz and modify its questions</p>
+        <p class="page-subtitle">Modify or delete existing questions</p>
 
         <?php if($success): ?>
             <div class="message success"><?php echo htmlspecialchars($success); ?></div>
@@ -421,8 +405,6 @@ $quizzes = $con->query($query);
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     </script>
-</body>
-</html>
 
     <script>
         function updateAnswerOptions(questionId) {
@@ -442,3 +424,5 @@ $quizzes = $con->query($query);
             `;
         }
     </script>
+</body>
+</html>
