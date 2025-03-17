@@ -328,7 +328,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             <div class="answer-section">
                 <h3 class="answer-title">Correct Answer</h3>
                 <select name="answer" class="form-control" required>
-                    <option value="">Select correct answer</option>
+                    <option value="">Select the correct answer</option>
                     <option value="0">Option 1</option>
                     <option value="1">Option 2</option>
                     <option value="2">Option 3</option>
@@ -350,15 +350,11 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             // Update the text of existing options without changing their values
             options.forEach((option, index) => {
                 if (answerSelect.options[index + 1]) {
-                    answerSelect.options[index + 1].text = option.value.trim() || Option ${index + 1};
+                    answerSelect.options[index + 1].text = option.value.trim() || `Option ${index + 1}`;
                 }
             });
         }
 
-        // Add input event listeners to all option inputs
-        document.querySelectorAll('input[name="options[]"]').forEach(input => {
-            input.addEventListener('input', updateAnswerOptions);
-        });
         // Add input event listeners to all option inputs
         document.querySelectorAll('input[name="options[]"]').forEach(input => {
             input.addEventListener('input', updateAnswerOptions);
