@@ -172,6 +172,12 @@ while($row = $result->fetch_assoc()) {
             transition: all 0.3s ease;
         }
 
+        select.form-control option {
+            background-color: #2a2a3e;
+            color: var(--text-light);
+            padding: 10px;
+        }
+
         .form-control:focus {
             border-color: var(--primary-color);
             background: rgba(255, 255, 255, 0.1);

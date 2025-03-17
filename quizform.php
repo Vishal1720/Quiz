@@ -352,12 +352,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
                 answerSelect.remove(1);
             }
             
-            // Add new options with actual text
+            // Add new options with only the answer text
             options.forEach((option, index) => {
                 if (option.value.trim() !== '') {
                     const optionElement = new Option(
                         option.value,
-                        `option${index + 1}`,
+                        index.toString(),
                         false,
                         false
                     );
