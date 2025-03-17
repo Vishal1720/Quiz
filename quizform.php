@@ -128,6 +128,18 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             outline: none;
         }
 
+        select.form-control {
+            color: var(--text-light);
+            background-color: rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+        }
+
+        select.form-control option {
+            background-color: #2a2a3e;
+            color: #ffffff;
+            padding: 10px;
+        }
+
         .options-container {
             background: rgba(255, 255, 255, 0.05);
             padding: 2rem;
