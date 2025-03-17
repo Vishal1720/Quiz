@@ -96,6 +96,7 @@ $email = $_SESSION['email'];
 
         <div class="action-buttons">
             <a href="manage_quizzes.php" class="action-button">Manage Quizzes</a>
+            <a href="../schedule_quiz.php" class="action-button">Schedule Quiz</a>
             <a href="manage_users.php" class="action-button">Manage Users</a>
             <a href="manage_categories.php" class="action-button">Manage Categories</a>
             <a href="view_statistics.php" class="action-button">View Statistics</a>

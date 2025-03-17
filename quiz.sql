@@ -159,6 +159,23 @@ ALTER TABLE `quizes`
   MODIFY `ID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
+-- Table structure for table `scheduled_quizzes`
+--
+
+CREATE TABLE `scheduled_quizzes` (
+  `schedule_id` int(11) NOT NULL AUTO_INCREMENT,
+  `quizid` int(5) NOT NULL,
+  `start_time` datetime NOT NULL,
+  `end_time` datetime NOT NULL,
+  `access_code` varchar(32) NOT NULL,
+  `status` enum('pending','active','completed') DEFAULT 'pending',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`schedule_id`),
+  KEY `quizid` (`quizid`),
+  CONSTRAINT `scheduled_quizzes_ibfk_1` FOREIGN KEY (`quizid`) REFERENCES `quizdetails` (`quizid`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
 -- Constraints for dumped tables
 --
 

@@ -351,19 +351,22 @@ function getPageTitle() {
                         <div class="nav-item">
                             <a href="/Quiz/createquiz.php" class="nav-link admin-nav-link <?php echo $currentPage === 'createquiz.php' ? 'active' : ''; ?>">
                                 <i class="fas fa-plus-circle"></i><span>Create</span>
+                            </a>
+                        </div>
+                        <div class="nav-item">
+                            <a href="/Quiz/schedule_quiz.php" class="nav-link admin-nav-link <?php echo $currentPage === 'schedule_quiz.php' ? 'active' : ''; ?>">
+                                <i class="fas fa-clock"></i><span>Schedule</span>
                                 <div class="admin-badge">Admin</div>
                             </a>
                         </div>
                         <div class="nav-item">
                             <a href="/Quiz/quizform.php" class="nav-link admin-nav-link <?php echo $currentPage === 'quizform.php' ? 'active' : ''; ?>">
                                 <i class="fas fa-list-ol"></i><span>Insert</span>
-                                <div class="admin-badge">Admin</div>
                             </a>
                         </div>
                         <div class="nav-item">
                             <a href="/Quiz/quizmanip.php" class="nav-link admin-nav-link <?php echo $currentPage === 'quizmanip.php' ? 'active' : ''; ?>">
                                 <i class="fas fa-edit"></i><span>Edit</span>
-                                <div class="admin-badge">Admin</div>
                             </a>
                         </div>
                     <?php endif; ?>

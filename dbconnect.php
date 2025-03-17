@@ -115,6 +115,44 @@ if ($row['count'] == 0) {
     }
 }
 
+// Create scheduled_quizzes table after quizdetails
+try {
+    // Set foreign key checks off
+    $con->query("SET FOREIGN_KEY_CHECKS=0");
+    
+    // Create the table if not exists (don't drop existing)
+    $createScheduledQuizzesTable = "CREATE TABLE IF NOT EXISTS scheduled_quizzes (
+        schedule_id INT NOT NULL AUTO_INCREMENT,
+        quizid INT NOT NULL,
+        start_time DATETIME NOT NULL,
+        end_time DATETIME NOT NULL,
+        access_code VARCHAR(32) NOT NULL,
+        status ENUM('pending','active','completed') DEFAULT 'pending',
+        created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (schedule_id),
+        UNIQUE KEY unique_access_code (access_code)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci";
+    
+    $con->query($createScheduledQuizzesTable);
+    
+    // Add foreign key if it doesn't exist
+    $addForeignKey = "ALTER TABLE scheduled_quizzes 
+                      ADD CONSTRAINT fk_scheduled_quizzes_quizid 
+                      FOREIGN KEY (quizid) REFERENCES quizdetails(quizid) 
+                      ON DELETE CASCADE";
+    try {
+        $con->query($addForeignKey);
+    } catch (Exception $e) {
+        // Foreign key might already exist, ignore the error
+    }
+    
+    // Set foreign key checks back on
+    $con->query("SET FOREIGN_KEY_CHECKS=1");
+    
+} catch (Exception $e) {
+    error_log("Error managing scheduled_quizzes table: " . $e->getMessage());
+}
+
 // Handle session timeout
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 1800)) {
     session_unset();
