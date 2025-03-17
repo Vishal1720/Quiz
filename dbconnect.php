@@ -83,20 +83,77 @@ $createQuizesTable = "CREATE TABLE IF NOT EXISTS quizes (
 
 $con->query($createQuizesTable);
 
-// Create category table if not exists
-$createCategoryTable = "CREATE TABLE IF NOT EXISTS category (
-    id INT AUTO_INCREMENT PRIMARY KEY,
-    categoryname VARCHAR(100) NOT NULL UNIQUE
-)";
+// ===== CATEGORY AND SUBCATEGORY TABLES =====
 
-$con->query($createCategoryTable);
+// First, check if we need to fix the tables
+$needsFix = false;
 
-// Add default categories if none exist
-$checkCategories = "SELECT COUNT(*) as count FROM category";
-$result = $con->query($checkCategories);
-$row = $result->fetch_assoc();
+// Check if subcategories table exists
+$checkSubcategoriesTable = "SHOW TABLES LIKE 'subcategories'";
+$subcategoriesResult = $con->query($checkSubcategoriesTable);
 
-if ($row['count'] == 0) {
+// Check if category table exists
+$checkCategoryTable = "SHOW TABLES LIKE 'category'";
+$categoryResult = $con->query($checkCategoryTable);
+
+// If either table doesn't exist, we need to fix
+if ($subcategoriesResult->num_rows == 0 || $categoryResult->num_rows == 0) {
+    $needsFix = true;
+} else {
+    // Both tables exist, check if subcategories table has the correct structure
+    try {
+        // Try to create a test subcategory to see if the foreign key works
+        $testCategory = "Test_" . time();
+        $con->query("INSERT IGNORE INTO category (categoryname) VALUES ('$testCategory')");
+        $testSubcategory = "TestSub_" . time();
+        $testInsert = $con->query("INSERT INTO subcategories (subcategory_name, category_name) VALUES ('$testSubcategory', '$testCategory')");
+        
+        if (!$testInsert) {
+            // If insert fails, we need to fix the tables
+            $needsFix = true;
+        } else {
+            // Clean up test data
+            $con->query("DELETE FROM subcategories WHERE subcategory_name = '$testSubcategory'");
+            $con->query("DELETE FROM category WHERE categoryname = '$testCategory'");
+        }
+    } catch (Exception $e) {
+        // If any exception occurs, we need to fix the tables
+        $needsFix = true;
+    }
+}
+
+// If we need to fix the tables, drop and recreate them
+if ($needsFix) {
+    // Drop subcategories table first (to avoid foreign key constraints)
+    $con->query("DROP TABLE IF EXISTS subcategories");
+    
+    // Drop category table
+    $con->query("DROP TABLE IF EXISTS category");
+    
+    // Create category table
+    $createCategoryTable = "CREATE TABLE category (
+        categoryname VARCHAR(200) NOT NULL,
+        PRIMARY KEY (categoryname)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci";
+    
+    if (!$con->query($createCategoryTable)) {
+        die("Error creating category table: " . $con->error);
+    }
+    
+    // Create subcategories table
+    $createSubcategoriesTable = "CREATE TABLE subcategories (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        subcategory_name VARCHAR(100) NOT NULL,
+        category_name VARCHAR(200) NOT NULL,
+        FOREIGN KEY (category_name) REFERENCES category(categoryname) ON DELETE CASCADE,
+        UNIQUE KEY unique_subcategory_per_category (subcategory_name, category_name)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci";
+    
+    if (!$con->query($createSubcategoriesTable)) {
+        die("Error creating subcategories table: " . $con->error);
+    }
+    
+    // Add default categories
     $defaultCategories = [
         'General Knowledge',
         'Science',
