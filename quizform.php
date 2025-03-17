@@ -347,25 +347,18 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             const answerSelect = document.querySelector('select[name="answer"]');
             const options = document.querySelectorAll('input[name="options[]"]');
             
-            // Clear existing options except the first placeholder
-            while (answerSelect.options.length > 1) {
-                answerSelect.remove(1);
-            }
-            
-            // Add new options with only the answer text
+            // Update the text of existing options without changing their values
             options.forEach((option, index) => {
-                if (option.value.trim() !== '') {
-                    const optionElement = new Option(
-                        option.value,
-                        index.toString(),
-                        false,
-                        false
-                    );
-                    answerSelect.add(optionElement);
+                if (answerSelect.options[index + 1]) {
+                    answerSelect.options[index + 1].text = option.value.trim() || Option ${index + 1};
                 }
             });
         }
 
+        // Add input event listeners to all option inputs
+        document.querySelectorAll('input[name="options[]"]').forEach(input => {
+            input.addEventListener('input', updateAnswerOptions);
+        });
         // Add input event listeners to all option inputs
         document.querySelectorAll('input[name="options[]"]').forEach(input => {
             input.addEventListener('input', updateAnswerOptions);
