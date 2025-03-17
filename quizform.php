@@ -68,6 +68,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             margin-bottom: 1rem;
             background: linear-gradient(135deg, #fff, var(--primary-color));
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
         }
@@ -329,10 +330,34 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
     </div>
 
     <script>
-        // Add smooth scrolling to form after submission
-        if(window.location.href.includes('quizform.php')) {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        // Function to update answer dropdown options
+        function updateAnswerOptions() {
+            const answerSelect = document.querySelector('select[name="answer"]');
+            const options = document.querySelectorAll('input[name="options[]"]');
+            
+            // Clear existing options except the first placeholder
+            while (answerSelect.options.length > 1) {
+                answerSelect.remove(1);
+            }
+            
+            // Add new options with actual text
+            options.forEach((option, index) => {
+                if (option.value.trim() !== '') {
+                    const optionElement = new Option(
+                        option.value,
+                        `option${index + 1}`,
+                        false,
+                        false
+                    );
+                    answerSelect.add(optionElement);
+                }
+            });
         }
+
+        // Add input event listeners to all option inputs
+        document.querySelectorAll('input[name="options[]"]').forEach(input => {
+            input.addEventListener('input', updateAnswerOptions);
+        });
     </script>
 </body>
 </html>
