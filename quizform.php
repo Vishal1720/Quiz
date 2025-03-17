@@ -140,6 +140,12 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             padding: 10px;
         }
 
+        .answer-section select.form-control option {
+            background-color: #1a1a2e;
+            color: #ffffff;
+            padding: 12px;
+        }
+
         .options-container {
             background: rgba(255, 255, 255, 0.05);
             padding: 2rem;

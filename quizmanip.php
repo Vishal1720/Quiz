@@ -220,6 +220,12 @@ $quizzes = $con->query($query);
             margin: 1.5rem 0;
         }
 
+        .answer-section select.form-control option {
+            background: #1a1a2e;
+            color: #fff;
+            padding: 1rem;
+        }
+
         .answer-section label {
             color: var(--success-color);
         }
