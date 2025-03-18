@@ -16,11 +16,42 @@ unset($_SESSION['schedule_error']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $quizid = mysqli_real_escape_string($con, $_POST['quizid']); 
-    $start_time = date('Y-m-d H:i:s', strtotime($_POST['start_time']));
-    $end_time = date('Y-m-d H:i:s', strtotime($_POST['end_time']));
     
-    if (strtotime($start_time) && strtotime($end_time)) {
+    // Convert input times to server timezone
+    $start_datetime = new DateTime($_POST['start_time']);
+    $end_datetime = new DateTime($_POST['end_time']);
+    
+    $start_time = $start_datetime->format('Y-m-d H:i:s');
+    $end_time = $end_datetime->format('Y-m-d H:i:s');
+    
+    if ($start_datetime && $end_datetime) {
         try {
+            // Validate times
+            $now = new DateTime();
+            if ($start_datetime < $now) {
+                throw new Exception("Start time cannot be in the past");
+            }
+            if ($end_datetime <= $start_datetime) {
+                throw new Exception("End time must be after start time");
+            }
+            
+            // Validate quiz exists
+            $quizCheck = $con->prepare("SELECT quizid FROM quizdetails WHERE quizid = ?");
+            $quizCheck->bind_param("i", $quizid);
+            $quizCheck->execute();
+            if ($quizCheck->get_result()->num_rows === 0) {
+                throw new Exception("Invalid quiz selected");
+            }
+
+            // Check if quiz has questions
+            $questionCheck = $con->prepare("SELECT COUNT(*) as count FROM quizes WHERE quizid = ?");
+            $questionCheck->bind_param("i", $quizid);
+            $questionCheck->execute();
+            $count = $questionCheck->get_result()->fetch_assoc()['count'];
+            if ($count === 0) {
+                throw new Exception("Quiz has no questions");
+            }
+
             // Check if table exists, if not create it
             $tableCheck = $con->query("SHOW TABLES LIKE 'scheduled_quizzes'");
             if ($tableCheck->num_rows == 0) {
@@ -28,10 +59,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 require 'dbconnect.php';
             }
             
-            $access_code = bin2hex(random_bytes(16));
+            $access_code = bin2hex(random_bytes(16)); // Generate unique access code
             
             $stmt = $con->prepare("INSERT INTO scheduled_quizzes (quizid, start_time, end_time, access_code) VALUES (?, ?, ?, ?)");
             if (!$stmt) {
+                // Debugging: Log statement preparation error
+                error_log("Failed to prepare statement: " . $con->error);
                 throw new Exception("Failed to prepare statement: " . $con->error);
             }
             
@@ -39,10 +72,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             if($stmt->execute()) {
                 $quiz_url = "http://" . $_SERVER['HTTP_HOST'] . "/Quiz/scheduled_quiz.php?code=" . $access_code;
+                // Debugging: Log the generated quiz URL
+                error_log("Quiz URL: $quiz_url");
                 $_SESSION['schedule_success'] = "<div class='share-info'>
                     <p><i class='fas fa-check-circle'></i> Quiz scheduled successfully!</p>
                     <div class='share-box'>
                         <p><strong>Share this link with students:</strong></p>
+                        <p><strong>Start time:</strong> " . $start_datetime->format('F j, Y, g:i a') . "</p>
+                        <p><strong>End time:</strong> " . $end_datetime->format('F j, Y, g:i a') . "</p>
                         <div class='copy-section'>
                             <input type='text' id='quiz-link' value='{$quiz_url}' readonly>
                             <button type='button' onclick='copyLink()' class='copy-btn'>
@@ -53,6 +90,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                 </div>";
             } else {
+                // Debugging: Log execution error
+                error_log("Failed to execute statement: " . $stmt->error);
                 throw new Exception("Failed to execute statement: " . $stmt->error);
             }
             
@@ -269,3 +308,4 @@ document.querySelector('.schedule-form').addEventListener('submit', function(e) 
 });
 </script>
 </body>
+</html>

@@ -153,6 +153,27 @@ try {
     error_log("Error managing scheduled_quizzes table: " . $e->getMessage());
 }
 
+// Check if scheduled_quizzes table exists
+$tableCheck = $con->query("SHOW TABLES LIKE 'scheduled_quizzes'");
+if ($tableCheck->num_rows == 0) {
+    $createScheduledQuizzesTable = "CREATE TABLE scheduled_quizzes (
+        schedule_id INT NOT NULL AUTO_INCREMENT,
+        quizid INT NOT NULL,
+        start_time DATETIME NOT NULL,
+        end_time DATETIME NOT NULL,
+        access_code VARCHAR(32) NOT NULL,
+        status ENUM('pending','active','completed') DEFAULT 'pending',
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (schedule_id),
+        UNIQUE KEY unique_access_code (access_code),
+        FOREIGN KEY (quizid) REFERENCES quizdetails(quizid) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+    
+    if (!$con->query($createScheduledQuizzesTable)) {
+        error_log("Failed to create scheduled_quizzes table: " . $con->error);
+    }
+}
+
 // Handle session timeout
 if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 1800)) {
     session_unset();

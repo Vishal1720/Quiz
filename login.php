@@ -13,6 +13,12 @@ if(isset($_POST['login_type']) && isset($_POST['username']) && isset($_POST['pas
             $_SESSION['status'] = "admin";
             $_SESSION['username'] = 'admin';
             $_SESSION['email'] = 'admin123@gmail.com';
+            if(isset($_SESSION['redirect_after_login'])) {
+                $redirect = $_SESSION['redirect_after_login'];
+                unset($_SESSION['redirect_after_login']);
+                header("Location: " . $redirect);
+                exit();
+            }
             header("Location: index.php");
             exit();
         } else {
@@ -36,6 +42,12 @@ if(isset($_POST['login_type']) && isset($_POST['username']) && isset($_POST['pas
             if(password_verify($pwd, $user['password'])) {
                 $_SESSION['status'] = "loggedin";
                 $_SESSION['email'] = $email;
+                if(isset($_SESSION['redirect_after_login'])) {
+                    $redirect = $_SESSION['redirect_after_login'];
+                    unset($_SESSION['redirect_after_login']);
+                    header("Location: " . $redirect);
+                    exit();
+                }
                 header("Location: index.php");
                 exit();
             } else {
@@ -46,6 +58,12 @@ if(isset($_POST['login_type']) && isset($_POST['username']) && isset($_POST['pas
             $_SESSION['status'] = 'loggedout';
         }
     }
+}
+
+if(isset($_GET['redirect'])) {
+    $redirect = htmlspecialchars($_GET['redirect']);
+    // Store redirect URL in session
+    $_SESSION['redirect_after_login'] = $redirect;
 }
 ?>
 <?php include "components/header.php"; ?>

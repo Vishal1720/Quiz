@@ -16,6 +16,39 @@ if (!isset($_GET['quizid'])) {
 
 $quizid = mysqli_real_escape_string($con, $_GET['quizid']);
 
+// Check scheduled quiz access
+if (isset($_GET['scheduled']) && isset($_GET['code'])) {
+    $code = mysqli_real_escape_string($con, $_GET['code']);
+    $scheduleCheck = $con->prepare("SELECT sq.*, qd.quizname 
+                                  FROM scheduled_quizzes sq 
+                                  JOIN quizdetails qd ON sq.quizid = qd.quizid 
+                                  WHERE sq.access_code = ? 
+                                  AND sq.quizid = ? 
+                                  AND sq.start_time <= NOW() 
+                                  AND sq.end_time >= NOW()");
+                                  
+    if (!$scheduleCheck) {
+        error_log("Failed to prepare schedule check: " . $con->error);
+        header("Location: index.php?error=system_error");
+        exit();
+    }
+
+    $scheduleCheck->bind_param("si", $code, $quizid);
+    $scheduleCheck->execute();
+    $scheduleResult = $scheduleCheck->get_result();
+    
+    if ($scheduleResult->num_rows === 0) {
+        error_log("Scheduled quiz access denied - Code: $code, Quiz ID: $quizid");
+        header("Location: scheduled_quiz.php?code=$code&error=not_available");
+        exit();
+    }
+
+    // Update quiz status
+    $updateStmt = $con->prepare("UPDATE scheduled_quizzes SET status = 'active' WHERE access_code = ?");
+    $updateStmt->bind_param("s", $code);
+    $updateStmt->execute();
+}
+
 // Reset timer if this is a new quiz attempt or a different quiz
 if (isset($_SESSION['current_quiz_id']) && $_SESSION['current_quiz_id'] != $quizid) {
     // User is starting a different quiz, reset timer
@@ -28,7 +61,9 @@ if (isset($_SESSION['current_quiz_id']) && $_SESSION['current_quiz_id'] != $quiz
 $_SESSION['current_quiz_id'] = $quizid;
 
 // Get quiz details
-$stmt = $con->prepare("SELECT * FROM quizdetails WHERE quizid = ?");
+$stmt = $con->prepare("SELECT qd.*, q.* FROM quizdetails qd 
+                      LEFT JOIN quizes q ON qd.quizid = q.quizid 
+                      WHERE qd.quizid = ?");
 $stmt->bind_param("i", $quizid);
 $stmt->execute();
 $quizDetails = $stmt->get_result()->fetch_assoc();
