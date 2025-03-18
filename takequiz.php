@@ -631,6 +631,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         const timerElement = document.getElementById('timer');
         const quizForm = document.getElementById('quiz-form');
         
+        // Add visibility change detection
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden && !timeIsUp) {
+                alert('Tab switching detected. The quiz will now be submitted.');
+                endQuiz();
+            }
+        });
+        
+        // Detect fullscreen exit
+        document.addEventListener('fullscreenchange', function() {
+            if (!document.fullscreenElement && !timeIsUp) {
+                warningCount++;
+                const remainingWarnings = MAX_WARNINGS - warningCount;
+                
+                if (warningCount >= MAX_WARNINGS) {
+                    alert('You have exceeded the maximum number of fullscreen exits. The quiz will now be submitted.');
+                    endQuiz();
+                } else {
+                    alert(`Warning: Exiting fullscreen during the quiz is not allowed! You have ${remainingWarnings} warning(s) remaining before automatic submission.`);
+                }
+            }
+        });
+        
+        // Request fullscreen when starting the quiz
+        document.addEventListener('DOMContentLoaded', function() {
+            const quizContainer = document.querySelector('.quiz-container');
+            if (quizContainer.requestFullscreen) {
+                quizContainer.requestFullscreen();
+            }
+        });
+        
         // Get quiz ID and create localStorage keys
         const quizId = <?php echo $quizid; ?>;
         const quizStartKey = 'quiz_' + quizId + '_start_time';
