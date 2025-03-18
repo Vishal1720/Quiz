@@ -233,6 +233,74 @@ if ($quizResult) {
             justify-content: center;
         }
 
+        /* Add Category Styles */
+        .add-category-section {
+            margin: var(--spacing-lg) 0;
+            background: var(--quiz-card-bg);
+            border-radius: 15px;
+            padding: var(--spacing-lg);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--quiz-card-border);
+            text-align: center;
+        }
+
+        .section-title {
+            color: var(--text-light);
+            font-size: clamp(1.3rem, 4vw, 1.6rem);
+            margin-bottom: var(--spacing-md);
+            text-align: center;
+        }
+
+        .add-category-form {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .category-input {
+            flex: 1;
+            min-width: 250px;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--quiz-card-border);
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-light);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .category-input:focus {
+            outline: none;
+            border-color: var(--quiz-primary);
+            box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+        }
+
+        .add-category-btn {
+            padding: 12px 20px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .add-category-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+            background: linear-gradient(135deg, #059669, #10b981);
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -275,6 +343,20 @@ if ($quizResult) {
                 <?php endif; ?>
             </p>
         </section>
+
+        <?php if($_SESSION['status'] === "admin"): ?>
+        <section class="add-category-section">
+            <h2 class="section-title">Add New Category</h2>
+            <form method="POST" action="add_category.php" class="add-category-form">
+                <div class="form-group">
+                    <input type="text" name="category_name" placeholder="Enter new category name" required class="category-input">
+                    <button type="submit" class="add-category-btn">
+                        <i class="fas fa-plus"></i> Add Category
+                    </button>
+                </div>
+            </form>
+        </section>
+        <?php endif; ?>
 
         <?php foreach($categories as $category): ?>
             <section class="category-section">
