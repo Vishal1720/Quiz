@@ -630,19 +630,57 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Timer functionality
         const timerElement = document.getElementById('timer');
         const quizForm = document.getElementById('quiz-form');
-        let timeRemaining = <?php echo max(0, $timeRemaining); ?>; // Ensure time is never negative
-        let quizDuration = <?php echo isset($quizDuration) ? $quizDuration : ($_SESSION['total_quiz_duration'] * 60); ?>; // Store the total quiz duration
+        
+        // Get quiz ID and create localStorage keys
+        const quizId = <?php echo $quizid; ?>;
+        const quizStartKey = 'quiz_' + quizId + '_start_time';
+        const quizTimeRemainingKey = 'quiz_' + quizId + '_time_remaining';
+        const quizEndTimeKey = 'quiz_' + quizId + '_end_time';
+        
+        // Get server-provided time remaining
+        let serverTimeRemaining = <?php echo max(0, $timeRemaining); ?>;
+        let timeRemaining;
+        
+        // Get the current timestamp
+        const currentTime = Math.floor(Date.now() / 1000);
+        
+        // Initialize or retrieve quiz end time from localStorage
+        if (!localStorage.getItem(quizEndTimeKey)) {
+            // First visit - calculate and store end time
+            const endTime = currentTime + serverTimeRemaining;
+            localStorage.setItem(quizEndTimeKey, endTime.toString());
+            localStorage.setItem(quizStartKey, currentTime.toString());
+            timeRemaining = serverTimeRemaining;
+        } else {
+            // On refresh - calculate time remaining based on stored end time
+            const storedEndTime = parseInt(localStorage.getItem(quizEndTimeKey));
+            timeRemaining = Math.max(0, storedEndTime - currentTime);
+            
+            // If server time is less than calculated time (e.g., admin reduced time),
+            // use the server time instead
+            if (serverTimeRemaining < timeRemaining) {
+                timeRemaining = serverTimeRemaining;
+                // Update stored end time
+                localStorage.setItem(quizEndTimeKey, (currentTime + serverTimeRemaining).toString());
+            }
+        }
+        
+        // Store current time remaining for reference
+        localStorage.setItem(quizTimeRemainingKey, timeRemaining.toString());
+        
+        console.log("Initial time setup - Server time:", serverTimeRemaining, 
+                    "Calculated time:", timeRemaining, 
+                    "End time:", localStorage.getItem(quizEndTimeKey));
+        
+        let quizDuration = <?php echo isset($quizDuration) ? $quizDuration : ($_SESSION['total_quiz_duration'] * 60); ?>;
         let timerInterval;
         const isScheduledQuiz = <?php echo $_SESSION['is_scheduled_quiz'] ? 'true' : 'false'; ?>;
-        const totalQuizDuration = <?php echo $_SESSION['total_quiz_duration'] * 60; ?>; // Total quiz duration in seconds
-        let timeIsUp = false; // Flag to prevent multiple submissions
-        const quizId = <?php echo $quizid; ?>;
+        const totalQuizDuration = <?php echo $_SESSION['total_quiz_duration'] * 60; ?>;
+        let timeIsUp = false;
+        
         <?php if ($_SESSION['is_scheduled_quiz']): ?>
-        // Use server-calculated percentage for scheduled quizzes
         const percentTimeUsed = <?php echo $_SESSION['percent_time_used']; ?>;
         <?php endif; ?>
-        
-        console.log("Debug - Time remaining:", timeRemaining, "Total duration:", totalQuizDuration);
         
         // If time is already up when page loads, end the quiz immediately
         if (timeRemaining <= 0) {
@@ -652,10 +690,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             });
         }
         
-        // Cap the time remaining to the total duration to avoid showing excessive times
+        // Cap the time remaining to the total duration
         if (timeRemaining > totalQuizDuration) {
             console.log("Correcting excessive time remaining");
             timeRemaining = totalQuizDuration;
+            // Update stored end time
+            localStorage.setItem(quizEndTimeKey, (currentTime + timeRemaining).toString());
+            localStorage.setItem(quizTimeRemainingKey, timeRemaining.toString());
         }
 
         function endQuiz() {
@@ -664,6 +705,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             timeIsUp = true;
             clearInterval(timerInterval);
             timerElement.querySelector('span').textContent = 'Time is up!';
+            
+            // Clear localStorage timer data
+            localStorage.removeItem(quizStartKey);
+            localStorage.removeItem(quizTimeRemainingKey);
+            localStorage.removeItem(quizEndTimeKey);
             
             // Disable submit button
             const submitBtn = document.querySelector('.submit-btn');
