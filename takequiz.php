@@ -654,6 +654,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         });
         
+        // ...existing code ...
+        // Prevent back button functionality
+        window.history.pushState(null, null, window.location.href);
+        window.addEventListener('popstate', function() {
+            window.history.pushState(null, null, window.location.href);
+            alert('Back button is disabled during the quiz!');
+        });
+
         // Request fullscreen when starting the quiz
         document.addEventListener('DOMContentLoaded', function() {
             const quizContainer = document.querySelector('.quiz-container');
