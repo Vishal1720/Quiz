@@ -1,6 +1,12 @@
 <?php
+session_start();
 require 'dbconnect.php';
 
+// Ensure user is logged in
+if (!isset($_SESSION["status"]) || ($_SESSION["status"] !== "loggedin" && $_SESSION["status"] !== "admin")) {
+    header("Location: login.php?error=login_required&redirect=" . urlencode($_SERVER['REQUEST_URI']));
+    exit();
+}
 
 $error = '';
 if(isset($_POST['quiz_link'])) {

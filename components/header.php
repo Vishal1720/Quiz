@@ -382,11 +382,13 @@ function getPageTitle() {
                         <i class="fas fa-sign-out-alt"></i><span>Logout</span>
                     </a>
                 </div>
+                <?php if($_SESSION['status'] === 'loggedin'): ?>
                 <div class="nav-item">
                     <a href="/Quiz/access_quiz.php" class="nav-link">
                         <i class="fas fa-link"></i><span>Access Quiz</span>
                     </a>
                 </div>
+                <?php endif; ?>
             <?php else: ?>
                 <!-- Not logged in -->
                 <?php if($currentPage === 'landing.php'): ?>

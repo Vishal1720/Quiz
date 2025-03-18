@@ -2,8 +2,8 @@
 session_start();
 require "dbconnect.php";
 
-if (!isset($_SESSION["status"]) || $_SESSION["status"] !== "loggedin") {
-    header("Location: login.php");
+if (!isset($_SESSION["status"]) || ($_SESSION["status"] !== "loggedin" && $_SESSION["status"] !== "admin")) {
+    header("Location: login.php?error=login_required&redirect=" . urlencode($_SERVER['REQUEST_URI']));
     exit();
 }
 
@@ -47,10 +47,17 @@ if($totalQuestions == 0)
     }
 $percentage = ($score / $totalQuestions) * 100;
 
+// Check if this was a scheduled quiz
+$wasScheduledQuiz = isset($_SESSION['is_scheduled_quiz']) && $_SESSION['is_scheduled_quiz'] === true;
+
 // Clear quiz session data
 unset($_SESSION["quiz_completed"]);
 unset($_SESSION["quiz_answers"]);
 unset($_SESSION["quiz_start_time"]);
+unset($_SESSION["is_scheduled_quiz"]);
+unset($_SESSION["scheduled_end_time"]);
+unset($_SESSION["scheduled_start_time"]);
+unset($_SESSION["scheduled_total_duration"]);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -323,7 +330,9 @@ unset($_SESSION["quiz_start_time"]);
 
         <div class="action-buttons">
             <a href="index.php" class="action-btn primary-btn">Back to Home</a>
+            <?php if(!$wasScheduledQuiz): ?>
             <a href="takequiz.php?quizid=<?php echo $quizid; ?>" class="action-btn secondary-btn">Try Again</a>
+            <?php endif; ?>
         </div>
     </div>
 </body>
