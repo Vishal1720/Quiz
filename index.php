@@ -33,6 +33,8 @@ if ($quizResult) {
             --quiz-card-bg: rgba(255, 255, 255, 0.05);
             --quiz-card-border: rgba(255, 255, 255, 0.1);
             --quiz-card-hover: rgba(255, 255, 255, 0.08);
+            --delete-color: #ef4444;
+            --delete-hover: #dc2626;
         }
 
         .dashboard {
@@ -203,6 +205,34 @@ if ($quizResult) {
             font-style: italic;
         }
 
+        /* Delete Category Button */
+        .delete-category-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--delete-color);
+            font-size: 1.2rem;
+            margin-left: 10px;
+            vertical-align: middle;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+            padding: 5px;
+            border-radius: 50%;
+        }
+
+        .delete-category-btn:hover {
+            opacity: 1;
+            color: var(--delete-hover);
+            transform: scale(1.1);
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+
+        .category-title-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -248,7 +278,19 @@ if ($quizResult) {
 
         <?php foreach($categories as $category): ?>
             <section class="category-section">
-                <h2 class="category-title"><?php echo htmlspecialchars($category); ?></h2>
+                <h2 class="category-title">
+                    <span class="category-title-wrapper">
+                        <?php echo htmlspecialchars($category); ?>
+                        <?php if($_SESSION['status'] === "admin"): ?>
+                            <form method="POST" action="delete_category.php" onsubmit="return confirm('WARNING: Deleting the category \'<?php echo htmlspecialchars($category); ?>\' will PERMANENTLY DELETE all quizzes in this category along with their questions and results. This action cannot be undone. Do you want to continue?')" style="display: inline;">
+                                <input type="hidden" name="category" value="<?php echo htmlspecialchars($category); ?>">
+                                <button type="submit" class="delete-category-btn" title="Permanently delete category and all its quizzes">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </form>
+                        <?php endif; ?>
+                    </span>
+                </h2>
                 <div class="quiz-grid">
                     <?php
                     $quizResult->data_seek(0);
