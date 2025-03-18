@@ -67,12 +67,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Get categories
-$query = "SELECT categoryname FROM category ORDER BY categoryname ASC";
+$query = "SELECT DISTINCT category FROM quizdetails ORDER BY category ASC";
 $result = $con->query($query);
 $categories = [];
-while($row = $result->fetch_assoc()) {
-    $categories[] = $row['categoryname'];
+if ($result && $result->num_rows > 0) {
+    while($row = $result->fetch_assoc()) {
+        $categories[] = $row['category'];
+    }
 }
+
+// Always ensure Uncategorized is available as an option
+if (!in_array('Uncategorized', $categories)) {
+    $categories[] = 'Uncategorized';
+}
+
+// Sort categories alphabetically
+sort($categories);
 ?>
 <?php include "components/header.php"; ?>
     <style>
@@ -307,14 +317,18 @@ while($row = $result->fetch_assoc()) {
                 <label for="category">Category</label>
                 <select name="category" id="category" class="form-control" required>
                     <option value="">Select a category</option>
-                    <?php foreach($categories as $category): ?>
-                        <option value="<?php echo htmlspecialchars($category); ?>"
-                                <?php echo (isset($_POST['category']) && $_POST['category'] === $category) ? 'selected' : ''; ?>>
-                            <?php echo htmlspecialchars($category); ?>
-                        </option>
-                    <?php endforeach; ?>
+                    <?php if(empty($categories)): ?>
+                        <option value="Uncategorized">No categories available - using Uncategorized</option>
+                    <?php else: ?>
+                        <?php foreach($categories as $category): ?>
+                            <option value="<?php echo htmlspecialchars($category); ?>"
+                                    <?php echo (isset($_POST['category']) && $_POST['category'] === $category) ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($category); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </select>
-                <p class="helper-text">Choose a category for your quiz</p>
+                <p class="helper-text">Choose a category for your quiz <?php if($_SESSION['status'] === "admin"): ?> or <a href="index.php" style="color: var(--primary-color);">create new categories</a> first<?php endif; ?></p>
             </div>
 
             <div class="timer-section">
