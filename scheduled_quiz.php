@@ -214,6 +214,7 @@ if (!$stmt) {
                     <p><strong>Available from:</strong> <?php echo $formatted_start_time; ?></p>
                     <p><strong>Available until:</strong> <?php echo $formatted_end_time; ?></p>
                     <?php if($quiz['timer'] > 0): ?>
+                        <p><strong>Time Limit:</strong> <?php echo $quiz['timer']; ?> minutes</p>
                     <?php endif; ?>
                 </div>
             </div>

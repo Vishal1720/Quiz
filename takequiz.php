@@ -125,15 +125,24 @@ if ($_SESSION['is_scheduled_quiz'] && isset($_SESSION['scheduled_end_time'])) {
     // Calculate remaining time based on scheduled end time
     $timeRemainingSeconds = $_SESSION['scheduled_end_time'] - time();
     
+    // Get the total scheduled duration (end time - start time)
+    $totalScheduledDuration = $_SESSION['scheduled_end_time'] - $_SESSION['scheduled_start_time'];
+    $totalScheduledMinutes = ceil($totalScheduledDuration / 60);
+    
+    // Calculate elapsed time from scheduled start, not from when user started
+    $elapsedFromScheduledStart = time() - $_SESSION['scheduled_start_time'];
+    
+    // Calculate percentage of scheduled time used (100% means we're at the end time)
+    $percentOfTimeUsed = min(100, round(($elapsedFromScheduledStart / $totalScheduledDuration) * 100));
+    
     // Log time calculation details for debugging
     error_log("Time calc: end_time=" . $_SESSION['scheduled_end_time'] . 
               ", current=" . time() . 
               ", diff=" . $timeRemainingSeconds . 
-              " seconds");
+              " seconds, percent used=" . $percentOfTimeUsed . "%");
     
-    // Get the total scheduled duration for display
-    $totalScheduledDuration = $_SESSION['scheduled_total_duration'];
-    $totalScheduledMinutes = ceil($totalScheduledDuration / 60);
+    // Ensure time is never negative - important for JavaScript timer
+    $timeRemainingSeconds = max(0, $timeRemainingSeconds);
     
     // Convert seconds to minutes (rounded up to give full minutes)
     $scheduledMinutes = ceil($timeRemainingSeconds / 60);
@@ -151,16 +160,14 @@ if ($_SESSION['is_scheduled_quiz'] && isset($_SESSION['scheduled_end_time'])) {
     $_SESSION['quiz_duration'] = $scheduledMinutes;
     $_SESSION['total_quiz_duration'] = $totalScheduledMinutes;
     
-    // Calculate how long the user has been taking the quiz
-    $elapsedTime = time() - $originalStartTime;
-    $percentUsed = round(($elapsedTime / $totalScheduledDuration) * 100);
-    
     echo "<!-- DEBUG: Scheduled quiz with " . $scheduledMinutes . " minutes remaining out of total " . 
-         $totalScheduledMinutes . " minutes. User has used " . floor($elapsedTime/60) . 
-         " minutes (" . $percentUsed . "%) -->";
+         $totalScheduledMinutes . " minutes. Percent of time used: " . $percentOfTimeUsed . "% -->";
     
     // For scheduled quizzes, time remaining is based on end time, not quiz duration
     $timeRemaining = $timeRemainingSeconds;
+    
+    // Store percentage for JavaScript to use
+    $_SESSION['percent_time_used'] = $percentOfTimeUsed;
 } else {
     // Use the standard quiz timer
     $dbTimer = intval($quizDetails['timer']);
@@ -175,11 +182,14 @@ if ($_SESSION['is_scheduled_quiz'] && isset($_SESSION['scheduled_end_time'])) {
         $_SESSION['total_quiz_duration'] = $dbTimer;
     }
     
-    // Convert minutes to seconds
+    // Convert minutes to seconds for consistent handling with scheduled quizzes
     $quizDuration = $_SESSION['quiz_duration'] * 60;
     
     // Calculate time remaining based on the original start time
     $timeRemaining = $quizDuration - (time() - $originalStartTime);
+    
+    // Ensure time is never negative
+    $timeRemaining = max(0, $timeRemaining);
 }
 
 // Force debug output to browser for troubleshooting
@@ -545,7 +555,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="quiz-info">
                 <div class="timer" id="timer">
                     <i class="fas fa-clock"></i>
-                    <span>Time remaining: --:--</span>
+                    <span><?php 
+                    // Pre-initialize timer text instead of showing --:--
+                    if ($_SESSION['is_scheduled_quiz']) {
+                        // For scheduled quizzes, show the time remaining until the end time
+                        $totalMinutes = floor($timeRemaining / 60);
+                        $seconds = $timeRemaining % 60;
+                        
+                        // Clean, standard timer format
+                        echo "Time remaining: " . $totalMinutes . ":" . str_pad($seconds, 2, "0", STR_PAD_LEFT);
+                    } else {
+                        // Format time for regular quizzes - pad with zeros to match JS format
+                        $minutes = floor($timeRemaining / 60);
+                        $seconds = $timeRemaining % 60;
+                        echo "Time remaining: " . $minutes . ":" . str_pad($seconds, 2, "0", STR_PAD_LEFT);
+                    }
+                    ?></span>
                 </div>
                 <?php if ($_SESSION['is_scheduled_quiz']): ?>
                 <div class="scheduled-time">
@@ -555,7 +580,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <?php echo date('g:i a', $_SESSION['scheduled_end_time']); ?> 
                         (<?php 
                         // Format the duration nicely
-                        $durationMinutes = $_SESSION['total_quiz_duration'];
+                        $durationMinutes = ceil(($_SESSION['scheduled_end_time'] - $_SESSION['scheduled_start_time']) / 60);
+                        $_SESSION['total_quiz_duration'] = $durationMinutes;
+                        
                         if ($durationMinutes >= 60) {
                             $hours = floor($durationMinutes / 60);
                             $mins = $durationMinutes % 60;
@@ -603,12 +630,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Timer functionality
         const timerElement = document.getElementById('timer');
         const quizForm = document.getElementById('quiz-form');
-        let timeRemaining = <?php echo $timeRemaining; ?>;
-        let quizDuration = <?php echo $quizDuration; ?>; // Store the total quiz duration
+        let timeRemaining = <?php echo max(0, $timeRemaining); ?>; // Ensure time is never negative
+        let quizDuration = <?php echo isset($quizDuration) ? $quizDuration : ($_SESSION['total_quiz_duration'] * 60); ?>; // Store the total quiz duration
         let timerInterval;
         const isScheduledQuiz = <?php echo $_SESSION['is_scheduled_quiz'] ? 'true' : 'false'; ?>;
         const totalQuizDuration = <?php echo $_SESSION['total_quiz_duration'] * 60; ?>; // Total quiz duration in seconds
         let timeIsUp = false; // Flag to prevent multiple submissions
+        const quizId = <?php echo $quizid; ?>;
+        <?php if ($_SESSION['is_scheduled_quiz']): ?>
+        // Use server-calculated percentage for scheduled quizzes
+        const percentTimeUsed = <?php echo $_SESSION['percent_time_used']; ?>;
+        <?php endif; ?>
         
         console.log("Debug - Time remaining:", timeRemaining, "Total duration:", totalQuizDuration);
         
@@ -626,18 +658,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             timeRemaining = totalQuizDuration;
         }
 
-        function formatTime(seconds) {
-            const hours = Math.floor(seconds / 3600);
-            const minutes = Math.floor((seconds % 3600) / 60);
-            const remainingSeconds = seconds % 60;
-            
-            if (hours > 0) {
-                return `${hours}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-            } else {
-                return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-            }
-        }
-
         function endQuiz() {
             if (timeIsUp) return; // Prevent multiple submissions
             
@@ -652,16 +672,73 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 submitBtn.textContent = 'Quiz Ended';
             }
             
-            // Display message
-            alert('Time is up! Your answers will be submitted automatically.');
+            console.log("Quiz ended - submitting answers and redirecting to results page");
             
-            // Submit the form
-            quizForm.submit();
+            // Display overlay with message
+            const overlay = document.createElement('div');
+            overlay.style.position = 'fixed';
+            overlay.style.top = '0';
+            overlay.style.left = '0';
+            overlay.style.width = '100%';
+            overlay.style.height = '100%';
+            overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+            overlay.style.display = 'flex';
+            overlay.style.justifyContent = 'center';
+            overlay.style.alignItems = 'center';
+            overlay.style.zIndex = '9999';
+            overlay.style.color = 'white';
+            overlay.style.fontSize = '24px';
+            overlay.style.textAlign = 'center';
+            overlay.style.padding = '20px';
+            overlay.innerHTML = '<div>Time is up!<br>Submitting your answers...</div>';
+            document.body.appendChild(overlay);
             
-            // As a fallback, if submission doesn't redirect for some reason
+            // If the form has selections, submit it - otherwise create a hidden form to force submission
+            if (hasAnswers()) {
+                console.log("Submitting form with user's answers");
+                quizForm.submit();
+            } else {
+                console.log("No answers selected - redirecting to results page directly");
+                // Create and submit a hidden form to ensure the quiz is marked as completed
+                submitEmptyForm();
+            }
+            
+            // As a final fallback, redirect after a short delay if form submission doesn't work
             setTimeout(function() {
-                window.location.href = 'results.php?quizid=<?php echo $quizid; ?>';
-            }, 1000);
+                console.log("Fallback redirect activated");
+                window.location.href = 'results.php?quizid=' + quizId;
+            }, 1500);
+        }
+        
+        // Helper function to check if any answers are selected
+        function hasAnswers() {
+            const radios = document.querySelectorAll('input[type="radio"]:checked');
+            return radios.length > 0;
+        }
+        
+        // Function to submit an empty form to mark quiz as completed
+        function submitEmptyForm() {
+            const hiddenForm = document.createElement('form');
+            hiddenForm.method = 'POST';
+            hiddenForm.action = window.location.href; // Same URL to trigger the POST handler
+            
+            // Add a flag to indicate quiz is completed
+            const completedField = document.createElement('input');
+            completedField.type = 'hidden';
+            completedField.name = 'quiz_completed';
+            completedField.value = '1';
+            hiddenForm.appendChild(completedField);
+            
+            // Add quiz ID
+            const quizIdField = document.createElement('input');
+            quizIdField.type = 'hidden';
+            quizIdField.name = 'quizid';
+            quizIdField.value = quizId;
+            hiddenForm.appendChild(quizIdField);
+            
+            // Append to document and submit
+            document.body.appendChild(hiddenForm);
+            hiddenForm.submit();
         }
 
         function updateTimer() {
@@ -670,27 +747,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 return;
             }
 
-            // Create a more descriptive time message for scheduled quizzes
-            let timeMessage = 'Time remaining: ' + formatTime(timeRemaining);
-            if (isScheduledQuiz) {
-                const hours = Math.floor(timeRemaining / 3600);
-                const minutes = Math.floor((timeRemaining % 3600) / 60);
-                const seconds = timeRemaining % 60;
-                
-                // Calculate how much time has been used
-                const totalSeconds = Math.floor(totalQuizDuration);
-                const usedSeconds = totalSeconds - timeRemaining;
-                const percentComplete = Math.round((usedSeconds / totalSeconds) * 100);
-                
-                // Create a more human-readable format without showing hours if less than 1 hour
-                if (hours > 0) {
-                    timeMessage = `${hours}h ${minutes}m ${seconds}s remaining (${percentComplete}% used)`;
-                } else if (minutes > 0) {
-                    timeMessage = `${minutes}m ${seconds}s remaining (${percentComplete}% used)`;
-                } else {
-                    timeMessage = `${seconds}s remaining (${percentComplete}% used)`;
-                }
-            }
+            // Create a standard time message for all quiz types
+            // Convert all time to total minutes and seconds
+            const totalMinutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            
+            // Format with proper padding - clean, simple format
+            const timeMessage = `Time remaining: ${totalMinutes}:${seconds.toString().padStart(2, '0')}`;
             
             timerElement.querySelector('span').textContent = timeMessage;
             
@@ -709,31 +772,51 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             timeRemaining--;
         }
 
-        // Start timer immediately
-        updateTimer();
-        // Update every second
-        timerInterval = setInterval(updateTimer, 1000);
-
-        // Form submission handling
-        quizForm.addEventListener('submit', function(e) {
-            if (timeRemaining <= 0) {
-                e.preventDefault();
-                endQuiz();
-            }
+        // Make sure DOM is fully loaded before manipulating elements
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("DOM loaded, initializing timer...");
+            
+            // Start timer immediately - fix for "--:--" display issue
+            updateTimer();
+            
+            // Update every second - now set this after the initial update to prevent delay
+            timerInterval = setInterval(updateTimer, 1000);
+            
+            // Form submission handling
+            quizForm.addEventListener('submit', function(e) {
+                if (timeRemaining <= 0) {
+                    e.preventDefault();
+                    endQuiz();
+                }
+            });
+            
+            // Set a permanent redirect after max quiz time + buffer
+            // This prevents users from staying on the page after time expires
+            const maxTimeWithBuffer = totalQuizDuration + 60; // Add 60 seconds buffer
+            setTimeout(function() {
+                if (!timeIsUp) {
+                    endQuiz();
+                }
+            }, maxTimeWithBuffer * 1000);
+            
+            // Additional safeguard - check time every 5 seconds in case interval fails
+            const safeguardInterval = setInterval(function() {
+                if (timeRemaining <= 0 && !timeIsUp) {
+                    console.log("Safeguard detected time expired");
+                    clearInterval(safeguardInterval);
+                    endQuiz();
+                }
+            }, 5000);
+            
+            console.log("Timer initialized successfully");
         });
 
-        // Set a permanent redirect after max quiz time + buffer
-        // This prevents users from staying on the page after time expires
-        const maxTimeWithBuffer = totalQuizDuration + 60; // Add 60 seconds buffer
-        setTimeout(function() {
-            if (!timeIsUp) {
-                endQuiz();
-            }
-        }, maxTimeWithBuffer * 1000);
-
-        // Cleanup interval on page unload
+        // Cleanup intervals on page unload
         window.addEventListener('unload', function() {
             clearInterval(timerInterval);
+            if (typeof safeguardInterval !== 'undefined') {
+                clearInterval(safeguardInterval);
+            }
         });
     </script>
 </body>
