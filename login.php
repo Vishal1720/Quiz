@@ -366,6 +366,7 @@ if(isset($_GET['redirect'])) {
             text-align: center;
             background: linear-gradient(135deg, #fff, var(--primary));
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
             font-weight: 700;
         }
