@@ -360,6 +360,12 @@ function getPageTitle() {
                             </a>
                         </div>
                         <div class="nav-item">
+                            <a href="/Quiz/quiz_statistics.php" class="nav-link admin-nav-link <?php echo $currentPage === 'quiz_statistics.php' ? 'active' : ''; ?>">
+                                <i class="fas fa-chart-bar"></i><span>Statistics</span>
+                                <div class="admin-badge">Admin</div>
+                            </a>
+                        </div>
+                        <div class="nav-item">
                             <a href="/Quiz/quizform.php" class="nav-link admin-nav-link <?php echo $currentPage === 'quizform.php' ? 'active' : ''; ?>">
                                 <i class="fas fa-list-ol"></i><span>Insert</span>
                             </a>
