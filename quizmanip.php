@@ -319,7 +319,15 @@ $quizzes = $con->query($query);
             <select id="quiz-select" class="form-control" onchange="loadQuestions(this.value)">
                 <option value="">Choose a quiz...</option>
                 <?php while($quiz = $quizzes->fetch_assoc()): ?>
-                    <option value="<?php echo htmlspecialchars($quiz['quizid']); ?>">
+                    <option value="<?php echo htmlspecialchars($quiz['quizid']); ?>"
+                    <?php
+                    if(isset($_GET['quizid'])){
+                        if($_GET['quizid']==$quiz['quizid'])
+                        echo "selected";
+                        
+                    }
+                    ?>
+                    >
                         <?php echo htmlspecialchars($quiz['quizname'] . ' (' . $quiz['category'] . ')'); ?>
                     </option>
                 <?php endwhile; ?>
@@ -332,6 +340,7 @@ $quizzes = $con->query($query);
     </div>
 
     <script>
+        loadQuestions(document.getElementById("quiz-select").value);//calling it by default for selected element
         function loadQuestions(quizId) {
             if (!quizId) {
                 document.getElementById('questions-container').innerHTML = '';
