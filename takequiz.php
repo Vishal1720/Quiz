@@ -601,7 +601,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <?php foreach ($questions as $index => $question): ?>
                 <div class="question-card">
                     <div class="question-text">
-                        <?php echo ($index + 1) . ". " . htmlspecialchars($question['question']); ?>
+                        <?php 
+                        $ques=$question['question'];
+                        $ques=str_replace("\'","'",$ques);
+                        $ques=str_replace('\"','"',$ques);
+                        echo ($index + 1).".".htmlspecialchars($ques);  ?>
                     </div>
                     <ul class="options-list">
                         <?php for ($i = 1; $i <= 4; $i++): ?>
