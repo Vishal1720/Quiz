@@ -67,18 +67,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Get categories
-$query = "SELECT DISTINCT category FROM quizdetails ORDER BY category ASC";
+$query = "SELECT DISTINCT categoryname FROM category";
 $result = $con->query($query);
 $categories = [];
 if ($result && $result->num_rows > 0) {
     while($row = $result->fetch_assoc()) {
-        $categories[] = $row['category'];
+        $categories[] = $row['categoryname'];
     }
 }
-
-// Always ensure Uncategorized is available as an option
+else
 if (!in_array('Uncategorized', $categories)) {
-    $categories[] = 'Uncategorized';
+    $categories[] = 'Uncategorized';// If no categories found in db
 }
 
 // Sort categories alphabetically
