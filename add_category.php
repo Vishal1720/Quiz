@@ -33,7 +33,7 @@ if (!preg_match('/^[a-zA-Z0-9\s\-\_\&\.\,\:\;]+$/', $categoryName)) {
 }
 
 // Check if category already exists
-$checkQuery = "SELECT COUNT(*) as count FROM quizdetails WHERE category = ?";
+$checkQuery = "SELECT COUNT(*) as count FROM category WHERE categoryname = ?";
 $checkStmt = $con->prepare($checkQuery);
 $checkStmt->bind_param("s", $categoryName);
 $checkStmt->execute();
@@ -47,21 +47,20 @@ if ($row['count'] > 0) {
 }
 
 // Create a placeholder quiz in the new category to make it visible in the list
-$insertQuery = "INSERT INTO quizdetails (quizname, category, timer, email) VALUES (?, ?, 30, ?)";
+$insertQuery = "INSERT INTO category (categoryname) VALUES (?)";
 $insertStmt = $con->prepare($insertQuery);
 $placeholderQuizName = "New Quiz in " . $categoryName;
 
 // Use admin's email from session or a default email
 $adminEmail = isset($_SESSION['email']) ? $_SESSION['email'] : 'admin@quizplatform.com';
 
-$insertStmt->bind_param("sss", $placeholderQuizName, $categoryName, $adminEmail);
+$insertStmt->bind_param("s",  $categoryName);
 
 if ($insertStmt->execute()) {
-    $_SESSION['success'] = "Category '" . htmlspecialchars($categoryName) . "' has been created successfully with a placeholder quiz. You can edit or delete this quiz as needed.";
+    $_SESSION['success'] = "Category '" . htmlspecialchars($categoryName) . "' has been created successfully .";
 } else {
     $_SESSION['error'] = "Failed to create category. Error: " . $con->error;
 }
 
 header("Location: index.php");
 exit();
-?> 
