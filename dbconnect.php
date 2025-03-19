@@ -39,6 +39,50 @@ if (session_status() === PHP_SESSION_NONE) {
     }
 }
 
+// Create users table if not exists
+$createUsersTable = "CREATE TABLE IF NOT EXISTS users (
+    email VARCHAR(255) NOT NULL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    password VARCHAR(255) DEFAULT NULL,
+    contact VARCHAR(10) DEFAULT NULL,
+    google_id VARCHAR(255) DEFAULT NULL,
+    profile_picture VARCHAR(255) DEFAULT NULL,
+    auth_provider ENUM('password', 'google') DEFAULT 'password',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+)";
+
+$con->query($createUsersTable);
+
+// Check if users table needs to be updated for Google auth
+$checkGoogleIdColumn = "SHOW COLUMNS FROM users LIKE 'google_id'";
+$googleIdResult = $con->query($checkGoogleIdColumn);
+if ($googleIdResult->num_rows == 0) {
+    // Google ID column doesn't exist, add it
+    $addGoogleIdColumn = "ALTER TABLE users ADD COLUMN google_id VARCHAR(255) DEFAULT NULL";
+    $con->query($addGoogleIdColumn);
+}
+
+$checkProfilePictureColumn = "SHOW COLUMNS FROM users LIKE 'profile_picture'";
+$profilePictureResult = $con->query($checkProfilePictureColumn);
+if ($profilePictureResult->num_rows == 0) {
+    $addProfilePictureColumn = "ALTER TABLE users ADD COLUMN profile_picture VARCHAR(255) DEFAULT NULL";
+    $con->query($addProfilePictureColumn);
+}
+
+$checkAuthProviderColumn = "SHOW COLUMNS FROM users LIKE 'auth_provider'";
+$authProviderResult = $con->query($checkAuthProviderColumn);
+if ($authProviderResult->num_rows == 0) {
+    $addAuthProviderColumn = "ALTER TABLE users ADD COLUMN auth_provider ENUM('password', 'google') DEFAULT 'password'";
+    $con->query($addAuthProviderColumn);
+}
+
+$checkCreatedAtColumn = "SHOW COLUMNS FROM users LIKE 'created_at'";
+$createdAtResult = $con->query($checkCreatedAtColumn);
+if ($createdAtResult->num_rows == 0) {
+    $addCreatedAtColumn = "ALTER TABLE users ADD COLUMN created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP";
+    $con->query($addCreatedAtColumn);
+}
+
 // Create quizdetails table if not exists
 $createQuizDetailsTable = "CREATE TABLE IF NOT EXISTS quizdetails (
     quizid INT AUTO_INCREMENT PRIMARY KEY,

@@ -1,5 +1,19 @@
 <?php 
 require "dbconnect.php";
+require "google_config.php";
+
+// Create Google auth URL for sign-in button
+$google_auth_params = [
+    'client_id' => $google_client_id,
+    'redirect_uri' => $google_redirect_url,
+    'response_type' => 'code',
+    'scope' => implode(' ', $google_scopes),
+    'access_type' => 'online',
+    'prompt' => 'select_account'
+];
+
+$google_auth_link = $google_auth_url . '?' . http_build_query($google_auth_params);
+
 if(isset($_POST['email']) && isset($_POST['name']) && isset($_POST['contact']) && isset($_POST['password'])) 
 {
     $email = trim($_POST['email']);
@@ -17,7 +31,7 @@ if(isset($_POST['email']) && isset($_POST['name']) && isset($_POST['contact']) &
         echo "<script>alert('Email already exists')</script>";
     } else {
         // Insert new user using prepared statement
-        $stmt = $con->prepare("INSERT INTO users (email, name, password, contact) VALUES (?, ?, ?, ?)");
+        $stmt = $con->prepare("INSERT INTO users (email, name, password, contact, auth_provider) VALUES (?, ?, ?, ?, 'password')");
         $stmt->bind_param("ssss", $email, $name, $pwd, $contact);
         
         if($stmt->execute()) {
@@ -102,12 +116,13 @@ if(isset($_POST['email']) && isset($_POST['name']) && isset($_POST['contact']) &
         input {
             width: 100%;
             padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             background: rgba(255, 255, 255, 0.05);
-            border: 1px solid var(--quiz-card-border);
-            border-radius: 8px;
             color: var(--text);
             font-size: 1rem;
             transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
         }
 
         input:focus {
@@ -116,58 +131,19 @@ if(isset($_POST['email']) && isset($_POST['name']) && isset($_POST['contact']) &
             box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
         }
 
-        .error, .password-match-error {
-            color: #ef4444;
-            font-size: 0.9rem;
-            margin-top: 0.5rem;
-            display: none;
-            padding: 0.5rem;
-            border-radius: 4px;
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-        }
-
-        input:invalid + .error {
-            display: block;
-            animation: shake 0.5s;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-        }
-
-        .password-requirements {
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            margin-top: 0.5rem;
-            padding: 1rem;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 8px;
-        }
-
-        .password-requirements ul {
-            margin: 0.5rem 0 0 1.5rem;
-            padding: 0;
-        }
-
-        .password-requirements li {
-            margin-bottom: 0.25rem;
-        }
-
         button {
             width: 100%;
-            padding: 0.75rem 1.5rem;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border: none;
-            border-radius: 8px;
-            color: var(--text);
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            background: linear-gradient(135deg, var(--primary), #4f46e5);
+            color: #fff;
             font-size: 1rem;
-            font-weight: 600;
+            font-weight: 500;
+            border: none;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-top: 1rem;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
         button:hover {
@@ -197,6 +173,82 @@ if(isset($_POST['email']) && isset($_POST['name']) && isset($_POST['contact']) &
         .toggle-password:hover {
             color: #333;
         }
+        
+        /* Google login button styles */
+        .google-login-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 0.5rem;
+            background: #ffffff;
+            color: #757575;
+            font-size: 1rem;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            text-decoration: none;
+        }
+        
+        .google-login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .google-login-button img {
+            height: 18px;
+            margin-right: 10px;
+        }
+        
+        .login-divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+            color: var(--text-muted);
+        }
+        
+        .login-divider::before,
+        .login-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .login-divider span {
+            padding: 0 1rem;
+            font-size: 0.9rem;
+        }
+        
+        .error {
+            color: #ef4444;
+            display: none;
+            margin-top: 0.25rem;
+            font-size: 0.875rem;
+        }
+        
+        .password-requirements {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+        
+        .password-requirements ul {
+            margin-top: 0.25rem;
+            padding-left: 1.5rem;
+            font-size: 0.8rem;
+        }
+        
+        .password-match-error {
+            color: #ef4444;
+            display: none;
+            margin-top: 0.25rem;
+            font-size: 0.875rem;
+        }
     </style>
 </head>
 <body>
@@ -204,55 +256,70 @@ if(isset($_POST['email']) && isset($_POST['name']) && isset($_POST['contact']) &
         <div class="register-section">
             <h2 class="section-title">Create Account</h2>
             <p class="section-description">Join our quiz platform and start testing your knowledge</p>
+            
+            <!-- Google Sign-up Button -->
+            <a href="<?php echo htmlspecialchars($google_auth_link); ?>" class="google-login-button">
+                <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google">
+                Sign up with Google
+            </a>
+            
+            <div class="login-divider">
+                <span>OR</span>
+            </div>
+            
             <form action="./register.php" id="regform" method="post">
-        <div class="form-group">
-            <label for="email">Email</label>
-            <input type="email" name="email" id="email" placeholder="Enter your email" required>
-            <div class="error">Please enter a valid email address</div>
-        </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" name="email" id="email" placeholder="Enter your email" required>
+                    <div class="error">Please enter a valid email address</div>
+                </div>
 
-        <div class="form-group">
-            <label for="name">Name</label>
-            <input type="text" name="name" id="name" placeholder="Enter your name" 
-                   pattern="^[a-zA-Z\s]+$" title="Only alphabets and spaces allowed" required>
-            <div class="error">Name should only contain letters and spaces</div>
-        </div>
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input type="text" name="name" id="name" placeholder="Enter your name" 
+                           pattern="^[a-zA-Z\s]+$" title="Only alphabets and spaces allowed" required>
+                    <div class="error">Name should only contain letters and spaces</div>
+                </div>
 
-        <div class="form-group">
-            <label for="contact">Contact</label>
-            <input type="tel" name="contact" id="contact" pattern="^\d{10}$" maxlength="10" 
-                   placeholder="Enter your phone number" title="Enter 10-digit phone number" required>
-            <div class="error">Please enter a valid 10-digit phone number</div>
-        </div>
+                <div class="form-group">
+                    <label for="contact">Contact</label>
+                    <input type="tel" name="contact" id="contact" pattern="^\d{10}$" maxlength="10" 
+                           placeholder="Enter your phone number" title="Enter 10-digit phone number" required>
+                    <div class="error">Please enter a valid 10-digit phone number</div>
+                </div>
 
-        <div class="form-group">
-            <label for="password">Password</label>
-            <div class="password-container">
-                <input type="password" name="password" id="password" 
-                       pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$" 
-                       placeholder="Enter your password" required>
-                <i class="toggle-password fas fa-eye" onclick="togglePassword('password')"></i>
-            </div>
-            <div class="password-requirements">
-                Password must be at least 8 characters long and contain:
-                <ul>
-                    <li>At least one letter</li>
-                    <li>At least one number</li>
-                </ul>
-            </div>
-            <div class="error">Password must meet the requirements above</div>
-        </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <div class="password-container">
+                        <input type="password" name="password" id="password" 
+                               pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$" 
+                               placeholder="Enter your password" required>
+                        <i class="toggle-password fas fa-eye" onclick="togglePassword('password')"></i>
+                    </div>
+                    <div class="password-requirements">
+                        Password must be at least 8 characters long and contain:
+                        <ul>
+                            <li>At least one letter</li>
+                            <li>At least one number</li>
+                        </ul>
+                    </div>
+                    <div class="error">Password must meet the requirements above</div>
+                </div>
 
-        <div class="form-group">
-            <label for="conf">Confirm Password</label>
-            <div class="password-container">
-                <input type="password" id="conf" placeholder="Confirm your password" required>
-                <i class="toggle-password fas fa-eye" onclick="togglePassword('conf')"></i>
-            </div>
-            <div class="password-match-error">Passwords do not match</div>
-        </div>
+                <div class="form-group">
+                    <label for="conf">Confirm Password</label>
+                    <div class="password-container">
+                        <input type="password" id="conf" placeholder="Confirm your password" required>
+                        <i class="toggle-password fas fa-eye" onclick="togglePassword('conf')"></i>
+                    </div>
+                    <div class="password-match-error">Passwords do not match</div>
+                </div>
 
-        <button type="submit">Create Account</button>
+                <button type="submit">Create Account</button>
+                
+                <p style="text-align: center; margin-top: 1.5rem; color: var(--text-muted);">
+                    Already have an account? <a href="login.php" style="color: var(--primary);">Login</a>
+                </p>
             </form>
         </div>
     </div>

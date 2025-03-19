@@ -164,3 +164,180 @@ The application uses a MySQL database with the following main tables:
 - **Chirag** - Frontend Developer
 
 ---
+
+# Quiz Application
+
+A web-based quiz application that allows users to create, take, and manage quizzes. Features include user authentication, Google OAuth integration, and quiz scheduling.
+
+## Prerequisites
+
+Before you begin, ensure you have the following installed:
+
+1. PHP 8.2 or higher
+2. MySQL 5.7 or higher
+3. Composer (PHP package manager)
+4. Web server (Apache/Nginx)
+
+## Installation Steps for Windows
+
+### 1. Install PHP
+
+1. Download PHP for Windows from the official website:
+   - Go to [https://windows.php.net/download/](https://windows.php.net/download/)
+   - Download the latest PHP 8.2.x ZIP package (VS16 x64 Thread Safe)
+
+2. Set up PHP:
+   - Create a folder at `C:\php`
+   - Extract the downloaded ZIP contents to `C:\php`
+   - Copy `php.ini-development` to `php.ini`
+   - Edit `php.ini` and uncomment these extensions:
+     ```ini
+     extension=curl
+     extension=fileinfo
+     extension=gd
+     extension=mbstring
+     extension=mysqli
+     extension=openssl
+     extension=pdo_mysql
+     ```
+
+3. Add PHP to System PATH:
+   - Open System Properties (Win + Pause/Break)
+   - Click "Advanced system settings"
+   - Click "Environment Variables"
+   - Under "System Variables", find and select "Path"
+   - Click "Edit"
+   - Click "New"
+   - Add `C:\php`
+   - Click "OK" on all windows
+
+4. Verify PHP installation:
+   - Open Command Prompt
+   - Run: `php -v`
+   - You should see PHP version information
+
+### 2. Install Composer
+
+1. Download Composer:
+   - Go to [https://getcomposer.org/download/](https://getcomposer.org/download/)
+   - Click "Composer-Setup.exe"
+
+2. Run the installer:
+   - Double-click the downloaded "Composer-Setup.exe"
+   - If prompted by Windows Security, click "Run"
+   - Follow the installation wizard
+   - When asked for PHP path, select `C:\php\php.exe`
+
+3. Verify Composer installation:
+   - Open Command Prompt
+   - Run: `composer --version`
+   - You should see Composer version information
+
+### 3. Install MySQL
+
+1. Download MySQL:
+   - Go to [https://dev.mysql.com/downloads/installer/](https://dev.mysql.com/downloads/installer/)
+   - Download "MySQL Installer for Windows"
+
+2. Run the installer:
+   - Double-click the downloaded installer
+   - Choose "Developer Default" or "Server only" installation
+   - Follow the installation wizard
+   - Set root password when prompted
+   - Complete the installation
+
+3. Verify MySQL installation:
+   - Open Command Prompt
+   - Run: `mysql --version`
+   - You should see MySQL version information
+
+### 4. Install XAMPP (Alternative)
+
+If you prefer an all-in-one solution, you can install XAMPP instead:
+
+1. Download XAMPP:
+   - Go to [https://www.apachefriends.org/download.html](https://www.apachefriends.org/download.html)
+   - Download XAMPP with PHP 8.2
+
+2. Run the installer:
+   - Double-click the downloaded installer
+   - Follow the installation wizard
+   - Choose components (Apache, MySQL, PHP)
+
+3. Start XAMPP:
+   - Open XAMPP Control Panel
+   - Start Apache and MySQL services
+
+### 5. Project Setup
+
+1. Clone the repository:
+   ```bash
+   git clone [repository-url]
+   cd Quiz
+   ```
+
+2. Install dependencies:
+   ```bash
+   composer install
+   ```
+
+3. Configure database:
+   - Create a new MySQL database named 'quiz'
+   - Import the database schema from `database.sql`
+
+4. Configure Google OAuth:
+   - Go to [Google Cloud Console](https://console.cloud.google.com/)
+   - Create a new project
+   - Enable Google+ API
+   - Create OAuth 2.0 credentials
+   - Add authorized redirect URI: `http://localhost/Quiz/login.php`
+   - Copy Client ID and Client Secret
+   - Update `google_config.php` with your credentials
+
+5. Configure web server:
+   - If using XAMPP, place project files in `C:\xampp\htdocs\Quiz`
+   - If using standalone Apache, configure virtual host
+
+6. Set file permissions:
+   - Ensure web server has write permissions to:
+     - `uploads/` directory
+     - `logs/` directory
+
+### 6. Access the Application
+
+1. Start your web server:
+   - If using XAMPP: Start Apache and MySQL from XAMPP Control Panel
+   - If using standalone: Start Apache and MySQL services
+
+2. Open your browser:
+   - Go to `http://localhost/Quiz`
+   - Default admin credentials:
+     - Username: admin
+     - Password: admin123
+
+## Troubleshooting
+
+1. If PHP is not recognized:
+   - Verify PHP is in system PATH
+   - Restart Command Prompt
+
+2. If Composer fails to install:
+   - Ensure PHP is properly installed
+   - Check PHP version compatibility
+   - Verify SSL certificates
+
+3. If MySQL connection fails:
+   - Verify MySQL service is running
+   - Check database credentials
+   - Ensure MySQL port (3306) is not blocked
+
+4. If Google OAuth fails:
+   - Verify redirect URI matches exactly
+   - Check API credentials
+   - Ensure Google+ API is enabled
+
+## Support
+
+For additional support or questions, please open an issue in the repository.
+
+---
