@@ -20,9 +20,12 @@ $result = $stmt->get_result();
 
 $questions = [];
 while($row = $result->fetch_assoc()) {
+    $question = $row['question'];
+        $question=str_replace("\'","'",$question);
+        $question=str_replace('\"','"',$question);
     $questions[] = [
         'id' => $row['ID'],
-        'question' => htmlspecialchars($row['question']),
+        'question'=>$question,
         'option1' => htmlspecialchars($row['option1']),
         'option2' => htmlspecialchars($row['option2']),
         'option3' => htmlspecialchars($row['option3']),
