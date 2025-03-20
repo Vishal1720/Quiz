@@ -14,9 +14,12 @@ if (isset($_GET['code'])) {
     // This is a Google OAuth callback - process the code
     $code = $_GET['code'];
     $token_url = $google_token_url;
+    
+    // Check if this is from registration page
+    $is_registration = isset($_GET['state']) && $_GET['state'] === 'register';
 
     // Log the code received
-    error_log("Google OAuth - Received code: " . substr($code, 0, 10) . "...");
+    error_log("Google OAuth - Received code: " . substr($code, 0, 10) . "..." . ($is_registration ? " (from registration)" : ""));
 
     // Prepare the token request
     $token_data = [
@@ -134,6 +137,11 @@ if (isset($_GET['code'])) {
                         $_SESSION['name'] = $name;
                         $_SESSION['profile_picture'] = $profile_picture;
                         
+                        // Set a message for returning users coming from registration page
+                        if (isset($is_registration) && $is_registration) {
+                            $_SESSION['message'] = "Welcome back! You've logged in with your existing Google account.";
+                        }
+                        
                         // Redirect to index.php regardless of any redirect session
                         header("Location: index.php");
                         exit();
@@ -157,6 +165,11 @@ if (isset($_GET['code'])) {
                             $_SESSION['email'] = $email;
                             $_SESSION['name'] = $name;
                             $_SESSION['profile_picture'] = $profile_picture;
+                            
+                            // Set a welcome message for new users
+                            if (isset($is_registration) && $is_registration) {
+                                $_SESSION['message'] = "Your account has been created successfully with Google!";
+                            }
                             
                             // Redirect to index.php regardless of any redirect session
                             header("Location: index.php");
