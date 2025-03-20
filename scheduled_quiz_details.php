@@ -15,30 +15,27 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 
 $schedule_id = $_GET['id'];
 
-// Get scheduled quiz information
-$quiz_info_query = "
+// Get scheduled quiz details
+$quiz_details_query = "
     SELECT 
-        sq.*,
+        sq.schedule_id,
         qd.quizname,
-        qd.description as quizdescription,
-        u.name as creator_name
+        qd.description,  
+        u.name as creator_name,
+        sq.start_time,
+        sq.end_time,
+        sq.access_code,
+        sq.created_by,
+        sq.active
     FROM scheduled_quizzes sq
     JOIN quizdetails qd ON sq.quizid = qd.quizid
     LEFT JOIN users u ON sq.created_by = u.email
     WHERE sq.schedule_id = ?";
-
-$stmt = $con->prepare($quiz_info_query);
+    
+$stmt = $con->prepare($quiz_details_query);
 $stmt->bind_param("i", $schedule_id);
 $stmt->execute();
-$quiz_info_result = $stmt->get_result();
-
-if ($quiz_info_result->num_rows == 0) {
-    // Scheduled quiz not found
-    header("Location: quiz_statistics.php");
-    exit();
-}
-
-$quiz_info = $quiz_info_result->fetch_assoc();
+$quiz_details = $stmt->get_result()->fetch_assoc();
 
 // Get all attempts for this scheduled quiz
 $attempts_query = "
@@ -269,9 +266,13 @@ $question_performance_result = $stmt->get_result();
         .access-code {
             font-family: monospace;
             background: #f1f1f1;
-            padding: 3px 6px;
-            border-radius: 3px;
-            font-size: 0.9em;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #2c3e50;
+            border: 1px solid #ddd;
+            margin-left: 5px;
         }
         
         .status-badge {
@@ -519,8 +520,8 @@ $question_performance_result = $stmt->get_result();
     <div class="container">
         <div class="quiz-header">
             <div class="quiz-title">
-                <?php echo htmlspecialchars($quiz_info['quizname']); ?>
-                <?php if ($quiz_info['active']): ?>
+                <?php echo htmlspecialchars($quiz_details['quizname']); ?>
+                <?php if ($quiz_details['active']): ?>
                     <span class="active-badge">Active</span>
                 <?php else: ?>
                     <span class="inactive-badge">Inactive</span>
@@ -530,27 +531,27 @@ $question_performance_result = $stmt->get_result();
             <div class="quiz-meta">
                 <div class="meta-item">
                     <span class="meta-label">Access Code:</span>
-                    <span class="access-code"><?php echo htmlspecialchars($quiz_info['access_code']); ?></span>
+                    <span class="access-code"><?php echo htmlspecialchars($quiz_details['access_code']); ?></span>
                 </div>
                 
                 <div class="meta-item">
                     <span class="meta-label">Start Time:</span>
-                    <?php echo date('M d, Y H:i', strtotime($quiz_info['start_time'])); ?>
+                    <?php echo date('M d, Y H:i', strtotime($quiz_details['start_time'])); ?>
                 </div>
                 
                 <div class="meta-item">
                     <span class="meta-label">End Time:</span>
-                    <?php echo date('M d, Y H:i', strtotime($quiz_info['end_time'])); ?>
+                    <?php echo date('M d, Y H:i', strtotime($quiz_details['end_time'])); ?>
                 </div>
                 
                 <div class="meta-item">
                     <span class="meta-label">Created By:</span>
-                    <?php echo htmlspecialchars($quiz_info['creator_name'] ?? 'Unknown'); ?>
+                    <?php echo htmlspecialchars($quiz_details['creator_name'] ?? 'Unknown'); ?>
                 </div>
             </div>
             
             <div class="quiz-description">
-                <?php echo nl2br(htmlspecialchars($quiz_info['quizdescription'] ?? 'No description provided.')); ?>
+                <?php echo nl2br(htmlspecialchars($quiz_details['description'] ?? 'No description provided.')); ?>
             </div>
         </div>
         

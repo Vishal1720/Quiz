@@ -320,14 +320,35 @@ if ($tablesExist) {
         .badge-scheduled {
             background: #9b59b6;
             color: white;
+            font-weight: bold;
+            padding: 6px 10px;
+            font-size: 0.9em;
         }
         
         .access-code {
             font-family: monospace;
             background: #f1f1f1;
-            padding: 3px 6px;
-            border-radius: 3px;
-            font-size: 0.9em;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+            border: 1px solid #ddd;
+            display: inline-block;
+            letter-spacing: 1px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        /* Add a highlight box around access code */
+        .access-code-container {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f8f4ff;
+            border-radius: 6px;
+            border: 1px solid #e2d6f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .status-badge {
@@ -493,6 +514,7 @@ if ($tablesExist) {
                         <tr>
                             <th>User Name</th>
                             <th>Email</th>
+                            <th>Login Type</th>
                             <th>Quiz Name</th>
                             <th>Score</th>
                             <th>Correct / Total</th>
@@ -554,6 +576,7 @@ if ($tablesExist) {
                         <tr>
                             <th>User Name</th>
                             <th>Email</th>
+                            <th>Login Type</th>
                             <th>Quizzes Taken</th>
                             <th>Scheduled Quizzes</th>
                             <th>Average Score</th>
@@ -567,6 +590,11 @@ if ($tablesExist) {
                                 <tr>
                                     <td><strong><?php echo htmlspecialchars($user['name']); ?></strong></td>
                                     <td><?php echo htmlspecialchars($user['email']); ?></td>
+                                    <td>
+                                        <span class="badge <?php echo $user['login_type'] === 'Gmail' ? 'badge-gmail' : 'badge-direct'; ?>">
+                                            <?php echo $user['login_type']; ?>
+                                        </span>
+                                    </td>
                                     <td><?php echo $user['total_attempts'] ?: 0; ?></td>
                                     <td>
                                         <?php if ($user['scheduled_attempts'] > 0): ?>
@@ -598,10 +626,11 @@ if ($tablesExist) {
                         <div class="scheduled-quiz-card">
                             <div class="scheduled-quiz-header">
                                 <div class="scheduled-quiz-title"><?php echo htmlspecialchars($quiz['quizname']); ?></div>
-                                <div>
-                                    <span class="badge badge-scheduled">Access Code:</span>
-                                    <span class="access-code"><?php echo htmlspecialchars($quiz['access_code']); ?></span>
-                                </div>
+                            </div>
+                            
+                            <div class="access-code-container">
+                                <span class="badge badge-scheduled">Access Code:</span>&nbsp;
+                                <span class="access-code"><?php echo htmlspecialchars($quiz['access_code']); ?></span>
                             </div>
                             
                             <div>
@@ -677,17 +706,20 @@ if ($tablesExist) {
                 const row = rows[i];
                 const nameCell = row.cells[0];
                 const emailCell = row.cells[1];
-                const quizCell = row.cells[2];
-                const accessCell = row.cells[5];
+                const loginTypeCell = row.cells[2];
+                const quizCell = row.cells[3];
+                const accessCell = row.cells[6];
                 
-                if (nameCell && emailCell && quizCell && accessCell) {
+                if (nameCell && emailCell && loginTypeCell && quizCell && accessCell) {
                     const nameText = nameCell.textContent || nameCell.innerText;
                     const emailText = emailCell.textContent || emailCell.innerText;
+                    const loginTypeText = loginTypeCell.textContent || loginTypeCell.innerText;
                     const quizText = quizCell.textContent || quizCell.innerText;
                     const accessText = accessCell.textContent || accessCell.innerText;
                     
                     if (nameText.toUpperCase().indexOf(filter) > -1 || 
                         emailText.toUpperCase().indexOf(filter) > -1 ||
+                        loginTypeText.toUpperCase().indexOf(filter) > -1 ||
                         quizText.toUpperCase().indexOf(filter) > -1 ||
                         accessText.toUpperCase().indexOf(filter) > -1) {
                         row.style.display = "";
