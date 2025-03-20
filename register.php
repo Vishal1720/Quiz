@@ -197,6 +197,59 @@ if(isset($_POST['email']) && isset($_POST['name']) && isset($_POST['contact']) &
         .toggle-password:hover {
             color: #333;
         }
+
+        .separator {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .separator::before,
+        .separator::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--quiz-card-border);
+        }
+        
+        .separator span {
+            padding: 0 1rem;
+        }
+        
+        .social-login {
+            margin-top: 0.5rem;
+        }
+        
+        .google-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 0.75rem 1.5rem;
+            background: #ffffff;
+            color: #333333;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+        }
+        
+        .google-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        .google-btn i {
+            margin-right: 0.75rem;
+            font-size: 1.2rem;
+            color: #4285F4;
+        }
     </style>
 </head>
 <body>
@@ -254,6 +307,34 @@ if(isset($_POST['email']) && isset($_POST['name']) && isset($_POST['contact']) &
 
         <button type="submit">Create Account</button>
             </form>
+
+            <div class="separator">
+                <span>OR</span>
+            </div>
+            
+            <div class="social-login">
+                <a href="<?php
+                // Include Google config if not already included
+                if (!function_exists('isset_google_config')) {
+                    require_once "google_config.php";
+                }
+                
+                // Generate the Google auth URL
+                $auth_params = [
+                    'client_id' => $google_client_id,
+                    'redirect_uri' => $google_redirect_url,
+                    'response_type' => 'code',
+                    'scope' => implode(' ', $google_scopes),
+                    'access_type' => 'online',
+                    'state' => 'register',  // Add state parameter to indicate this is from registration
+                    'prompt' => 'select_account'
+                ];
+                
+                echo $google_auth_url . '?' . http_build_query($auth_params);
+                ?>" class="google-btn">
+                    <i class="fab fa-google"></i> Continue with Google
+                </a>
+            </div>
         </div>
     </div>
 

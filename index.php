@@ -89,6 +89,35 @@ if ($quizResult) {
             margin-right: auto;
         }
 
+        .alert {
+            position: relative;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            font-weight: 500;
+            animation: fadeInUp 0.5s ease;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .alert-success {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #10b981;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         .category-section {
             margin: var(--spacing-lg) 0;
             background: var(--quiz-card-bg);
@@ -328,20 +357,18 @@ if ($quizResult) {
         <?php endif; ?>
 
         <section class="welcome-section">
-            <h1 class="welcome-title">
-                <?php if($_SESSION['status'] === "admin"): ?>
-                    Welcome Admin
-                <?php else: ?>
-                    Welcome to the Quiz Platform
-                <?php endif; ?>
-            </h1>
-            <p class="welcome-subtitle">
-                <?php if($_SESSION['status'] === "admin"): ?>
-                    Manage quizzes and ensure a seamless experience for users
-                <?php else: ?>
-                    Choose a quiz from the categories below to test your knowledge
-                <?php endif; ?>
-            </p>
+            <h1 class="welcome-title">Welcome, <?php echo htmlspecialchars($_SESSION['name'] ?? $_SESSION['username']); ?>!</h1>
+            <p class="welcome-subtitle">Explore our quizzes below, categorized for your convenience.</p>
+            
+            <?php if (isset($_SESSION['message'])): ?>
+                <div class="alert alert-success">
+                    <?php 
+                        echo htmlspecialchars($_SESSION['message']); 
+                        // Clear the message after displaying it
+                        unset($_SESSION['message']);
+                    ?>
+                </div>
+            <?php endif; ?>
         </section>
 
         <?php if($_SESSION['status'] === "admin"): ?>
