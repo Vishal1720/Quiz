@@ -309,7 +309,12 @@ unset($_SESSION["scheduled_total_duration"]);
             <h2 style="color: var(--text-light); margin-bottom: var(--spacing-md);">Review Your Answers</h2>
             <?php foreach ($questions as $index => $question): ?>
                 <div class="answer-item">
-                    <div class="question-text"><?php echo ($index + 1) . ". " . htmlspecialchars($question["question"]); ?></div>
+                    
+                    <div class="question-text"><?php $ques=$question['question'];
+                    $ques=$question["question"];
+                        $ques=str_replace("\'","'",$ques);
+                        $ques=str_replace('\"','"',$ques);
+                         echo ($index + 1) . ". " . htmlspecialchars($ques); ?></div>
                     <div class="answer-details">
                         <div class="answer-card">
                             <span class="answer-label">Your Answer:</span>
