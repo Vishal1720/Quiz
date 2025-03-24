@@ -312,7 +312,6 @@ if ($tablesExist) {
             box-shadow: 0 2px 4px rgba(0,0,0,0.15);
             font-size: 1em;
             letter-spacing: 0.5px;
-            background-color: #3498db; /* Default blue background */
             color: white; /* Default white text */
         }
         
@@ -589,27 +588,27 @@ if ($tablesExist) {
                                         </span>
                                     </td>
                                     <td><?php echo htmlspecialchars($attempt['quizname'] ?? 'Unknown Quiz'); ?></td>
-                                    <td><span class="score">
+                                    <td>
                                         <?php 
                                             // Use the score field (percentage) and total_questions to calculate actual points
                                             $points = round(($attempt['score'] * $attempt['total_questions']) / 100);
                                             $percentage = ($points / $attempt['total_questions']) * 100;
                                             
                                             // Add score-level class based on percentage
-                                            $scoreClass = '';
+                                            $scoreClass = 'score ';
                                             if ($percentage === 100) {
-                                                $scoreClass = 'score-perfect';
+                                                $scoreClass .= 'score-perfect';
                                             } elseif ($percentage >= 70) {
-                                                $scoreClass = 'score-good';
+                                                $scoreClass .= 'score-good';
                                             } elseif ($percentage >= 40) {
-                                                $scoreClass = 'score-average';
+                                                $scoreClass .= 'score-average';
                                             } else {
-                                                $scoreClass = 'score-poor';
+                                                $scoreClass .= 'score-poor';
                                             }
                                             
                                             echo '<span class="' . $scoreClass . '">' . $points . ' / ' . $attempt['total_questions'] . '</span>'; 
                                         ?>
-                                    </span></td>
+                                    </td>
                                     <td>
                                         <?php if ($attempt['access_type'] == 'Scheduled'): ?>
                                             <span class="badge badge-scheduled">Scheduled</span>
@@ -742,54 +741,50 @@ if ($tablesExist) {
                                         ?>
                                     </td>
                                     <td>
-                                        <span class="score">
-                                            <?php 
-                                                // Calculate average points instead of percentage
-                                                $avg_points = $quiz['average_score'] ? 
-                                                    round(($quiz['average_score'] / 100) * $quiz['total_questions'], 1) : 0;
+                                        <?php 
+                                            // Calculate average points instead of percentage
+                                            $avg_points = $quiz['average_score'] ? 
+                                                round(($quiz['average_score'] / 100) * $quiz['total_questions'], 1) : 0;
                                                     
-                                                $avg_percentage = $quiz['average_score'] ?: 0;
-                                                
-                                                // Add score-level class based on percentage
-                                                $scoreClass = '';
-                                                if ($avg_percentage == 100) {
-                                                    $scoreClass = 'score-perfect';
-                                                } elseif ($avg_percentage >= 70) {
-                                                    $scoreClass = 'score-good';
-                                                } elseif ($avg_percentage >= 40) {
-                                                    $scoreClass = 'score-average';
-                                                } else {
-                                                    $scoreClass = 'score-poor';
-                                                }
-                                                
-                                                echo '<span class="' . $scoreClass . '">' . $avg_points . ' / ' . $quiz['total_questions'] . '</span>'; 
-                                            ?>
-                                        </span>
+                                            $avg_percentage = $quiz['average_score'] ?: 0;
+                                            
+                                            // Add score-level class based on percentage
+                                            $scoreClass = 'score ';
+                                            if ($avg_percentage == 100) {
+                                                $scoreClass .= 'score-perfect';
+                                            } elseif ($avg_percentage >= 70) {
+                                                $scoreClass .= 'score-good';
+                                            } elseif ($avg_percentage >= 40) {
+                                                $scoreClass .= 'score-average';
+                                            } else {
+                                                $scoreClass .= 'score-poor';
+                                            }
+                                            
+                                            echo '<span class="' . $scoreClass . '">' . $avg_points . ' / ' . $quiz['total_questions'] . '</span>'; 
+                                        ?>
                                     </td>
                                     <td>
-                                        <span class="score">
-                                            <?php 
-                                                // Calculate highest points instead of percentage
-                                                $highest_points = $quiz['highest_score'] ? 
-                                                    round(($quiz['highest_score'] / 100) * $quiz['total_questions']) : 0;
+                                        <?php 
+                                            // Calculate highest points instead of percentage
+                                            $highest_points = $quiz['highest_score'] ? 
+                                                round(($quiz['highest_score'] / 100) * $quiz['total_questions']) : 0;
                                                     
-                                                $highest_percentage = $quiz['highest_score'] ?: 0;
-                                                
-                                                // Add score-level class based on percentage
-                                                $scoreClass = '';
-                                                if ($highest_percentage == 100) {
-                                                    $scoreClass = 'score-perfect';
-                                                } elseif ($highest_percentage >= 70) {
-                                                    $scoreClass = 'score-good';
-                                                } elseif ($highest_percentage >= 40) {
-                                                    $scoreClass = 'score-average';
-                                                } else {
-                                                    $scoreClass = 'score-poor';
-                                                }
-                                                
-                                                echo '<span class="' . $scoreClass . '">' . $highest_points . ' / ' . $quiz['total_questions'] . '</span>'; 
-                                            ?>
-                                        </span>
+                                            $highest_percentage = $quiz['highest_score'] ?: 0;
+                                            
+                                            // Add score-level class based on percentage
+                                            $scoreClass = 'score ';
+                                            if ($highest_percentage == 100) {
+                                                $scoreClass .= 'score-perfect';
+                                            } elseif ($highest_percentage >= 70) {
+                                                $scoreClass .= 'score-good';
+                                            } elseif ($highest_percentage >= 40) {
+                                                $scoreClass .= 'score-average';
+                                            } else {
+                                                $scoreClass .= 'score-poor';
+                                            }
+                                            
+                                            echo '<span class="' . $scoreClass . '">' . $highest_points . ' / ' . $quiz['total_questions'] . '</span>'; 
+                                        ?>
                                     </td>
                                     <td>
                                         <?php echo $quiz['last_attempt_date'] 
@@ -974,61 +969,8 @@ if ($tablesExist) {
             }
         }
         
-        // Color-code scores
-        function colorScores() {
-            const scores = document.querySelectorAll('.score');
-            scores.forEach(score => {
-                const scoreText = score.textContent.trim();
-                let backgroundColor = '#3498db'; // Default blue color
-                
-                // Handle percentage format (e.g. "80%")
-                if (scoreText.endsWith('%')) {
-                    const percentage = parseFloat(scoreText);
-                    if (percentage === 100) {
-                        backgroundColor = '#2ecc71'; // Green for perfect scores
-                    } else if (percentage >= 70) {
-                        backgroundColor = '#3498db'; // Blue for good scores
-                    } else if (percentage >= 40) {
-                        backgroundColor = '#f39c12'; // Orange for average scores
-                    } else {
-                        backgroundColor = '#e74c3c'; // Red for poor scores
-                    }
-                }
-                // Handle fraction format (e.g. "8 / 10")
-                else if (scoreText.includes('/')) {
-                    const parts = scoreText.split('/');
-                    if (parts.length === 2) {
-                        const points = parseFloat(parts[0].trim());
-                        const total = parseFloat(parts[1].trim());
-                        
-                        if (!isNaN(points) && !isNaN(total) && total !== 0) {
-                            // Calculate percentage for coloring
-                            const percentage = (points / total) * 100;
-                            
-                            if (percentage === 100) {
-                                backgroundColor = '#2ecc71'; // Green for perfect scores
-                            } else if (percentage >= 70) {
-                                backgroundColor = '#3498db'; // Blue for good scores
-                            } else if (percentage >= 40) {
-                                backgroundColor = '#f39c12'; // Orange for average scores
-                            } else {
-                                backgroundColor = '#e74c3c'; // Red for poor scores
-                            }
-                        }
-                    }
-                }
-                
-                // Apply styling
-                score.style.backgroundColor = backgroundColor;
-                score.style.color = 'white';
-                score.style.fontWeight = 'bold';
-            });
-        }
-        
         // Run when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            colorScores();
-            
             // Add event listeners for search inputs
             document.getElementById('attemptSearch').addEventListener('keyup', searchAttempts);
             document.getElementById('userSearch').addEventListener('keyup', searchUsers);
