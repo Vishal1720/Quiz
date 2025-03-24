@@ -153,6 +153,26 @@ if ($tablesExist) {
         ORDER BY sq.start_time DESC";
         
     $scheduled_stats_result = $con->query($scheduled_stats_query);
+
+    // New query for quiz performance statistics
+    $quiz_stats_query = "
+        SELECT 
+            qd.quizid,
+            qd.quizname,
+            qd.category,
+            COUNT(DISTINCT qa.attempt_id) as total_attempts,
+            ROUND(AVG(qa.score), 1) as average_score,
+            MAX(qa.score) as highest_score,
+            MIN(qa.score) as lowest_score,
+            COUNT(CASE WHEN qa.status = 'completed' THEN 1 END) as completed_attempts,
+            (SELECT COUNT(*) FROM quizes q WHERE q.quizid = qd.quizid) as total_questions,
+            MAX(qa.end_time) as last_attempt_date
+        FROM quizdetails qd
+        LEFT JOIN quiz_attempts qa ON qd.quizid = qa.quizid
+        GROUP BY qd.quizid, qd.quizname, qd.category
+        ORDER BY COUNT(DISTINCT qa.attempt_id) DESC, qd.quizname ASC";
+        
+    $quiz_stats_result = $con->query($quiz_stats_query);
 }
 ?>
 
@@ -282,21 +302,36 @@ if ($tablesExist) {
             background: #f1f8fe;
         }
 
+        .score {
+            font-weight: bold;
+            padding: 8px 12px;
+            border-radius: 6px;
+            text-align: center;
+            display: inline-block;
+            min-width: 80px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+            font-size: 1em;
+            letter-spacing: 0.5px;
+        }
+
         .user-name, .user-email, .total-attempts {
             color: #333 !important;
+            font-weight: 500;
+        }
+        
+        .quiz-date, .quiz-duration {
+            color: #555;
+            font-family: 'Courier New', monospace;
+            background: #f8f9fa;
+            padding: 5px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            font-size: 0.95em;
         }
         
         /* Ensure all text in table cells has good contrast */
         td {
             color: #333;
-        }
-        
-        .score {
-            font-weight: bold;
-            padding: 5px 10px;
-            border-radius: 4px;
-            background: #f1f8fe;
-            color: #2980b9;
         }
         
         .badge {
@@ -497,7 +532,8 @@ if ($tablesExist) {
             <div class="tabs">
                 <button class="tab active" onclick="openTab(event, 'quiz-attempts')">Quiz Attempts</button>
                 <button class="tab" onclick="openTab(event, 'user-performance')">User Performance</button>
-                <button class="tab" onclick="openTab(event, 'scheduled-quizzes')">Scheduled Quizzes</button>
+                <button class="tab" onclick="openTab(event, 'quiz-scores')">Quiz Scores</button>
+                
             </div>
             
             <!-- Quiz Attempts Tab -->
@@ -516,8 +552,7 @@ if ($tablesExist) {
                             <th>Email</th>
                             <th>Login Type</th>
                             <th>Quiz Name</th>
-                            <th>Score</th>
-                            <th>Correct / Total</th>
+                            <th>Points Scored</th>
                             <th>Access Method</th>
                             <th>Date</th>
                             <th>Status</th>
@@ -527,16 +562,21 @@ if ($tablesExist) {
                         <?php if ($all_attempts_result && $all_attempts_result->num_rows > 0): ?>
                             <?php while ($attempt = $all_attempts_result->fetch_assoc()): ?>
                                 <tr>
-                                    <td><strong><?php echo htmlspecialchars($attempt['name']); ?></strong></td>
-                                    <td><?php echo htmlspecialchars($attempt['email']); ?></td>
+                                    <td><strong class="user-name"><?php echo htmlspecialchars($attempt['name']); ?></strong></td>
+                                    <td><span class="user-email"><?php echo htmlspecialchars($attempt['email']); ?></span></td>
                                     <td>
                                         <span class="badge <?php echo $attempt['login_type'] === 'Gmail' ? 'badge-gmail' : 'badge-direct'; ?>">
                                             <?php echo $attempt['login_type']; ?>
                                         </span>
                                     </td>
                                     <td><?php echo htmlspecialchars($attempt['quizname'] ?? 'Unknown Quiz'); ?></td>
-                                    <td><span class="score"><?php echo $attempt['score']; ?>%</span></td>
-                                    <td><?php echo $attempt['correct_answers']; ?> / <?php echo $attempt['total_questions']; ?></td>
+                                    <td><span class="score">
+                                        <?php 
+                                            // Use the score field (percentage) and total_questions to calculate actual points
+                                            $points = round(($attempt['score'] * $attempt['total_questions']) / 100);
+                                            echo $points . ' / ' . $attempt['total_questions']; 
+                                        ?>
+                                    </span></td>
                                     <td>
                                         <?php if ($attempt['access_type'] == 'Scheduled'): ?>
                                             <span class="badge badge-scheduled">Scheduled</span>
@@ -545,7 +585,7 @@ if ($tablesExist) {
                                             <span class="badge badge-secondary">Direct</span>
                                         <?php endif; ?>
                                     </td>
-                                    <td><?php echo date('M d, Y H:i', strtotime($attempt['end_time'] ?? $attempt['start_time'])); ?></td>
+                                    <td><span class="quiz-date"><?php echo date('M d, Y H:i', strtotime($attempt['end_time'] ?? $attempt['start_time'])); ?></span></td>
                                     <td>
                                         <span class="status-badge status-<?php echo strtolower($attempt['status']); ?>">
                                             <?php echo ucfirst($attempt['status']); ?>
@@ -579,8 +619,8 @@ if ($tablesExist) {
                             <th>Login Type</th>
                             <th>Quizzes Taken</th>
                             <th>Scheduled Quizzes</th>
-                            <th>Average Score</th>
-                            <th>Highest Score</th>
+                            <th>Average Points</th>
+                            <th>Best Score</th>
                             <th>Last Attempt</th>
                         </tr>
                     </thead>
@@ -605,12 +645,91 @@ if ($tablesExist) {
                                     </td>
                                     <td><span class="score"><?php echo $user['average_score'] ? number_format($user['average_score'], 1) : '0.0'; ?>%</span></td>
                                     <td><span class="score"><?php echo $user['highest_score'] ?: '0'; ?>%</span></td>
-                                    <td><?php echo $user['last_attempt'] ? date('M d, Y H:i', strtotime($user['last_attempt'])) : '-'; ?></td>
+                                    <td><?php echo $user['last_attempt'] ? '<span class="quiz-date">' . date('M d, Y H:i', strtotime($user['last_attempt'])) . '</span>' : '-'; ?></td>
                                 </tr>
                             <?php endwhile; ?>
                         <?php else: ?>
                             <tr>
                                 <td colspan="8" class="no-data">No user performance data available yet.</td>
+                            </tr>
+                        <?php endif; ?>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Quiz Scores Tab - NEW -->
+            <div id="quiz-scores" class="tab-content">
+                <div class="search-bar">
+                    <input type="text" id="quizSearch" class="search-input" placeholder="Search by quiz name or category...">
+                    <button class="search-button" onclick="searchQuizzes()">Search</button>
+                </div>
+                
+                <h2>Quiz Performance Summary</h2>
+                
+                <table id="quiz-summary-table">
+                    <thead>
+                        <tr>
+                            <th>Quiz Name</th>
+                            <th>Category</th>
+                            <th>Questions</th>
+                            <th>Attempts</th>
+                            <th>Completion Rate</th>
+                            <th>Average Points</th>
+                            <th>Highest Points</th>
+                            <th>Last Attempt</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php if ($quiz_stats_result && $quiz_stats_result->num_rows > 0): ?>
+                            <?php while($quiz = $quiz_stats_result->fetch_assoc()): ?>
+                                <tr>
+                                    <td><strong><?php echo htmlspecialchars($quiz['quizname']); ?></strong></td>
+                                    <td><?php echo htmlspecialchars($quiz['category']); ?></td>
+                                    <td><?php echo $quiz['total_questions']; ?></td>
+                                    <td><?php echo $quiz['total_attempts'] ?: 0; ?></td>
+                                    <td>
+                                        <?php 
+                                            $completion_rate = $quiz['total_attempts'] > 0 
+                                                ? round(($quiz['completed_attempts'] / $quiz['total_attempts']) * 100) 
+                                                : 0;
+                                            echo $completion_rate . '%';
+                                        ?>
+                                    </td>
+                                    <td>
+                                        <span class="score">
+                                            <?php 
+                                                // Calculate average points instead of percentage
+                                                $avg_points = $quiz['average_score'] ? 
+                                                    round(($quiz['average_score'] / 100) * $quiz['total_questions'], 1) : 0;
+                                                echo $avg_points . ' / ' . $quiz['total_questions']; 
+                                            ?>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <span class="score">
+                                            <?php 
+                                                // Calculate highest points instead of percentage
+                                                $highest_points = $quiz['highest_score'] ? 
+                                                    round(($quiz['highest_score'] / 100) * $quiz['total_questions']) : 0;
+                                                echo $highest_points . ' / ' . $quiz['total_questions']; 
+                                            ?>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <?php echo $quiz['last_attempt_date'] 
+                                            ? '<span class="quiz-date">' . date('M d, Y H:i', strtotime($quiz['last_attempt_date'])) . '</span>' 
+                                            : '-'; 
+                                        ?>
+                                    </td>
+                                    <td>
+                                        <a href="quiz_detail_stats.php?id=<?php echo $quiz['quizid']; ?>" class="badge badge-primary">View Details</a>
+                                    </td>
+                                </tr>
+                            <?php endwhile; ?>
+                        <?php else: ?>
+                            <tr>
+                                <td colspan="9" class="no-data">No quiz data available yet.</td>
                             </tr>
                         <?php endif; ?>
                     </tbody>
@@ -755,20 +874,74 @@ if ($tablesExist) {
             }
         }
         
+        function searchQuizzes() {
+            const input = document.getElementById('quizSearch');
+            const filter = input.value.toUpperCase();
+            const table = document.getElementById('quiz-summary-table');
+            const rows = table.getElementsByTagName('tr');
+            
+            for (let i = 1; i < rows.length; i++) { // Skip header row
+                const row = rows[i];
+                const nameCell = row.cells[0];
+                const categoryCell = row.cells[1];
+                
+                if (nameCell && categoryCell) {
+                    const nameText = nameCell.textContent || nameCell.innerText;
+                    const categoryText = categoryCell.textContent || categoryCell.innerText;
+                    
+                    if (nameText.toUpperCase().indexOf(filter) > -1 || 
+                        categoryText.toUpperCase().indexOf(filter) > -1) {
+                        row.style.display = "";
+                    } else {
+                        row.style.display = "none";
+                    }
+                }
+            }
+        }
+        
         // Color-code scores
         function colorScores() {
             const scores = document.querySelectorAll('.score');
             scores.forEach(score => {
-                const value = parseInt(score.textContent);
-                if (value === 100) {
-                    score.style.backgroundColor = '#2ecc71'; // Green for perfect scores
-                } else if (value >= 70) {
-                    score.style.backgroundColor = '#3498db'; // Blue for good scores
-                } else if (value >= 40) {
-                    score.style.backgroundColor = '#f39c12'; // Orange for average scores
-                } else {
-                    score.style.backgroundColor = '#e74c3c'; // Red for poor scores
+                const scoreText = score.textContent.trim();
+                
+                // Handle percentage format (e.g. "80%")
+                if (scoreText.endsWith('%')) {
+                    const percentage = parseFloat(scoreText);
+                    if (percentage === 100) {
+                        score.style.backgroundColor = '#2ecc71'; // Green for perfect scores
+                    } else if (percentage >= 70) {
+                        score.style.backgroundColor = '#3498db'; // Blue for good scores
+                    } else if (percentage >= 40) {
+                        score.style.backgroundColor = '#f39c12'; // Orange for average scores
+                    } else {
+                        score.style.backgroundColor = '#e74c3c'; // Red for poor scores
+                    }
                 }
+                // Handle fraction format (e.g. "8 / 10")
+                else if (scoreText.includes('/')) {
+                    const parts = scoreText.split('/');
+                    if (parts.length !== 2) return;
+                    
+                    const points = parseFloat(parts[0].trim());
+                    const total = parseFloat(parts[1].trim());
+                    
+                    if (isNaN(points) || isNaN(total) || total === 0) return;
+                    
+                    // Calculate percentage for coloring
+                    const percentage = (points / total) * 100;
+                    
+                    if (percentage === 100) {
+                        score.style.backgroundColor = '#2ecc71'; // Green for perfect scores
+                    } else if (percentage >= 70) {
+                        score.style.backgroundColor = '#3498db'; // Blue for good scores
+                    } else if (percentage >= 40) {
+                        score.style.backgroundColor = '#f39c12'; // Orange for average scores
+                    } else {
+                        score.style.backgroundColor = '#e74c3c'; // Red for poor scores
+                    }
+                }
+                
                 score.style.color = 'white';
                 score.style.fontWeight = 'bold';
             });
@@ -781,6 +954,7 @@ if ($tablesExist) {
             // Add event listeners for search inputs
             document.getElementById('attemptSearch').addEventListener('keyup', searchAttempts);
             document.getElementById('userSearch').addEventListener('keyup', searchUsers);
+            document.getElementById('quizSearch').addEventListener('keyup', searchQuizzes);
         });
     </script>
 </body>

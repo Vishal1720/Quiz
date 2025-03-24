@@ -49,6 +49,7 @@ if (isset($_GET['scheduled']) && isset($_GET['code'])) {
     $_SESSION['is_scheduled_quiz'] = true;
     $_SESSION['scheduled_end_time'] = strtotime($scheduledQuiz['end_time']);
     $_SESSION['scheduled_start_time'] = strtotime($scheduledQuiz['start_time']);
+    $_SESSION['scheduled_quiz_id'] = $scheduledQuiz['schedule_id'];
     
     // Calculate and store the total scheduled duration (in seconds)
     $_SESSION['scheduled_total_duration'] = $_SESSION['scheduled_end_time'] - $_SESSION['scheduled_start_time'];

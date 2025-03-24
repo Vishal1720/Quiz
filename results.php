@@ -58,6 +58,59 @@ unset($_SESSION["is_scheduled_quiz"]);
 unset($_SESSION["scheduled_end_time"]);
 unset($_SESSION["scheduled_start_time"]);
 unset($_SESSION["scheduled_total_duration"]);
+
+// After calculating the score and before displaying results
+if (!isset($_SESSION['quiz_attempt_recorded'])) {
+    // Get the current user's email and name
+    $user_email = $_SESSION['email'];
+    $quiz_id = $_GET["quizid"];
+    
+    // Check if the quiz was scheduled
+    $was_scheduled_quiz = isset($_SESSION['is_scheduled_quiz']) && $_SESSION['is_scheduled_quiz'] === true;
+    $schedule_id = isset($_SESSION['scheduled_quiz_id']) ? $_SESSION['scheduled_quiz_id'] : null;
+    
+    // Calculate the score percentage
+    $score_percentage = ($score / $totalQuestions) * 100;
+    
+    // Prepare current date/time for database
+    $current_time = date('Y-m-d H:i:s');
+    $start_time = isset($_SESSION['actual_quiz_start_time']) ? 
+                  date('Y-m-d H:i:s', $_SESSION['actual_quiz_start_time']) : 
+                  date('Y-m-d H:i:s', strtotime('-30 minutes')); // Fallback
+    
+    try {
+        // Insert the quiz attempt
+        $stmt = $con->prepare("INSERT INTO quiz_attempts (user_email, quizid, schedule_id, score, total_questions, start_time, end_time, status) 
+                              VALUES (?, ?, ?, ?, ?, ?, ?, 'completed')");
+        $stmt->bind_param("siidiss", $user_email, $quiz_id, $schedule_id, $score_percentage, $totalQuestions, $start_time, $current_time);
+        $stmt->execute();
+        $attempt_id = $con->insert_id;
+        
+        // Record individual question responses
+        if (isset($userAnswers) && is_array($userAnswers)) {
+            $response_stmt = $con->prepare("INSERT INTO quiz_responses (attempt_id, question_id, user_answer, is_correct) 
+                                           VALUES (?, ?, ?, ?)");
+            
+            foreach ($questions as $question) {
+                $question_id = $question['ID'];
+                $user_answer = isset($userAnswers[$question_id]) ? $userAnswers[$question_id] : '';
+                $is_correct = ($user_answer === $question['answer']) ? 1 : 0;
+                
+                $response_stmt->bind_param("iisi", $attempt_id, $question_id, $user_answer, $is_correct);
+                $response_stmt->execute();
+            }
+        }
+        
+        // Mark that we've recorded this attempt to prevent duplicates
+        $_SESSION['quiz_attempt_recorded'] = true;
+        
+        // Log success
+        error_log("Quiz attempt recorded successfully. ID: $attempt_id, User: $user_email, Score: $score_percentage%");
+    } catch (Exception $e) {
+        // Log error but continue showing results
+        error_log("Error recording quiz attempt: " . $e->getMessage());
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">

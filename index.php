@@ -6,6 +6,17 @@ if(!isset($_SESSION['status']) || ($_SESSION['status'] !== "loggedin" && $_SESSI
     exit();
 }
 
+// Initialize welcome name variable
+$welcome_name = '';
+if (isset($_SESSION['name']) && !empty($_SESSION['name'])) {
+    $welcome_name = $_SESSION['name'];
+} else if (isset($_SESSION['username']) && !empty($_SESSION['username'])) {
+    $welcome_name = $_SESSION['username'];
+} else if (isset($_SESSION['email']) && !empty($_SESSION['email'])) {
+    // Use email as fallback, but remove domain part
+    $welcome_name = explode('@', $_SESSION['email'])[0];
+}
+
 // Get available quizzes
 $quizQuery = "SELECT qd.quizid, qd.quizname, qd.category, 
               (SELECT COUNT(*) FROM quizes WHERE quizid = qd.quizid) as question_count 
@@ -357,8 +368,12 @@ if ($quizResult) {
         <?php endif; ?>
 
         <section class="welcome-section">
-            <h1 class="welcome-title">Welcome, <?php echo htmlspecialchars($_SESSION['name'] ?? $_SESSION['username']); ?>!</h1>
-            <p class="welcome-subtitle">Explore our quizzes below, categorized for your convenience.</p>
+            <h1 class="welcome-title">
+                Welcome<?php echo $welcome_name ? ', ' . htmlspecialchars($welcome_name) : ''; ?>!
+            </h1>
+            <p class="welcome-subtitle">
+                Explore our quizzes below, categorized for your convenience.
+            </p>
             
             <?php if (isset($_SESSION['message'])): ?>
                 <div class="alert alert-success">
