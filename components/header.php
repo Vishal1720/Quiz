@@ -29,7 +29,7 @@ function getPageTitle() {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QuizMaster - <?php echo getPageTitle(); ?></title>
-    <link rel="shortcut icon" href="/Quiz/quiz.png" type="image/x-icon">
+    <link rel="shortcut icon" href="./quiz.png" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="/Quiz/css/responsive.css">
     <style>
@@ -348,7 +348,7 @@ function getPageTitle() {
 <body>
     <div class="gradient-bg"></div>
     <nav class="navbar <?php echo (isset($_SESSION['status']) && $_SESSION['status'] === 'admin') ? 'admin-navbar' : ''; ?>">
-        <a href="/Quiz/index.php" class="navbar-brand">
+        <a href="./index.php" class="navbar-brand">
             <i class="fas fa-brain"></i>
             <span>QuizMaster</span>
         </a>
@@ -360,54 +360,54 @@ function getPageTitle() {
             <?php if(isset($_SESSION['status']) && $_SESSION['status'] !== 'loggedout'): ?>
                 <?php if(!$isTakingQuiz): ?>
                     <div class="nav-item">
-                        <a href="/Quiz/index.php" class="nav-link <?php echo $currentPage === 'index.php' ? 'active' : ''; ?> <?php echo ($_SESSION['status'] === 'admin') ? 'admin-nav-link' : ''; ?>">
+                        <a href="./index.php" class="nav-link <?php echo $currentPage === 'index.php' ? 'active' : ''; ?> <?php echo ($_SESSION['status'] === 'admin') ? 'admin-nav-link' : ''; ?>">
                             <i class="fas fa-home"></i><span>Home</span>
                         </a>
                     </div>
                     <?php if($_SESSION['status'] === 'admin'): ?>
                         <div class="nav-item">
-                            <a href="/Quiz/createquiz.php" class="nav-link admin-nav-link <?php echo $currentPage === 'createquiz.php' ? 'active' : ''; ?>">
+                            <a href="./createquiz.php" class="nav-link admin-nav-link <?php echo $currentPage === 'createquiz.php' ? 'active' : ''; ?>">
                                 <i class="fas fa-plus-circle"></i><span>Create</span>
                             </a>
                         </div>
                         <div class="nav-item">
-                            <a href="/Quiz/schedule_quiz.php" class="nav-link admin-nav-link <?php echo $currentPage === 'schedule_quiz.php' ? 'active' : ''; ?>">
+                            <a href="./schedule_quiz.php" class="nav-link admin-nav-link <?php echo $currentPage === 'schedule_quiz.php' ? 'active' : ''; ?>">
                                 <i class="fas fa-clock"></i><span>Schedule</span>
                                 <div class="admin-badge">Admin</div>
                             </a>
                         </div>
                         <div class="nav-item">
-                            <a href="/Quiz/quiz_statistics.php" class="nav-link admin-nav-link <?php echo $currentPage === 'quiz_statistics.php' ? 'active' : ''; ?>">
+                            <a href="./quiz_statistics.php" class="nav-link admin-nav-link <?php echo $currentPage === 'quiz_statistics.php' ? 'active' : ''; ?>">
                                 <i class="fas fa-chart-bar"></i><span>Statistics</span>
                                 <div class="admin-badge">Admin</div>
                             </a>
                         </div>
                         <div class="nav-item">
-                            <a href="/Quiz/quizform.php" class="nav-link admin-nav-link <?php echo $currentPage === 'quizform.php' ? 'active' : ''; ?>">
+                            <a href="./quizform.php" class="nav-link admin-nav-link <?php echo $currentPage === 'quizform.php' ? 'active' : ''; ?>">
                                 <i class="fas fa-list-ol"></i><span>Insert</span>
                             </a>
                         </div>
                         <div class="nav-item">
-                            <a href="/Quiz/quizmanip.php" class="nav-link admin-nav-link <?php echo $currentPage === 'quizmanip.php' ? 'active' : ''; ?>">
+                            <a href="./quizmanip.php" class="nav-link admin-nav-link <?php echo $currentPage === 'quizmanip.php' ? 'active' : ''; ?>">
                                 <i class="fas fa-edit"></i><span>Edit</span>
                             </a>
                         </div>
                     <?php endif; ?>
                 <?php else: ?>
                     <div class="nav-item">
-                        <a href="/Quiz/index.php" class="nav-link <?php echo ($_SESSION['status'] === 'admin') ? 'admin-nav-link' : ''; ?>">
+                        <a href="./index.php" class="nav-link <?php echo ($_SESSION['status'] === 'admin') ? 'admin-nav-link' : ''; ?>">
                             <i class="fas fa-home"></i><span>Home</span>
                         </a>
                     </div>
                 <?php endif; ?>
                 <div class="nav-item">
-                    <a href="/Quiz/logout.php" class="nav-link <?php echo ($_SESSION['status'] === 'admin') ? 'admin-nav-link' : ''; ?>">
+                    <a href="./logout.php" class="nav-link <?php echo ($_SESSION['status'] === 'admin') ? 'admin-nav-link' : ''; ?>">
                         <i class="fas fa-sign-out-alt"></i><span>Logout</span>
                     </a>
                 </div>
                 <?php if($_SESSION['status'] === 'loggedin'): ?>
                 <div class="nav-item">
-                    <a href="/Quiz/access_quiz.php" class="nav-link">
+                    <a href="./access_quiz.php" class="nav-link">
                         <i class="fas fa-link"></i><span>Access Quiz</span>
                     </a>
                 </div>
@@ -416,30 +416,30 @@ function getPageTitle() {
                 <!-- Not logged in -->
                 <?php if($currentPage === 'landing.php'): ?>
                     <div class="nav-item">
-                        <a href="/Quiz/login.php" class="nav-link">
+                        <a href="./login.php" class="nav-link">
                             <i class="fas fa-sign-in-alt"></i><span>Login</span>
                         </a>
                     </div>
                 <?php elseif($currentPage === 'login.php'): ?>
                     <div class="nav-item">
-                        <a href="/Quiz/register.php" class="nav-link">
+                        <a href="./register.php" class="nav-link">
                             <i class="fas fa-user-plus"></i><span>Register</span>
                         </a>
                     </div>
                 <?php elseif($currentPage === 'register.php'): ?>
                     <div class="nav-item">
-                        <a href="/Quiz/login.php" class="nav-link">
+                        <a href="./login.php" class="nav-link">
                             <i class="fas fa-sign-in-alt"></i><span>Login</span>
                         </a>
                     </div>
                 <?php else: ?>
                     <div class="nav-item">
-                        <a href="/Quiz/login.php" class="nav-link <?php echo $currentPage === 'login.php' ? 'active' : ''; ?>">
+                        <a href="./login.php" class="nav-link <?php echo $currentPage === 'login.php' ? 'active' : ''; ?>">
                             <i class="fas fa-sign-in-alt"></i><span>Login</span>
                         </a>
                     </div>
                     <div class="nav-item">
-                        <a href="/Quiz/register.php" class="nav-link <?php echo $currentPage === 'register.php' ? 'active' : ''; ?>">
+                        <a href="./register.php" class="nav-link <?php echo $currentPage === 'register.php' ? 'active' : ''; ?>">
                             <i class="fas fa-user-plus"></i><span>Register</span>
                         </a>
                     </div>
