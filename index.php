@@ -17,13 +17,20 @@ if (isset($_SESSION['name']) && !empty($_SESSION['name'])) {
     $welcome_name = explode('@', $_SESSION['email'])[0];
 }
 
-// Get available quizzes
+// Get available quizzes with visibility check
 $quizQuery = "SELECT qd.quizid, qd.quizname, qd.category, 
-              (SELECT COUNT(*) FROM quizes WHERE quizid = qd.quizid) as question_count 
+              (SELECT COUNT(*) FROM quizes WHERE quizid = qd.quizid) as question_count,
+              qd.is_visible 
               FROM quizdetails qd";
+
+// Add visibility condition for non-admin users
+if ($_SESSION['status'] !== 'admin') {
+    $quizQuery .= " WHERE qd.is_visible = TRUE";
+}
+
 $quizResult = $con->query($quizQuery);
 
-// Get unique categories
+// Get unique categories from visible quizzes only
 $categories = array();
 if ($quizResult) {
     while ($row = $quizResult->fetch_assoc()) {
@@ -345,6 +352,30 @@ if ($quizResult) {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        /* Add visibility indicator styles */
+        .visibility-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            z-index: 2;
+        }
+
+        .visibility-visible {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #10b981;
+        }
+
+        .visibility-hidden {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
     </style>
 </style>
 
@@ -400,21 +431,9 @@ if ($quizResult) {
         </section>
         <?php endif; ?>
 
-        <?php foreach($categories as $category): ?>
-            <section class="category-section">
-                <h2 class="category-title">
-                    <span class="category-title-wrapper">
-                        <?php echo htmlspecialchars($category); ?>
-                        <?php if($_SESSION['status'] === "admin"): ?>
-                            <form method="POST" action="delete_category.php" onsubmit="return confirm('WARNING: Deleting the category \'<?php echo htmlspecialchars($category); ?>\' will PERMANENTLY DELETE all quizzes in this category along with their questions and results. This action cannot be undone. Do you want to continue?')" style="display: inline;">
-                                <input type="hidden" name="category" value="<?php echo htmlspecialchars($category); ?>">
-                                <button type="submit" class="delete-category-btn" title="Permanently delete category and all its quizzes">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </form>
-                        <?php endif; ?>
-                    </span>
-                </h2>
+        <?php foreach ($categories as $category): ?>
+            <div class="category-section">
+                <h2 class="category-title"><?php echo htmlspecialchars($category); ?></h2>
                 <div class="quiz-grid">
                     <?php
                     $quizResult->data_seek(0);
@@ -423,37 +442,31 @@ if ($quizResult) {
                         if ($quiz['category'] === $category):
                             $hasQuizzes = true;
                     ?>
-                        <article class="quiz-card">
-                            <div>
-                                <h3 class="quiz-title"><?php echo htmlspecialchars($quiz['quizname']); ?></h3>
-                                <p class="quiz-info"><?php echo $quiz['question_count']; ?> Questions</p>
-                            </div>
-                            <?php if($_SESSION['status'] === "admin"): ?>
-                                <a href="quizmanip.php?quizid=<?php echo $quiz['quizid']; ?>" class="take-quiz-btn">
-                                    Edit Quiz
-                                </a>
-                                <div style="height: 10px;"></div><!-- Spacer between buttons -->
-                                <form method="POST" action="delete_quiz.php" onsubmit="return confirm('Are you sure you want to delete this quiz? This action cannot be undone.');">
-                                    <input type="hidden" name="quizid" value="<?php echo $quiz['quizid']; ?>">
-                                    <button type="submit" class="take-quiz-btn delete-quiz-btn" style="background: linear-gradient(135deg, #ef4444, #b91c1c);">
-                                        Delete Quiz
-                                    </button>
-                                </form>
-                            <?php else: ?>
-                                <a href="takequiz.php?quizid=<?php echo $quiz['quizid']; ?>" class="take-quiz-btn">
-                                    Take Quiz
-                                </a>
+                        <div class="quiz-card">
+                            <?php if ($_SESSION['status'] === 'admin'): ?>
+                                <div class="visibility-indicator <?php echo $quiz['is_visible'] ? 'visibility-visible' : 'visibility-hidden'; ?>">
+                                    <?php echo $quiz['is_visible'] ? 'Visible' : 'Hidden'; ?>
+                                </div>
                             <?php endif; ?>
-                        </article>
+                            <h3 class="quiz-title"><?php echo htmlspecialchars($quiz['quizname']); ?></h3>
+                            <p class="quiz-info">
+                                Questions: <?php echo $quiz['question_count']; ?>
+                            </p>
+                            <a href="takequiz.php?quizid=<?php echo $quiz['quizid']; ?>" class="take-quiz-btn">
+                                Take Quiz
+                            </a>
+                        </div>
                     <?php
                         endif;
                     endwhile;
                     if (!$hasQuizzes):
                     ?>
-                        <p class="empty-category">No quizzes available in this category yet.</p>
+                        <div class="empty-category">
+                            No quizzes available in this category.
+                        </div>
                     <?php endif; ?>
                 </div>
-            </section>
+            </div>
         <?php endforeach; ?>
     </div>
 <?php include "components/footer.php"; ?>

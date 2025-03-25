@@ -62,7 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 // Get quizzes
-$query = "SELECT quizid, quizname, category FROM quizdetails ORDER BY quizname ASC";
+$query = "SELECT quizid, quizname, category, is_visible FROM quizdetails ORDER BY quizname ASC";
 $quizzes = $con->query($query);
 ?>
 <?php include "components/header.php"; ?>
@@ -299,12 +299,79 @@ $quizzes = $con->query($query);
                 width: 100%;
             }
         }
+
+        /* Simple Toggle Button Styles */
+        .visibility-toggle {
+            display: flex;
+            align-items: center;
+            margin-left: 1rem;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+            margin: 0 10px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #e74c3c;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #2ecc71;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(30px);
+        }
+
+        .visibility-label {
+            margin-left: 0.5rem;
+            color: #a0a0a0;
+        }
+        
+        .quiz-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
     </style>
 </head>
 <body>
     <div class="edit-container">
-        <h1 class="page-title">Edit Quiz Questions</h1>
-        <p class="page-subtitle">Modify or delete existing questions</p>
+        <h1 class="page-title">Edit Quiz</h1>
+        <p class="page-subtitle">Select a quiz to edit its questions</p>
 
         <?php if($success): ?>
             <div class="message success"><?php echo htmlspecialchars($success); ?></div>
@@ -315,23 +382,26 @@ $quizzes = $con->query($query);
         <?php endif; ?>
 
         <div class="select-quiz">
-            <label for="quiz-select">Select Quiz to Edit</label>
-            <select id="quiz-select" class="form-control" onchange="loadQuestions(this.value)">
-                <option value="">Choose a quiz...</option>
-                <?php while($quiz = $quizzes->fetch_assoc()): ?>
-                    <option value="<?php echo htmlspecialchars($quiz['quizid']); ?>"
-                    <?php
-                    if(isset($_GET['quizid'])){
-                        if($_GET['quizid']==$quiz['quizid'])
-                        echo "selected";
-                        
-                    }
-                    ?>
-                    >
-                        <?php echo htmlspecialchars($quiz['quizname'] . ' (' . $quiz['category'] . ')'); ?>
-                    </option>
-                <?php endwhile; ?>
-            </select>
+            <label for="quiz-select">Select Quiz:</label>
+            <div class="quiz-header">
+                <select id="quiz-select" class="form-control" onchange="loadQuestions(this.value)">
+                    <option value="">Select a quiz...</option>
+                    <?php while($quiz = $quizzes->fetch_assoc()): ?>
+                        <option value="<?php echo $quiz['quizid']; ?>">
+                            <?php echo htmlspecialchars($quiz['quizname']); ?> 
+                            (<?php echo htmlspecialchars($quiz['category']); ?>)
+                        </option>
+                    <?php endwhile; ?>
+                </select>
+                <div class="visibility-toggle">
+                    
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="visibility-toggle" onchange="toggleVisibility()">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span id="visibility-status">Visible</span>
+                </div>
+            </div>
         </div>
 
         <div id="questions-container" class="questions-container">
@@ -437,6 +507,82 @@ $quizzes = $con->query($query);
                 <option value="${option3}" ${currentAnswer === option3 ? 'selected' : ''}>${option3}</option>
                 <option value="${option4}" ${currentAnswer === option4 ? 'selected' : ''}>${option4}</option>
             `;
+        }
+    </script>
+
+    <script>
+        function toggleVisibility() {
+            const quizSelect = document.getElementById('quiz-select');
+            const quizid = quizSelect.value;
+            const visibilityToggle = document.getElementById('visibility-toggle');
+            const visibilityStatus = document.getElementById('visibility-status');
+
+            if (!quizid) {
+                visibilityToggle.checked = false;
+                visibilityStatus.textContent = 'Hidden';
+                return;
+            }
+
+            fetch('api/toggle_quiz_visibility.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `quizid=${encodeURIComponent(quizid)}`
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    visibilityStatus.textContent = data.is_visible ? 'Visible' : 'Hidden';
+                } else {
+                    visibilityToggle.checked = !visibilityToggle.checked; // Revert toggle
+                    alert('Failed to toggle visibility: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                visibilityToggle.checked = !visibilityToggle.checked; // Revert toggle
+                alert('Failed to toggle visibility: ' + error.message);
+            });
+        }
+
+        function loadQuestions(quizid) {
+            // ... existing loadQuestions code ...
+            
+            // Update visibility toggle state
+            const visibilityToggle = document.getElementById('visibility-toggle');
+            const visibilityStatus = document.getElementById('visibility-status');
+            
+            if (quizid) {
+                fetch(`api/get_quiz_visibility.php?quizid=${encodeURIComponent(quizid)}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            visibilityToggle.checked = data.is_visible;
+                            visibilityStatus.textContent = data.is_visible ? 'Visible' : 'Hidden';
+                        } else {
+                            console.error('Failed to get visibility status:', data.error);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        visibilityToggle.checked = false;
+                        visibilityStatus.textContent = 'Hidden';
+                    });
+            } else {
+                visibilityToggle.checked = false;
+                visibilityStatus.textContent = 'Hidden';
+            }
         }
     </script>
 </body>
