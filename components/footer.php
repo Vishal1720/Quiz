@@ -19,20 +19,19 @@
                     </ul>
                 </div>
                 <div class="footer-section">
-                    <h3 class="footer-title">Contact</h3>
+                    <h3 class="footer-title">Developers</h3>
                     <ul class="footer-links">
-                        <li><a href="mailto:support@quizmaster.com"><i class="fas fa-envelope"></i> support@quizmaster.com</a></li>
-                        <li><a href="#"><i class="fas fa-phone"></i> +1 (555) 123-4567</a></li>
+                        <li><a href="https://www.linkedin.com/in/vishalshetty17" target="_blank"><i class="fab fa-linkedin"></i> Vishal - Lead Backend Developer</a></li>
+                        <li><a href="https://www.linkedin.com/in/aneesh-bhat" target="_blank"><i class="fab fa-linkedin"></i> Aneesh - PHP Developer</a></li>
+                        <li><a href="https://www.linkedin.com/in/Chirag-S-Kotian" target="_blank"><i class="fab fa-linkedin"></i> Chirag - Frontend Developer</a></li>
                     </ul>
                 </div>
             </div>
             <div class="footer-bottom">
                 <p>&copy; <?php echo date('Y'); ?> QuizMaster. All rights reserved.</p>
                 <div class="social-links">
-                    <a href="#" class="social-link"><i class="fab fa-facebook"></i></a>
-                    <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
-                    <a href="#" class="social-link"><i class="fab fa-linkedin"></i></a>
-                    <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+                    <a href="https://github.com/quiz-developers/quiz-master" class="social-link" target="_blank"><i class="fab fa-github"></i></a>
+                    <a href="https://linkedin.com/company/quiz-master" class="social-link" target="_blank"><i class="fab fa-linkedin"></i></a>
                 </div>
             </div>
         </div>
