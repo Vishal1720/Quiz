@@ -31,7 +31,7 @@ function getPageTitle() {
     <title>QuizMaster - <?php echo getPageTitle(); ?></title>
     <link rel="shortcut icon" href="./quiz.png" type="image/x-icon">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="stylesheet" href="/Quiz/css/responsive.css">
+    <link rel="stylesheet" href="./css/responsive.css">
     <style>
         /* Base Styles */
         :root {
