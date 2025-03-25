@@ -183,26 +183,27 @@ if ($tablesExist) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Quiz Statistics</title>
     <link rel="shortcut icon" href="quiz.png" type="image/x-icon">
-    <link rel="stylesheet" href="nav.css">
     <style>
         body {
             font-family: Arial, sans-serif;
             line-height: 1.6;
             margin: 0;
-            padding: 20px;
-            background: #f5f5f5;
+            padding: 0;
+            background: var(--background);
+            color: var(--text);
+            min-height: 100vh;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 2rem;
         }
         
         h1 {
-            color: #2c3e50;
+            color: var(--text);
             margin-bottom: 25px;
-            border-bottom: 2px solid #3498db;
+            border-bottom: 2px solid var(--primary);
             padding-bottom: 10px;
         }
         
@@ -213,40 +214,44 @@ if ($tablesExist) {
         }
 
         .setup-card {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
+            background: rgba(231, 76, 60, 0.1);
+            color: var(--text);
+            border: 1px solid rgba(231, 76, 60, 0.3);
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 20px;
         }
 
         .setup-card h2 {
-            color: #721c24;
+            color: var(--text);
             margin-top: 0;
         }
 
         .setup-card a {
             display: inline-block;
-            background: #dc3545;
+            background: var(--primary);
             color: white;
             padding: 10px 15px;
             border-radius: 4px;
             text-decoration: none;
             margin-top: 15px;
+            transition: all 0.3s ease;
         }
 
         .setup-card a:hover {
-            background: #c82333;
+            background: var(--primary-dark);
+            transform: translateY(-2px);
         }
 
         .search-bar {
             margin-bottom: 20px;
             width: 100%;
             display: flex;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
             border-radius: 4px;
             overflow: hidden;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .search-input {
@@ -254,40 +259,47 @@ if ($tablesExist) {
             padding: 12px 15px;
             border: none;
             font-size: 16px;
+            background: transparent;
+            color: var(--text);
+        }
+        
+        .search-input::placeholder {
+            color: var(--text-muted);
         }
         
         .search-button {
             padding: 12px 20px;
-            background: #3498db;
+            background: var(--primary);
             color: white;
             border: none;
             cursor: pointer;
             font-weight: bold;
+            transition: all 0.3s ease;
         }
         
         .search-button:hover {
-            background: #2980b9;
+            background: var(--primary-dark);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
-            background: white;
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
         th, td {
             padding: 15px;
             text-align: left;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         th {
-            background: #3498db;
-            color: white;
+            background: rgba(74, 144, 226, 0.2);
+            color: var(--text);
             font-weight: bold;
             text-transform: uppercase;
             font-size: 0.9em;
@@ -295,11 +307,11 @@ if ($tablesExist) {
         }
 
         tr:nth-child(even) {
-            background: #f9f9f9;
+            background: rgba(255, 255, 255, 0.02);
         }
 
         tr:hover {
-            background: #f1f8fe;
+            background: rgba(255, 255, 255, 0.05);
         }
 
         .score {
@@ -333,14 +345,14 @@ if ($tablesExist) {
         }
 
         .user-name, .user-email, .total-attempts {
-            color: #333 !important;
+            color: var(--text) !important;
             font-weight: 500;
         }
         
         .quiz-date, .quiz-duration {
-            color: #555;
+            color: var(--text-muted);
             font-family: 'Courier New', monospace;
-            background: #f8f9fa;
+            background: rgba(255, 255, 255, 0.05);
             padding: 5px 8px;
             border-radius: 4px;
             display: inline-block;
@@ -349,7 +361,7 @@ if ($tablesExist) {
         
         /* Ensure all text in table cells has good contrast */
         td {
-            color: #333;
+            color: var(--text);
         }
         
         .badge {
@@ -380,25 +392,25 @@ if ($tablesExist) {
         
         .access-code {
             font-family: monospace;
-            background: #f1f1f1;
+            background: rgba(255, 255, 255, 0.05);
             padding: 6px 10px;
             border-radius: 4px;
             font-size: 1.2em;
             font-weight: bold;
-            color: #2c3e50;
-            border: 1px solid #ddd;
+            color: var(--text);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             display: inline-block;
             letter-spacing: 1px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
         
         /* Add a highlight box around access code */
         .access-code-container {
             margin-top: 10px;
             padding: 10px;
-            background-color: #f8f4ff;
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 6px;
-            border: 1px solid #e2d6f5;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -429,11 +441,11 @@ if ($tablesExist) {
         }
         
         .no-data {
-            background: #f8f9fa;
+            background: rgba(255, 255, 255, 0.05);
             padding: 30px;
             text-align: center;
             border-radius: 8px;
-            color: #6c757d;
+            color: var(--text-muted);
             font-style: italic;
             margin: 20px 0;
         }
@@ -441,46 +453,62 @@ if ($tablesExist) {
         .tabs {
             display: flex;
             margin-bottom: 20px;
-            background: white;
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 8px;
             overflow: hidden;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .tab {
             flex: 1;
             padding: 15px 0;
             text-align: center;
-            background: #f8f9fa;
+            background: transparent;
             border: none;
             cursor: pointer;
             font-weight: bold;
+            color: var(--text-muted);
             transition: all 0.3s ease;
         }
         
         .tab.active {
-            background: #3498db;
+            background: var(--primary);
             color: white;
         }
         
         .tab:hover:not(.active) {
-            background: #e9ecef;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
         }
         
         .tab-content {
             display: none;
+            animation: fadeIn 0.3s ease;
         }
         
         .tab-content.active {
             display: block;
         }
         
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
         .scheduled-quiz-card {
-            background: white;
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .scheduled-quiz-header {
@@ -488,14 +516,14 @@ if ($tablesExist) {
             justify-content: space-between;
             align-items: center;
             margin-bottom: 15px;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             padding-bottom: 10px;
         }
         
         .scheduled-quiz-title {
             font-size: 1.2em;
             font-weight: bold;
-            color: #2c3e50;
+            color: var(--text);
         }
         
         .scheduled-quiz-details {
@@ -512,12 +540,12 @@ if ($tablesExist) {
         .detail-value {
             font-size: 1.5em;
             font-weight: bold;
-            color: #3498db;
+            color: var(--primary);
             margin-bottom: 5px;
         }
         
         .detail-label {
-            color: #7f8c8d;
+            color: var(--text-muted);
             font-size: 0.9em;
         }
         
@@ -529,6 +557,149 @@ if ($tablesExist) {
         .badge-direct {
             background: #4285F4;
             color: white;
+        }
+
+        /* Responsive Styles */
+        @media screen and (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .search-bar {
+                flex-direction: column;
+                background: none;
+                box-shadow: none;
+                border: none;
+            }
+
+            .search-input {
+                width: 100%;
+                margin-bottom: 0.5rem;
+                border-radius: 4px;
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .search-button {
+                width: 100%;
+                border-radius: 4px;
+            }
+
+            .tabs {
+                flex-direction: column;
+                background: none;
+                box-shadow: none;
+                border: none;
+                gap: 0.5rem;
+            }
+
+            .tab {
+                border-radius: 4px;
+                background: rgba(255, 255, 255, 0.05);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            /* Table Responsive Styles */
+            table, thead, tbody, th, td, tr {
+                display: block;
+            }
+
+            thead tr {
+                position: absolute;
+                top: -9999px;
+                left: -9999px;
+            }
+
+            tr {
+                margin-bottom: 1rem;
+                background: rgba(255, 255, 255, 0.05) !important;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 8px;
+                padding: 0.5rem;
+            }
+
+            td {
+                border: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                position: relative;
+                padding-left: 50%;
+                text-align: right;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            td:last-child {
+                border-bottom: none;
+            }
+
+            td:before {
+                content: attr(data-label);
+                position: relative;
+                left: 0;
+                width: 45%;
+                padding-right: 10px;
+                text-align: left;
+                font-weight: bold;
+                color: var(--text-muted);
+            }
+
+            .score {
+                margin-left: auto;
+            }
+
+            .badge {
+                margin-left: auto;
+            }
+
+            .scheduled-quiz-card {
+                padding: 1rem;
+            }
+
+            .scheduled-quiz-details {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .scheduled-quiz-header {
+                flex-direction: column;
+                gap: 0.5rem;
+                text-align: center;
+            }
+
+            .access-code-container {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+
+        /* Small mobile devices */
+        @media screen and (max-width: 480px) {
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            h2 {
+                font-size: 1.2rem;
+            }
+
+            .detail-value {
+                font-size: 1.2em;
+            }
+
+            td {
+                padding: 0.75rem;
+                font-size: 0.9rem;
+            }
+
+            .badge, .status-badge {
+                font-size: 0.75em;
+            }
+
+            .score {
+                min-width: 60px;
+                font-size: 0.9em;
+            }
         }
     </style>
 </head>
@@ -580,21 +751,19 @@ if ($tablesExist) {
                         <?php if ($all_attempts_result && $all_attempts_result->num_rows > 0): ?>
                             <?php while ($attempt = $all_attempts_result->fetch_assoc()): ?>
                                 <tr>
-                                    <td><strong class="user-name"><?php echo htmlspecialchars($attempt['name']); ?></strong></td>
-                                    <td><span class="user-email"><?php echo htmlspecialchars($attempt['email']); ?></span></td>
-                                    <td>
+                                    <td data-label="User Name"><strong class="user-name"><?php echo htmlspecialchars($attempt['name']); ?></strong></td>
+                                    <td data-label="Email"><span class="user-email"><?php echo htmlspecialchars($attempt['email']); ?></span></td>
+                                    <td data-label="Login Type">
                                         <span class="badge <?php echo $attempt['login_type'] === 'Gmail' ? 'badge-gmail' : 'badge-direct'; ?>">
                                             <?php echo $attempt['login_type']; ?>
                                         </span>
                                     </td>
-                                    <td><?php echo htmlspecialchars($attempt['quizname'] ?? 'Unknown Quiz'); ?></td>
-                                    <td>
+                                    <td data-label="Quiz Name"><?php echo htmlspecialchars($attempt['quizname'] ?? 'Unknown Quiz'); ?></td>
+                                    <td data-label="Points Scored">
                                         <?php 
-                                            // Use the score field (percentage) and total_questions to calculate actual points
                                             $points = round(($attempt['score'] * $attempt['total_questions']) / 100);
                                             $percentage = ($points / $attempt['total_questions']) * 100;
                                             
-                                            // Add score-level class based on percentage
                                             $scoreClass = 'score ';
                                             if ($percentage === 100) {
                                                 $scoreClass .= 'score-perfect';
@@ -609,7 +778,7 @@ if ($tablesExist) {
                                             echo '<span class="' . $scoreClass . '">' . $points . ' / ' . $attempt['total_questions'] . '</span>'; 
                                         ?>
                                     </td>
-                                    <td>
+                                    <td data-label="Access Method">
                                         <?php if ($attempt['access_type'] == 'Scheduled'): ?>
                                             <span class="badge badge-scheduled">Scheduled</span>
                                             <span class="access-code"><?php echo $attempt['access_code']; ?></span>
@@ -617,8 +786,8 @@ if ($tablesExist) {
                                             <span class="badge badge-secondary">Direct</span>
                                         <?php endif; ?>
                                     </td>
-                                    <td><span class="quiz-date"><?php echo date('M d, Y H:i', strtotime($attempt['end_time'] ?? $attempt['start_time'])); ?></span></td>
-                                    <td>
+                                    <td data-label="Date"><span class="quiz-date"><?php echo date('M d, Y H:i', strtotime($attempt['end_time'] ?? $attempt['start_time'])); ?></span></td>
+                                    <td data-label="Status">
                                         <span class="status-badge status-<?php echo strtolower($attempt['status']); ?>">
                                             <?php echo ucfirst($attempt['status']); ?>
                                         </span>
@@ -660,36 +829,36 @@ if ($tablesExist) {
                         <?php if ($user_stats_result && $user_stats_result->num_rows > 0): ?>
                             <?php while($user = $user_stats_result->fetch_assoc()): ?>
                                 <tr>
-                                    <td><strong><?php echo htmlspecialchars($user['name']); ?></strong></td>
-                                    <td><?php echo htmlspecialchars($user['email']); ?></td>
-                                    <td>
+                                    <td data-label="User Name"><strong><?php echo htmlspecialchars($user['name']); ?></strong></td>
+                                    <td data-label="Email"><?php echo htmlspecialchars($user['email']); ?></td>
+                                    <td data-label="Login Type">
                                         <span class="badge <?php echo $user['login_type'] === 'Gmail' ? 'badge-gmail' : 'badge-direct'; ?>">
                                             <?php echo $user['login_type']; ?>
                                         </span>
                                     </td>
-                                    <td><?php echo $user['total_attempts'] ?: 0; ?></td>
-                                    <td>
+                                    <td data-label="Quizzes Taken"><?php echo $user['total_attempts'] ?: 0; ?></td>
+                                    <td data-label="Scheduled Quizzes">
                                         <?php if ($user['scheduled_attempts'] > 0): ?>
                                             <span class="badge badge-scheduled"><?php echo $user['scheduled_attempts']; ?></span>
                                         <?php else: ?>
                                             0
                                         <?php endif; ?>
                                     </td>
-                                    <td><span class="score <?php 
+                                    <td data-label="Average Points"><span class="score <?php 
                                         $avgScore = $user['average_score'] ? number_format($user['average_score'], 1) : '0.0';
                                         if ($avgScore == 100) echo 'score-perfect';
                                         elseif ($avgScore >= 70) echo 'score-good';
                                         elseif ($avgScore >= 40) echo 'score-average';
                                         else echo 'score-poor';
                                     ?>"><?php echo $avgScore; ?>%</span></td>
-                                    <td><span class="score <?php 
+                                    <td data-label="Best Score"><span class="score <?php 
                                         $highScore = $user['highest_score'] ?: '0';
                                         if ($highScore == 100) echo 'score-perfect';
                                         elseif ($highScore >= 70) echo 'score-good';
                                         elseif ($highScore >= 40) echo 'score-average';
                                         else echo 'score-poor';
                                     ?>"><?php echo $highScore; ?>%</span></td>
-                                    <td><?php echo $user['last_attempt'] ? '<span class="quiz-date">' . date('M d, Y H:i', strtotime($user['last_attempt'])) . '</span>' : '-'; ?></td>
+                                    <td data-label="Last Attempt"><?php echo $user['last_attempt'] ? '<span class="quiz-date">' . date('M d, Y H:i', strtotime($user['last_attempt'])) . '</span>' : '-'; ?></td>
                                 </tr>
                             <?php endwhile; ?>
                         <?php else: ?>
@@ -728,11 +897,11 @@ if ($tablesExist) {
                         <?php if ($quiz_stats_result && $quiz_stats_result->num_rows > 0): ?>
                             <?php while($quiz = $quiz_stats_result->fetch_assoc()): ?>
                                 <tr>
-                                    <td><strong><?php echo htmlspecialchars($quiz['quizname']); ?></strong></td>
-                                    <td><?php echo htmlspecialchars($quiz['category']); ?></td>
-                                    <td><?php echo $quiz['total_questions']; ?></td>
-                                    <td><?php echo $quiz['total_attempts'] ?: 0; ?></td>
-                                    <td>
+                                    <td data-label="Quiz Name"><strong><?php echo htmlspecialchars($quiz['quizname']); ?></strong></td>
+                                    <td data-label="Category"><?php echo htmlspecialchars($quiz['category']); ?></td>
+                                    <td data-label="Questions"><?php echo $quiz['total_questions']; ?></td>
+                                    <td data-label="Attempts"><?php echo $quiz['total_attempts'] ?: 0; ?></td>
+                                    <td data-label="Completion Rate">
                                         <?php 
                                             $completion_rate = $quiz['total_attempts'] > 0 
                                                 ? round(($quiz['completed_attempts'] / $quiz['total_attempts']) * 100) 
@@ -740,15 +909,13 @@ if ($tablesExist) {
                                             echo $completion_rate . '%';
                                         ?>
                                     </td>
-                                    <td>
+                                    <td data-label="Average Points">
                                         <?php 
-                                            // Calculate average points instead of percentage
                                             $avg_points = $quiz['average_score'] ? 
                                                 round(($quiz['average_score'] / 100) * $quiz['total_questions'], 1) : 0;
                                                     
                                             $avg_percentage = $quiz['average_score'] ?: 0;
                                             
-                                            // Add score-level class based on percentage
                                             $scoreClass = 'score ';
                                             if ($avg_percentage == 100) {
                                                 $scoreClass .= 'score-perfect';
@@ -763,15 +930,13 @@ if ($tablesExist) {
                                             echo '<span class="' . $scoreClass . '">' . $avg_points . ' / ' . $quiz['total_questions'] . '</span>'; 
                                         ?>
                                     </td>
-                                    <td>
+                                    <td data-label="Highest Points">
                                         <?php 
-                                            // Calculate highest points instead of percentage
                                             $highest_points = $quiz['highest_score'] ? 
                                                 round(($quiz['highest_score'] / 100) * $quiz['total_questions']) : 0;
                                                     
                                             $highest_percentage = $quiz['highest_score'] ?: 0;
                                             
-                                            // Add score-level class based on percentage
                                             $scoreClass = 'score ';
                                             if ($highest_percentage == 100) {
                                                 $scoreClass .= 'score-perfect';
@@ -786,13 +951,13 @@ if ($tablesExist) {
                                             echo '<span class="' . $scoreClass . '">' . $highest_points . ' / ' . $quiz['total_questions'] . '</span>'; 
                                         ?>
                                     </td>
-                                    <td>
+                                    <td data-label="Last Attempt">
                                         <?php echo $quiz['last_attempt_date'] 
                                             ? '<span class="quiz-date">' . date('M d, Y H:i', strtotime($quiz['last_attempt_date'])) . '</span>' 
                                             : '-'; 
                                         ?>
                                     </td>
-                                    <td>
+                                    <td data-label="Actions">
                                         <a href="quiz_detail_stats.php?id=<?php echo $quiz['quizid']; ?>" class="badge badge-primary">View Details</a>
                                     </td>
                                 </tr>
