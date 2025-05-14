@@ -173,6 +173,20 @@ if ($tablesExist) {
         ORDER BY COUNT(DISTINCT qa.attempt_id) DESC, qd.quizname ASC";
         
     $quiz_stats_result = $con->query($quiz_stats_query);
+
+    // Add this query after the existing statistics queries
+    $difficulty_stats_query = "
+        SELECT 
+            qh.difficulty_level,
+            COUNT(DISTINCT qh.question_id) as questions_attempted,
+            COUNT(DISTINCT qh.user_email) as unique_users,
+            qd.quizname
+        FROM user_quiz_history qh
+        JOIN quizdetails qd ON qh.quizid = qd.quizid
+        GROUP BY qh.difficulty_level, qd.quizid
+        ORDER BY qh.difficulty_level
+    ";
+    $difficulty_stats = $con->query($difficulty_stats_query);
 }
 ?>
 
@@ -701,6 +715,24 @@ if ($tablesExist) {
                 font-size: 0.9em;
             }
         }
+
+        .difficulty-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .stat-card {
+            padding: 1rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-card.difficulty-easy { background: rgba(46, 204, 113, 0.1); }
+        .stat-card.difficulty-medium { background: rgba(241, 196, 15, 0.1); }
+        .stat-card.difficulty-intermediate { background: rgba(230, 126, 34, 0.1); }
+        .stat-card.difficulty-hard { background: rgba(231, 76, 60, 0.1); }
     </style>
 </head>
 <body>
@@ -1026,6 +1058,20 @@ if ($tablesExist) {
                         <p>No scheduled quizzes available yet.</p>
                     </div>
                 <?php endif; ?>
+            </div>
+
+            <!-- Difficulty Level Statistics -->
+            <div class="stats-section">
+                <h3>Performance by Difficulty Level</h3>
+                <div class="difficulty-stats">
+                    <?php while($stat = $difficulty_stats->fetch_assoc()): ?>
+                        <div class="stat-card difficulty-<?php echo $stat['difficulty_level']; ?>">
+                            <h4><?php echo ucfirst($stat['difficulty_level']); ?> Level</h4>
+                            <p>Questions Attempted: <?php echo $stat['questions_attempted']; ?></p>
+                            <p>Unique Users: <?php echo $stat['unique_users']; ?></p>
+                        </div>
+                    <?php endwhile; ?>
+                </div>
             </div>
             
         <?php endif; ?>

@@ -16,16 +16,17 @@ if($res->num_rows == 0) {
 }
 
 if($_SERVER['REQUEST_METHOD'] == 'POST') {
-    if(isset($_POST['quizid']) && isset($_POST['question']) && isset($_POST['options']) && isset($_POST['answer'])) {
+    if(isset($_POST['quizid']) && isset($_POST['question']) && isset($_POST['options']) && isset($_POST['answer']) && isset($_POST['difficulty'])) {
         $quizid = mysqli_real_escape_string($con, $_POST['quizid']);
         $question = mysqli_real_escape_string($con, $_POST['question']);
         $options = array_map('mysqli_real_escape_string', array_fill(0, 4, $con), $_POST['options']);
         $answer = mysqli_real_escape_string($con, $_POST['answer']);
+        $difficulty = mysqli_real_escape_string($con, $_POST['difficulty']);
 
-        $query = "INSERT INTO quizes (question, quizid, option1, option2, option3, option4, answer) 
-                 VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $query = "INSERT INTO quizes (question, quizid, option1, option2, option3, option4, answer, difficulty_level) 
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $con->prepare($query);
-        $stmt->bind_param("sssssss", $question, $quizid, $options[0], $options[1], $options[2], $options[3], $options[$answer]);
+        $stmt->bind_param("ssssssss", $question, $quizid, $options[0], $options[1], $options[2], $options[3], $options[$answer], $difficulty);
         
         if($stmt->execute()) {
             $success = "Question added successfully!";
@@ -341,6 +342,16 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
                     <option value="3">Option 4</option>
                 </select>
                 <p class="helper-text">Choose which option is the correct answer</p>
+            </div>
+
+            <div class="form-group">
+                <label for="difficulty">Difficulty Level</label>
+                <select name="difficulty" id="difficulty" required class="form-control">
+                    <option value="easy">Easy</option>
+                    <option value="medium">Medium</option>
+                    <option value="intermediate">Intermediate</option>
+                    <option value="hard">Hard</option>
+                </select>
             </div>
 
             <button type="submit" class="submit-btn">Add Question</button>

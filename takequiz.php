@@ -209,31 +209,57 @@ if ($timeRemaining <= 0) {
     exit();
 }
 
-// Get quiz questions
-$query = "SELECT q.*, qd.quizname, qd.category FROM quizes q 
-          JOIN quizdetails qd ON q.quizid = qd.quizid 
-          WHERE q.quizid = ? ORDER BY q.id ASC";
-
-$stmt = $con->prepare($query);
-$stmt->bind_param("i", $quizid);
-$stmt->execute();
-$result = $stmt->get_result();
-
-if ($result->num_rows == 0) {
-    header("Location: index.php?error=no_questions");
-    exit();
+// At the start of quiz loading...
+function getUniqueQuestions($con, $quizid, $user_email, $difficulty_level, $count) {
+    // Get questions user hasn't answered yet for this difficulty
+    $query = "SELECT q.* FROM quizes q 
+              WHERE q.quizid = ? 
+              AND q.difficulty_level = ?
+              AND q.ID NOT IN (
+                  SELECT question_id 
+                  FROM user_quiz_history 
+                  WHERE user_email = ? 
+                  AND quizid = ?
+              )
+              ORDER BY RAND() 
+              LIMIT ?";
+              
+    $stmt = $con->prepare($query);
+    $stmt->bind_param("issis", $quizid, $difficulty_level, $user_email, $quizid, $count);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 }
 
-$quizName = "";
-$category = "";
-$questions = array();
+// Get questions for each difficulty level
+$questions = [];
+$difficulties = ['easy', 'medium', 'intermediate', 'hard'];
+$questionsPerDifficulty = 5; // 5 questions per difficulty level
 
-while ($row = $result->fetch_assoc()) {
-    if (empty($quizName)) {
-        $quizName = $row['quizname'];
-        $category = $row['category'];
+foreach ($difficulties as $difficulty) {
+    $difficultyQuestions = getUniqueQuestions($con, $quizid, $_SESSION['email'], $difficulty, $questionsPerDifficulty);
+    $questions = array_merge($questions, $difficultyQuestions);
+}
+
+// If not enough new questions, get previously answered ones
+if (count($questions) < ($questionsPerDifficulty * count($difficulties))) {
+    foreach ($difficulties as $difficulty) {
+        $needed = $questionsPerDifficulty - count(array_filter($questions, function($q) use ($difficulty) {
+            return $q['difficulty_level'] === $difficulty;
+        }));
+        
+        if ($needed > 0) {
+            $query = "SELECT q.* FROM quizes q 
+                      WHERE q.quizid = ? 
+                      AND q.difficulty_level = ?
+                      ORDER BY RAND() 
+                      LIMIT ?";
+            $stmt = $con->prepare($query);
+            $stmt->bind_param("isi", $quizid, $difficulty, $needed);
+            $stmt->execute();
+            $additionalQuestions = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+            $questions = array_merge($questions, $additionalQuestions);
+        }
     }
-    $questions[] = $row;
 }
 
 // Handle form submission
@@ -546,6 +572,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 padding: var(--spacing-sm) var(--spacing-md);
             }
         }
+
+        .difficulty-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            margin-left: 1rem;
+        }
+
+        .difficulty-badge.easy { 
+            background: rgba(46, 204, 113, 0.2); 
+            color: #2ecc71; 
+        }
+        .difficulty-badge.medium { 
+            background: rgba(241, 196, 15, 0.2); 
+            color: #f1c40f; 
+        }
+        .difficulty-badge.intermediate { 
+            background: rgba(230, 126, 34, 0.2); 
+            color: #e67e22; 
+        }
+        .difficulty-badge.hard { 
+            background: rgba(231, 76, 60, 0.2); 
+            color: #e74c3c; 
+        }
     </style>
 </head>
 <body>
@@ -607,6 +658,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $ques=str_replace("\'","'",$ques);
                         $ques=str_replace('\"','"',$ques);
                         echo ($index + 1).".".htmlspecialchars($ques);  ?>
+                        <span class="difficulty-badge <?php echo $question['difficulty_level']; ?>">
+                            <?php echo ucfirst($question['difficulty_level']); ?>
+                        </span>
                     </div>
                     <ul class="options-list">
                         <?php for ($i = 1; $i <= 4; $i++): ?>
