@@ -345,8 +345,8 @@ if($_SERVER['REQUEST_METHOD'] == 'POST') {
             </div>
 
             <div class="form-group">
-                <label for="difficulty">Difficulty Level</label>
-                <select name="difficulty" id="difficulty" required class="form-control">
+                <label for="difficulty" class="form-label">Difficulty Level</label>
+                <select name="difficulty" id="difficulty" class="form-control" required>
                     <option value="easy">Easy</option>
                     <option value="medium">Medium</option>
                     <option value="intermediate">Intermediate</option>

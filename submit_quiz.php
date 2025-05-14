@@ -59,6 +59,18 @@ $stmtInsert->bind_param("siii", $_SESSION['email'], $quizid, $score, $totalQuest
 $stmtInsert->execute();
 
 // After recording the quiz score...
+// Record attempted questions
+foreach ($_POST['answers'] as $questionId => $userAnswer) {
+    $stmt = $con->prepare("
+        INSERT INTO user_quiz_history (user_email, quizid, question_id, difficulty_level) 
+        SELECT ?, ?, ?, difficulty_level 
+        FROM quizes 
+        WHERE ID = ?
+    ");
+    $stmt->bind_param("siii", $_SESSION['email'], $quizid, $questionId, $questionId);
+    $stmt->execute();
+}
+
 foreach ($_POST['answers'] as $questionId => $answer) {
     // Get question difficulty level
     $stmt = $con->prepare("SELECT difficulty_level FROM quizes WHERE ID = ?");

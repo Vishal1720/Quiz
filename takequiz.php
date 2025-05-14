@@ -230,36 +230,50 @@ function getUniqueQuestions($con, $quizid, $user_email, $difficulty_level, $coun
     return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 }
 
+// Add this after the session checks at the beginning of the file
+function getQuestionsForDifficulty($con, $quizid, $difficulty, $count) {
+    $stmt = $con->prepare("
+        SELECT q.* FROM quizes q 
+        LEFT JOIN user_quiz_history h ON q.ID = h.question_id 
+            AND h.user_email = ? 
+            AND h.quizid = ?
+        WHERE q.quizid = ? 
+        AND q.difficulty_level = ?
+        AND h.question_id IS NULL
+        ORDER BY RAND() 
+        LIMIT ?
+    ");
+    
+    $stmt->bind_param("siisi", $_SESSION['email'], $quizid, $quizid, $difficulty, $count);
+    $stmt->execute();
+    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+}
+
 // Get questions for each difficulty level
 $questions = [];
 $difficulties = ['easy', 'medium', 'intermediate', 'hard'];
-$questionsPerDifficulty = 5; // 5 questions per difficulty level
+$questionsPerDifficulty = 5;
 
 foreach ($difficulties as $difficulty) {
-    $difficultyQuestions = getUniqueQuestions($con, $quizid, $_SESSION['email'], $difficulty, $questionsPerDifficulty);
+    $difficultyQuestions = getQuestionsForDifficulty($con, $quizid, $difficulty, $questionsPerDifficulty);
     $questions = array_merge($questions, $difficultyQuestions);
 }
 
-// If not enough new questions, get previously answered ones
+// If we don't have enough questions, get any remaining questions regardless of previous attempts
 if (count($questions) < ($questionsPerDifficulty * count($difficulties))) {
-    foreach ($difficulties as $difficulty) {
-        $needed = $questionsPerDifficulty - count(array_filter($questions, function($q) use ($difficulty) {
-            return $q['difficulty_level'] === $difficulty;
-        }));
-        
-        if ($needed > 0) {
-            $query = "SELECT q.* FROM quizes q 
-                      WHERE q.quizid = ? 
-                      AND q.difficulty_level = ?
-                      ORDER BY RAND() 
-                      LIMIT ?";
-            $stmt = $con->prepare($query);
-            $stmt->bind_param("isi", $quizid, $difficulty, $needed);
-            $stmt->execute();
-            $additionalQuestions = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
-            $questions = array_merge($questions, $additionalQuestions);
-        }
-    }
+    $remaining = ($questionsPerDifficulty * count($difficulties)) - count($questions);
+    $stmt = $con->prepare("
+        SELECT * FROM quizes 
+        WHERE quizid = ? 
+        AND ID NOT IN (SELECT ID FROM quizes WHERE ID IN (" . 
+        implode(',', array_column($questions, 'ID')) . "))
+        ORDER BY RAND() 
+        LIMIT ?
+    ");
+    $stmt->bind_param("ii", $quizid, $remaining);
+    $stmt->execute();
+    $remainingQuestions = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    $questions = array_merge($questions, $remainingQuestions);
 }
 
 // Handle form submission
@@ -575,27 +589,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         .difficulty-badge {
             display: inline-block;
-            padding: 0.25rem 0.75rem;
+            padding: 4px 12px;
             border-radius: 15px;
-            font-size: 0.8rem;
-            margin-left: 1rem;
+            font-size: 0.85rem;
+            margin-left: 10px;
+            text-transform: capitalize;
         }
 
-        .difficulty-badge.easy { 
-            background: rgba(46, 204, 113, 0.2); 
-            color: #2ecc71; 
+        .difficulty-badge.easy {
+            background: rgba(46, 204, 113, 0.2);
+            color: #2ecc71;
+            border: 1px solid rgba(46, 204, 113, 0.3);
         }
-        .difficulty-badge.medium { 
-            background: rgba(241, 196, 15, 0.2); 
-            color: #f1c40f; 
+
+        .difficulty-badge.medium {
+            background: rgba(241, 196, 15, 0.2);
+            color: #f1c40f;
+            border: 1px solid rgba(241, 196, 15, 0.3);
         }
-        .difficulty-badge.intermediate { 
-            background: rgba(230, 126, 34, 0.2); 
-            color: #e67e22; 
+
+        .difficulty-badge.intermediate {
+            background: rgba(230, 126, 34, 0.2);
+            color: #e67e22;
+            border: 1px solid rgba(230, 126, 34, 0.3);
         }
-        .difficulty-badge.hard { 
-            background: rgba(231, 76, 60, 0.2); 
-            color: #e74c3c; 
+
+        .difficulty-badge.hard {
+            background: rgba(231, 76, 60, 0.2);
+            color: #e74c3c;
+            border: 1px solid rgba(231, 76, 60, 0.3);
         }
     </style>
 </head>
@@ -652,15 +674,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <form method="POST" id="quiz-form">
             <?php foreach ($questions as $index => $question): ?>
                 <div class="question-card">
-                    <div class="question-text">
-                        <?php 
-                        $ques=$question['question'];
-                        $ques=str_replace("\'","'",$ques);
-                        $ques=str_replace('\"','"',$ques);
-                        echo ($index + 1).".".htmlspecialchars($ques);  ?>
-                        <span class="difficulty-badge <?php echo $question['difficulty_level']; ?>">
-                            <?php echo ucfirst($question['difficulty_level']); ?>
-                        </span>
+                    <div class="question-header">
+                        <p class="question-text">
+                            <?php 
+                            $ques=$question['question'];
+                            $ques=str_replace("\'","'",$ques);
+                            $ques=str_replace('\"','"',$ques);
+                            echo ($index + 1).".".htmlspecialchars($ques);  ?>
+                            <span class="difficulty-badge <?php echo htmlspecialchars($question['difficulty_level']); ?>">
+                                <?php echo htmlspecialchars($question['difficulty_level']); ?>
+                            </span>
+                        </p>
                     </div>
                     <ul class="options-list">
                         <?php for ($i = 1; $i <= 4; $i++): ?>
