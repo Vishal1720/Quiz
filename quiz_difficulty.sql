@@ -13,3 +13,6 @@ CREATE TABLE IF NOT EXISTS user_quiz_history (
     FOREIGN KEY (quizid) REFERENCES quizdetails(quizid),
     FOREIGN KEY (question_id) REFERENCES quizes(ID)
 );
+
+ALTER TABLE quizes ADD COLUMN difficulty 
+ENUM('beginner', 'intermediate', 'advanced', 'expert') DEFAULT 'beginner';

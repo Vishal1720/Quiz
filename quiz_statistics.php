@@ -174,19 +174,31 @@ if ($tablesExist) {
         
     $quiz_stats_result = $con->query($quiz_stats_query);
 
-    // Add this query after the existing statistics queries
-    $difficulty_stats_query = "
-        SELECT 
-            qh.difficulty_level,
-            COUNT(DISTINCT qh.question_id) as questions_attempted,
-            COUNT(DISTINCT qh.user_email) as unique_users,
-            qd.quizname
-        FROM user_quiz_history qh
-        JOIN quizdetails qd ON qh.quizid = qd.quizid
-        GROUP BY qh.difficulty_level, qd.quizid
-        ORDER BY qh.difficulty_level
-    ";
-    $difficulty_stats = $con->query($difficulty_stats_query);
+    // Replace the existing difficulty stats section (around line 189) with:
+    $difficulty_stats = null;
+    $userHistoryTableExists = false;
+
+    try {
+        // Check if user_quiz_history table exists
+        $tableCheck = $con->query("SHOW TABLES LIKE 'user_quiz_history'");
+        if ($tableCheck->num_rows > 0) {
+            $userHistoryTableExists = true;
+            $difficulty_stats_query = "
+                SELECT 
+                    qh.difficulty_level,
+                    COUNT(DISTINCT qh.question_id) as questions_attempted,
+                    COUNT(DISTINCT qh.user_email) as unique_users,
+                    qd.quizname
+                FROM user_quiz_history qh
+                JOIN quizdetails qd ON qh.quizid = qd.quizid
+                GROUP BY qh.difficulty_level, qd.quizid, qd.quizname
+                ORDER BY qh.difficulty_level";
+            $difficulty_stats = $con->query($difficulty_stats_query);
+        }
+    } catch (Exception $e) {
+        error_log("Error querying difficulty stats: " . $e->getMessage());
+        $difficulty_stats = null;
+    }
 }
 ?>
 
@@ -765,74 +777,27 @@ if ($tablesExist) {
                 </div>
                 
                 <h2>All Quiz Attempts</h2>
-                
-                <table id="attempts-table">
-                    <thead>
-                        <tr>
-                            <th>User Name</th>
-                            <th>Email</th>
-                            <th>Login Type</th>
-                            <th>Quiz Name</th>
-                            <th>Points Scored</th>
-                            <th>Access Method</th>
-                            <th>Date</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php if ($all_attempts_result && $all_attempts_result->num_rows > 0): ?>
-                            <?php while ($attempt = $all_attempts_result->fetch_assoc()): ?>
-                                <tr>
-                                    <td data-label="User Name"><strong class="user-name"><?php echo htmlspecialchars($attempt['name']); ?></strong></td>
-                                    <td data-label="Email"><span class="user-email"><?php echo htmlspecialchars($attempt['email']); ?></span></td>
-                                    <td data-label="Login Type">
-                                        <span class="badge <?php echo $attempt['login_type'] === 'Gmail' ? 'badge-gmail' : 'badge-direct'; ?>">
-                                            <?php echo $attempt['login_type']; ?>
-                                        </span>
-                                    </td>
-                                    <td data-label="Quiz Name"><?php echo htmlspecialchars($attempt['quizname'] ?? 'Unknown Quiz'); ?></td>
-                                    <td data-label="Points Scored">
-                                        <?php 
-                                            $points = round(($attempt['score'] * $attempt['total_questions']) / 100);
-                                            $percentage = ($points / $attempt['total_questions']) * 100;
-                                            
-                                            $scoreClass = 'score ';
-                                            if ($percentage === 100) {
-                                                $scoreClass .= 'score-perfect';
-                                            } elseif ($percentage >= 70) {
-                                                $scoreClass .= 'score-good';
-                                            } elseif ($percentage >= 40) {
-                                                $scoreClass .= 'score-average';
-                                            } else {
-                                                $scoreClass .= 'score-poor';
-                                            }
-                                            
-                                            echo '<span class="' . $scoreClass . '">' . $points . ' / ' . $attempt['total_questions'] . '</span>'; 
-                                        ?>
-                                    </td>
-                                    <td data-label="Access Method">
-                                        <?php if ($attempt['access_type'] == 'Scheduled'): ?>
-                                            <span class="badge badge-scheduled">Scheduled</span>
-                                            <span class="access-code"><?php echo $attempt['access_code']; ?></span>
-                                        <?php else: ?>
-                                            <span class="badge badge-secondary">Direct</span>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td data-label="Date"><span class="quiz-date"><?php echo date('M d, Y H:i', strtotime($attempt['end_time'] ?? $attempt['start_time'])); ?></span></td>
-                                    <td data-label="Status">
-                                        <span class="status-badge status-<?php echo strtolower($attempt['status']); ?>">
-                                            <?php echo ucfirst($attempt['status']); ?>
-                                        </span>
-                                    </td>
-                                </tr>
-                            <?php endwhile; ?>
-                        <?php else: ?>
+                <div class="attempts-table">
+                    <table>
+                        <thead>
                             <tr>
-                                <td colspan="9" class="no-data">No quiz attempts recorded yet.</td>
+                                <th>USER NAME</th>
+                                <th>EMAIL</th>
+                                <th>LOGIN TYPE</th>
+                                <th>QUIZ NAME</th>
+                                <th>POINTS SCORED</th>
+                                <th>ACCESS METHOD</th>
+                                <th>DATE</th>
+                                <th>STATUS</th>
                             </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            <?php while ($attempt = $all_attempts_result->fetch_assoc()): ?>
+                                <!-- ... existing table rows code ... -->
+                            <?php endwhile; ?>
+                        </tbody>
+                    </table>
+                </div>
             </div>
             
             <!-- User Performance Tab -->
@@ -1061,18 +1026,25 @@ if ($tablesExist) {
             </div>
 
             <!-- Difficulty Level Statistics -->
-            <div class="stats-section">
-                <h3>Performance by Difficulty Level</h3>
-                <div class="difficulty-stats">
-                    <?php while($stat = $difficulty_stats->fetch_assoc()): ?>
-                        <div class="stat-card difficulty-<?php echo $stat['difficulty_level']; ?>">
-                            <h4><?php echo ucfirst($stat['difficulty_level']); ?> Level</h4>
-                            <p>Questions Attempted: <?php echo $stat['questions_attempted']; ?></p>
-                            <p>Unique Users: <?php echo $stat['unique_users']; ?></p>
-                        </div>
-                    <?php endwhile; ?>
+            <?php if ($userHistoryTableExists && $difficulty_stats && $difficulty_stats->num_rows > 0): ?>
+                <div class="stats-section">
+                    <h3>Performance by Difficulty Level</h3>
+                    <div class="difficulty-stats">
+                        <?php while($stat = $difficulty_stats->fetch_assoc()): ?>
+                            <div class="stat-card difficulty-<?php echo htmlspecialchars($stat['difficulty_level']); ?>">
+                                <h4><?php echo ucfirst(htmlspecialchars($stat['difficulty_level'])); ?> Level</h4>
+                                <p>Questions Attempted: <?php echo htmlspecialchars($stat['questions_attempted']); ?></p>
+                                <p>Unique Users: <?php echo htmlspecialchars($stat['unique_users']); ?></p>
+                            </div>
+                        <?php endwhile; ?>
+                    </div>
                 </div>
-            </div>
+            <?php elseif ($tablesExist): ?>
+                <div class="stats-section">
+                    <h3>Performance by Difficulty Level</h3>
+                    <div class="no-data">No difficulty level statistics available yet.</div>
+                </div>
+            <?php endif; ?>
             
         <?php endif; ?>
     </div>

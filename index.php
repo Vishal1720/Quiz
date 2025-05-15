@@ -452,7 +452,7 @@ if ($quizResult) {
                             <p class="quiz-info">
                                 Questions: <?php echo $quiz['question_count']; ?>
                             </p>
-                            <a href="takequiz.php?quizid=<?php echo $quiz['quizid']; ?>" class="take-quiz-btn">
+                            <a href="select_difficulty.php?quizid=<?php echo $quiz['quizid']; ?>" class="take-quiz-btn">
                                 Take Quiz
                             </a>
                         </div>

@@ -483,6 +483,36 @@ $quizzes = $con->query($query);
                         </div>
                     `;
                 });
+                
+            // Update visibility toggle state
+            const visibilityToggle = document.getElementById('visibility-toggle');
+            const visibilityStatus = document.getElementById('visibility-status');
+            
+            if (quizId) {
+                fetch(`api/get_quiz_visibility.php?quizid=${encodeURIComponent(quizId)}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            visibilityToggle.checked = data.is_visible;
+                            visibilityStatus.textContent = data.is_visible ? 'Visible' : 'Hidden';
+                        } else {
+                            console.error('Failed to get visibility status:', data.error);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        visibilityToggle.checked = false;
+                        visibilityStatus.textContent = 'Hidden';
+                    });
+            } else {
+                visibilityToggle.checked = false;
+                visibilityStatus.textContent = 'Hidden';
+            }
         }
 
         // Add smooth scrolling to form after submission
@@ -549,40 +579,6 @@ $quizzes = $con->query($query);
                 visibilityToggle.checked = !visibilityToggle.checked; // Revert toggle
                 alert('Failed to toggle visibility: ' + error.message);
             });
-        }
-
-        function loadQuestions(quizid) {
-            // ... existing loadQuestions code ...
-            
-            // Update visibility toggle state
-            const visibilityToggle = document.getElementById('visibility-toggle');
-            const visibilityStatus = document.getElementById('visibility-status');
-            
-            if (quizid) {
-                fetch(`api/get_quiz_visibility.php?quizid=${encodeURIComponent(quizid)}`)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.success) {
-                            visibilityToggle.checked = data.is_visible;
-                            visibilityStatus.textContent = data.is_visible ? 'Visible' : 'Hidden';
-                        } else {
-                            console.error('Failed to get visibility status:', data.error);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        visibilityToggle.checked = false;
-                        visibilityStatus.textContent = 'Hidden';
-                    });
-            } else {
-                visibilityToggle.checked = false;
-                visibilityStatus.textContent = 'Hidden';
-            }
         }
     </script>
 </body>

@@ -1,7 +1,7 @@
 <?php
 // Google OAuth Configuration
-$google_client_id = '';  // Replace with your Google Client ID
-$google_client_secret = '';  // Replace with your Google Client Secret
+$google_client_id = '182212861245-o99o3lq1h0ru17hvaenhke1dru7btocs.apps.googleusercontent.com';  // Replace with your Google Client ID
+$google_client_secret = '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';  // Replace with your Google Client Secret
 
 // Make sure the redirect URL is EXACTLY the same as what's configured in Google Cloud Console
 // No trailing slashes, case sensitive, etc.

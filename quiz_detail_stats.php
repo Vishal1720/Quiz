@@ -580,57 +580,59 @@ try {
                     </tr>
                 </thead>
                 <tbody>
-                    <?php if ($total_attempts > 0): ?>
-                        <?php while ($attempt = $attempts_result->fetch_assoc()): ?>
-                            <tr>
-                                <td><strong class="user-name"><?php echo htmlspecialchars($attempt['user_name']); ?></strong></td>
-                                <td><span class="user-email"><?php echo htmlspecialchars($attempt['user_email']); ?></span></td>
-                                <td>
-                                    <span class="badge <?php echo $attempt['login_type'] === 'Gmail' ? 'badge-gmail' : 'badge-direct'; ?>">
-                                        <?php echo $attempt['login_type']; ?>
-                                    </span>
-                                </td>
-                                <td><span class="score">
-                                    <?php 
-                                        // Use the score field (percentage) and total_questions to calculate actual points
-                                        $points = round(($attempt['score'] * $attempt['total_questions']) / 100);
-                                        echo $points . ' / ' . $attempt['total_questions']; 
-                                    ?>
-                                </span></td>
-                                <td><span class="quiz-date"><?php echo date('M d, Y H:i', strtotime($attempt['end_time'] ?? $attempt['start_time'])); ?></span></td>
-                                <td>
-                                    <?php 
-                                        if ($attempt['start_time'] && $attempt['end_time']) {
-                                            $start = new DateTime($attempt['start_time']);
-                                            $end = new DateTime($attempt['end_time']);
-                                            $duration = $start->diff($end);
-                                            echo '<span class="quiz-duration">' . $duration->format('%H:%I:%S') . '</span>';
-                                        } else {
-                                            echo '-';
-                                        }
-                                    ?>
-                                </td>
-                                <td>
-                                    <?php if ($attempt['access_type'] == 'Scheduled'): ?>
-                                        <span class="badge badge-scheduled">Scheduled</span>
-                                        <span class="access-code"><?php echo $attempt['access_code']; ?></span>
-                                    <?php else: ?>
-                                        <span class="badge badge-secondary">Direct</span>
-                                    <?php endif; ?>
-                                </td>
-                                <td>
-                                    <span class="status-badge status-<?php echo strtolower($attempt['status']); ?>">
-                                        <?php echo ucfirst($attempt['status']); ?>
-                                    </span>
-                                </td>
-                            </tr>
-                        <?php endwhile; ?>
+    <?php if ($total_attempts > 0): ?>
+        <?php while ($attempt = $attempts_result->fetch_assoc()): ?>
+            <tr>
+                <td><strong class="user-name"><?php echo htmlspecialchars((string)($attempt['user_name'] ?? 'Unknown User')); ?></strong></td>
+                <td><span class="user-email"><?php echo htmlspecialchars((string)($attempt['user_email'] ?? 'No Email')); ?></span></td>
+                <td>
+                    <span class="badge <?php echo ($attempt['login_type'] ?? '') === 'Gmail' ? 'badge-gmail' : 'badge-direct'; ?>">
+                        <?php echo htmlspecialchars((string)($attempt['login_type'] ?? 'Direct')); ?>
+                    </span>
+                </td>
+                <td><span class="score">
+                    <?php 
+                        $points = isset($attempt['score']) && isset($attempt['total_questions']) 
+                            ? round(($attempt['score'] * $attempt['total_questions']) / 100) 
+                            : 0;
+                        $total = $attempt['total_questions'] ?? 0;
+                        echo $points . ' / ' . $total; 
+                    ?>
+                </span></td>
+                <td><span class="quiz-date"><?php echo date('M d, Y H:i', strtotime($attempt['end_time'] ?? $attempt['start_time'] ?? 'now')); ?></span></td>
+                <td>
+                    <?php 
+                        if (!empty($attempt['start_time']) && !empty($attempt['end_time'])) {
+                            $start = new DateTime($attempt['start_time']);
+                            $end = new DateTime($attempt['end_time']);
+                            $duration = $start->diff($end);
+                            echo '<span class="quiz-duration">' . $duration->format('%H:%I:%S') . '</span>';
+                        } else {
+                            echo '<span class="quiz-duration">-</span>';
+                        }
+                    ?>
+                </td>
+                <td>
+                    <?php if (($attempt['access_type'] ?? '') == 'Scheduled'): ?>
+                        <span class="badge badge-scheduled">Scheduled</span>
+                        <span class="access-code"><?php echo htmlspecialchars((string)($attempt['access_code'] ?? '')); ?></span>
                     <?php else: ?>
-                        <tr>
-                            <td colspan="9" class="no-data">No attempts recorded for this quiz yet.</td>
-                        </tr>
+                        <span class="badge badge-secondary">Direct</span>
                     <?php endif; ?>
-                </tbody>
+                </td>
+                <td>
+                    <span class="status-badge status-<?php echo strtolower((string)($attempt['status'] ?? 'unknown')); ?>">
+                        <?php echo ucfirst(htmlspecialchars((string)($attempt['status'] ?? 'Unknown'))); ?>
+                    </span>
+                </td>
+            </tr>
+        <?php endwhile; ?>
+    <?php else: ?>
+        <tr>
+            <td colspan="8" class="no-data">No attempts recorded for this quiz yet.</td>
+        </tr>
+    <?php endif; ?>
+</tbody>
             </table>
         </div>
         
