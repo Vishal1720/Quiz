@@ -9,6 +9,15 @@ if (!isset($_SESSION['status']) || $_SESSION['status'] !== "loggedin" && $_SESSI
     exit();
 }
 
+// Add near the top of the file after session checks
+$difficulty = $_GET['difficulty'] ?? 'beginner';
+$quizid = $_GET['quizid'] ?? '';
+
+if(!$quizid || !$difficulty) {
+    header("Location: index.php");
+    exit();
+}
+
 // Check if quiz ID is provided
 if (!isset($_GET['quizid'])) {
     header("Location: index.php");
@@ -111,6 +120,10 @@ $stmt = $con->prepare("SELECT qd.*, q.* FROM quizdetails qd
 $stmt->bind_param("i", $quizid);
 $stmt->execute();
 $quizDetails = $stmt->get_result()->fetch_assoc();
+
+// Add these lines to get quiz name and category
+$quizName = $quizDetails['quizname'] ?? 'Untitled Quiz';
+$category = $quizDetails['category'] ?? 'Uncategorized';
 
 if (!$quizDetails) {
     header("Location: index.php?error=invalid_quiz");
@@ -232,27 +245,57 @@ function getUniqueQuestions($con, $quizid, $user_email, $difficulty_level, $coun
 
 // Add this after the session checks at the beginning of the file
 function getQuestionsForDifficulty($con, $quizid, $difficulty, $count) {
-    $stmt = $con->prepare("
-        SELECT q.* FROM quizes q 
-        LEFT JOIN user_quiz_history h ON q.ID = h.question_id 
-            AND h.user_email = ? 
-            AND h.quizid = ?
-        WHERE q.quizid = ? 
-        AND q.difficulty_level = ?
-        AND h.question_id IS NULL
-        ORDER BY RAND() 
-        LIMIT ?
-    ");
-    
-    $stmt->bind_param("siisi", $_SESSION['email'], $quizid, $quizid, $difficulty, $count);
-    $stmt->execute();
-    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    try {
+        // First check if user_quiz_history table exists
+        $tableCheck = $con->query("SHOW TABLES LIKE 'user_quiz_history'");
+        
+        if ($tableCheck->num_rows > 0) {
+            // If table exists, use the original query
+            $stmt = $con->prepare("
+                SELECT q.* FROM quizes q 
+                LEFT JOIN user_quiz_history h ON q.ID = h.question_id 
+                    AND h.user_email = ? 
+                    AND h.quizid = ?
+                WHERE q.quizid = ? 
+                AND q.difficulty_level = ?
+                AND h.question_id IS NULL
+                ORDER BY RAND() 
+                LIMIT ?
+            ");
+            
+            $stmt->bind_param("siisi", $_SESSION['email'], $quizid, $quizid, $difficulty, $count);
+        } else {
+            // If table doesn't exist, just get random questions
+            $stmt = $con->prepare("
+                SELECT * FROM quizes 
+                WHERE quizid = ? 
+                AND difficulty_level = ?
+                ORDER BY RAND() 
+                LIMIT ?
+            ");
+            
+            $stmt->bind_param("isi", $quizid, $difficulty, $count);
+        }
+        
+        $stmt->execute();
+        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        
+    } catch (Exception $e) {
+        error_log("Error in getQuestionsForDifficulty: " . $e->getMessage());
+        // Fallback - return empty array if there's an error
+        return array();
+    }
 }
 
 // Get questions for each difficulty level
 $questions = [];
 $difficulties = ['easy', 'medium', 'intermediate', 'hard'];
 $questionsPerDifficulty = 5;
+
+// Use the difficulty from URL parameter if provided
+if (isset($_GET['difficulty']) && in_array($_GET['difficulty'], $difficulties)) {
+    $difficulties = [$_GET['difficulty']];
+}
 
 foreach ($difficulties as $difficulty) {
     $difficultyQuestions = getQuestionsForDifficulty($con, $quizid, $difficulty, $questionsPerDifficulty);
