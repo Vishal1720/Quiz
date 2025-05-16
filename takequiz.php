@@ -296,10 +296,11 @@ if (isset($_GET['difficulty'])) {
     $difficulty = $_GET['difficulty'];
     // Map the URL parameter to the database difficulty levels
     $difficultyMap = [
-        'beginner' => 'easy',
+        'easy' => 'easy',
+        'medium' => 'medium',
         'intermediate' => 'intermediate',
-        'advanced' => 'medium',
-        'expert' => 'hard'
+        'hard' => 'hard',
+        'beginner' => 'easy'
     ];
     
     if (isset($difficultyMap[$difficulty])) {
@@ -309,7 +310,8 @@ if (isset($_GET['difficulty'])) {
     }
 } else {
     // Fallback to getting a mix of questions if no difficulty specified
-    $difficulties = ['easy', 'medium', 'intermediate', 'hard'];
+    // Exclude 'easy' difficulty from the fallback
+    $difficulties = ['medium', 'intermediate', 'hard'];
     $questionsPerType = floor($questionsPerDifficulty / count($difficulties));
     
     foreach ($difficulties as $difficulty) {
@@ -743,9 +745,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <p class="question-text">
                             <?php 
                             $ques=$question['question'];
-                            $ques=str_replace("\'","'",$ques);
-                            $ques=str_replace('\"','"',$ques);
-                            echo ($index + 1).".".htmlspecialchars($ques);  ?>
+                            $ques=str_replace("\\","", $ques); // Remove all backslashes
+                            $ques=str_replace("\\'",'\'',$ques);
+                            $ques=str_replace('\\"','"',$ques);
+                            echo ($index + 1)."." . htmlspecialchars($ques);  ?>
                             <span class="difficulty-badge <?php echo htmlspecialchars($question['difficulty_level']); ?>">
                                 <?php echo htmlspecialchars($question['difficulty_level']); ?>
                             </span>
