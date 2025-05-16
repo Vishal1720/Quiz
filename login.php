@@ -1,6 +1,5 @@
 <?php
 require "dbconnect.php";
-require "google_config.php";
 
 // Enable error reporting for debugging
 error_reporting(E_ALL);
