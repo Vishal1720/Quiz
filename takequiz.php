@@ -289,27 +289,44 @@ function getQuestionsForDifficulty($con, $quizid, $difficulty, $count) {
 
 // Get questions for each difficulty level
 $questions = [];
-$difficulties = ['easy', 'medium', 'intermediate', 'hard'];
-$questionsPerDifficulty = 5;
+$questionsPerDifficulty = 10; // Changed from 5 to 10
 
 // Use the difficulty from URL parameter if provided
-if (isset($_GET['difficulty']) && in_array($_GET['difficulty'], $difficulties)) {
-    $difficulties = [$_GET['difficulty']];
-}
-
-foreach ($difficulties as $difficulty) {
-    $difficultyQuestions = getQuestionsForDifficulty($con, $quizid, $difficulty, $questionsPerDifficulty);
-    $questions = array_merge($questions, $difficultyQuestions);
+if (isset($_GET['difficulty'])) {
+    $difficulty = $_GET['difficulty'];
+    // Map the URL parameter to the database difficulty levels
+    $difficultyMap = [
+        'beginner' => 'easy',
+        'intermediate' => 'intermediate',
+        'advanced' => 'medium',
+        'expert' => 'hard'
+    ];
+    
+    if (isset($difficultyMap[$difficulty])) {
+        $dbDifficulty = $difficultyMap[$difficulty];
+        $difficultyQuestions = getQuestionsForDifficulty($con, $quizid, $dbDifficulty, $questionsPerDifficulty);
+        $questions = array_merge($questions, $difficultyQuestions);
+    }
+} else {
+    // Fallback to getting a mix of questions if no difficulty specified
+    $difficulties = ['easy', 'medium', 'intermediate', 'hard'];
+    $questionsPerType = floor($questionsPerDifficulty / count($difficulties));
+    
+    foreach ($difficulties as $difficulty) {
+        $difficultyQuestions = getQuestionsForDifficulty($con, $quizid, $difficulty, $questionsPerType);
+        $questions = array_merge($questions, $difficultyQuestions);
+    }
 }
 
 // If we don't have enough questions, get any remaining questions regardless of previous attempts
-if (count($questions) < ($questionsPerDifficulty * count($difficulties))) {
-    $remaining = ($questionsPerDifficulty * count($difficulties)) - count($questions);
+if (count($questions) < $questionsPerDifficulty) {
+    $remaining = $questionsPerDifficulty - count($questions);
     $stmt = $con->prepare("
         SELECT * FROM quizes 
         WHERE quizid = ? 
-        AND ID NOT IN (SELECT ID FROM quizes WHERE ID IN (" . 
-        implode(',', array_column($questions, 'ID')) . "))
+        AND ID NOT IN (" . 
+        (count($questions) > 0 ? "SELECT ID FROM quizes WHERE ID IN (" . 
+        implode(',', array_column($questions, 'ID')) . ")" : "0") . ")
         ORDER BY RAND() 
         LIMIT ?
     ");
@@ -317,6 +334,11 @@ if (count($questions) < ($questionsPerDifficulty * count($difficulties))) {
     $stmt->execute();
     $remainingQuestions = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
     $questions = array_merge($questions, $remainingQuestions);
+}
+
+// Limit to exactly 10 questions
+if (count($questions) > $questionsPerDifficulty) {
+    $questions = array_slice($questions, 0, $questionsPerDifficulty);
 }
 
 // Handle form submission

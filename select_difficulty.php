@@ -22,27 +22,51 @@ if($quizid) {
 
 <?php include "components/header.php"; ?>
 <style>
+    :root {
+        --primary-color: #4a90e2;
+        --secondary-color: #357abd;
+        --success-color: #2ecc71;
+        --error-color: #e74c3c;
+        --background-dark: #1a1a2e;
+        --text-light: #ffffff;
+        --text-muted: #a0a0a0;
+    }
+
     body {
-        background: var(--background);
-        color: var(--text);
+        background: linear-gradient(135deg, var(--background-dark) 0%, #16213e 100%);
         min-height: 100vh;
+        margin: 0;
+        padding: 20px;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: var(--text-light);
     }
 
     .difficulty-container {
         max-width: 800px;
         margin: 2rem auto;
         padding: 2rem;
-        background: rgba(255, 255, 255, 0.05);
+        background: rgba(255, 255, 255, 0.08);
         backdrop-filter: blur(10px);
-        border-radius: 16px;
+        border-radius: 20px;
         border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        animation: slideUp 0.5s ease;
     }
 
     .difficulty-title {
         text-align: center;
         margin-bottom: 2rem;
-        color: var(--primary); /* Changed from var(--text-light) to primary blue */
-        font-size: 1.8rem;
+        font-size: 2rem;
+        background: linear-gradient(135deg, #fff, var(--primary-color));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
     }
 
     .difficulty-grid {
@@ -53,8 +77,8 @@ if($quizid) {
     }
 
     .difficulty-card {
-        background: var(--quiz-card-bg);
-        border: 1px solid var(--quiz-card-border);
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 12px;
         padding: 1.5rem;
         text-align: center;
@@ -65,13 +89,13 @@ if($quizid) {
 
     .difficulty-card:hover {
         transform: translateY(-5px);
-        background: var(--quiz-card-hover);
+        background: rgba(255, 255, 255, 0.1);
     }
 
-    .difficulty-beginner { border-left: 4px solid #4ade80; }
-    .difficulty-intermediate { border-left: 4px solid #60a5fa; }
-    .difficulty-advanced { border-left: 4px solid #f472b6; }
-    .difficulty-expert { border-left: 4px solid #8b5cf6; }
+    .difficulty-easy { border-left: 4px solid #4ade80; }
+    .difficulty-medium { border-left: 4px solid #60a5fa; }
+    .difficulty-intermediate { border-left: 4px solid #f472b6; }
+    .difficulty-hard { border-left: 4px solid #8b5cf6; }
 
     .difficulty-icon {
         font-size: 2.5rem;
@@ -97,13 +121,14 @@ if($quizid) {
         text-decoration: none;
         padding: 0.5rem 1rem;
         border-radius: 8px;
-        background: var(--primary);
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
         transition: all 0.3s ease;
     }
 
     .back-link:hover {
-        background: var(--primary-dark);
+        background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
         transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(74, 144, 226, 0.3);
     }
 </style>
 
@@ -113,27 +138,27 @@ if($quizid) {
     <h1 class="difficulty-title">Select Difficulty Level for:<br><?php echo htmlspecialchars($quiz_name); ?></h1>
     
     <div class="difficulty-grid">
-        <a href="takequiz.php?quizid=<?php echo $quizid; ?>&difficulty=beginner" class="difficulty-card difficulty-beginner">
+        <a href="takequiz.php?quizid=<?php echo $quizid; ?>&difficulty=easy" class="difficulty-card difficulty-easy">
             <div class="difficulty-icon">🔰</div>
-            <div class="difficulty-name">Beginner</div>
+            <div class="difficulty-name">Easy</div>
             <div class="difficulty-desc">Basic concepts and simple questions</div>
         </a>
         
-        <a href="takequiz.php?quizid=<?php echo $quizid; ?>&difficulty=intermediate" class="difficulty-card difficulty-intermediate">
+        <a href="takequiz.php?quizid=<?php echo $quizid; ?>&difficulty=medium" class="difficulty-card difficulty-medium">
             <div class="difficulty-icon">🧩</div>
-            <div class="difficulty-name">Intermediate</div>
+            <div class="difficulty-name">Medium</div>
             <div class="difficulty-desc">Moderate complexity and challenge</div>
         </a>
         
-        <a href="takequiz.php?quizid=<?php echo $quizid; ?>&difficulty=advanced" class="difficulty-card difficulty-advanced">
+        <a href="takequiz.php?quizid=<?php echo $quizid; ?>&difficulty=intermediate" class="difficulty-card difficulty-intermediate">
             <div class="difficulty-icon">🔥</div>
-            <div class="difficulty-name">Advanced</div>
+            <div class="difficulty-name">Intermediate</div>
             <div class="difficulty-desc">Complex concepts and tough questions</div>
         </a>
         
-        <a href="takequiz.php?quizid=<?php echo $quizid; ?>&difficulty=expert" class="difficulty-card difficulty-expert">
+        <a href="takequiz.php?quizid=<?php echo $quizid; ?>&difficulty=hard" class="difficulty-card difficulty-hard">
             <div class="difficulty-icon">💎</div>
-            <div class="difficulty-name">Expert</div>
+            <div class="difficulty-name">Hard</div>
             <div class="difficulty-desc">Most challenging questions</div>
         </a>
     </div>
