@@ -23,7 +23,8 @@ if($quizid) {
 <?php include "components/header.php"; ?>
 <style>
     body {
-        background: linear-gradient(135deg, #1a2e44, #2c1f42);
+        background: var(--background);
+        color: var(--text);
         min-height: 100vh;
     }
 
@@ -40,7 +41,7 @@ if($quizid) {
     .difficulty-title {
         text-align: center;
         margin-bottom: 2rem;
-        color: var(--text-light);
+        color: var(--primary); /* Changed from var(--text-light) to primary blue */
         font-size: 1.8rem;
     }
 
@@ -92,15 +93,17 @@ if($quizid) {
     .back-link {
         display: inline-block;
         margin-bottom: 1rem;
-        color: var(--text-light);
+        color: white;
         text-decoration: none;
         padding: 0.5rem 1rem;
         border-radius: 8px;
+        background: var(--primary);
         transition: all 0.3s ease;
     }
 
     .back-link:hover {
-        background: var(--quiz-card-hover);
+        background: var(--primary-dark);
+        transform: translateY(-2px);
     }
 </style>
 

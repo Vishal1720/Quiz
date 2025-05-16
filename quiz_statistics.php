@@ -171,11 +171,10 @@ if ($tablesExist) {
         LEFT JOIN quiz_attempts qa ON qd.quizid = qa.quizid
         GROUP BY qd.quizid, qd.quizname, qd.category
         ORDER BY COUNT(DISTINCT qa.attempt_id) DESC, qd.quizname ASC";
-        
-    $quiz_stats_result = $con->query($quiz_stats_query);
-
+            $quiz_stats_result = $con->query($quiz_stats_query);
+    
     // Replace the existing difficulty stats section (around line 189) with:
-    $difficulty_stats = null;
+$difficulty_stats = [];
     $userHistoryTableExists = false;
 
     try {

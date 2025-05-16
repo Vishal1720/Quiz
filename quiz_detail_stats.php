@@ -164,8 +164,10 @@ try {
             font-family: Arial, sans-serif;
             line-height: 1.6;
             margin: 0;
-            padding: 20px;
-            background: #f5f5f5;
+            padding: 0;
+            background: var(--background);
+            color: var(--text);
+            min-height: 100vh;
         }
 
         .container {
