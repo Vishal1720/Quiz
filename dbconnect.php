@@ -17,6 +17,45 @@ if ($con->connect_error) {
 mysqli_options($con, MYSQLI_OPT_INT_AND_FLOAT_NATIVE, true);
 mysqli_set_charset($con, 'utf8mb4');
 
+// First, handle the difficulty_level column in quizes table
+try {
+    $addDifficultyLevel = "ALTER TABLE quizes 
+        ADD COLUMN IF NOT EXISTS difficulty_level 
+        ENUM('easy', 'medium', 'intermediate', 'hard') 
+        NOT NULL DEFAULT 'easy'";
+    $con->query($addDifficultyLevel);
+} catch (Exception $e) {
+    error_log("Error adding difficulty level: " . $e->getMessage());
+}
+
+// Then handle the user_quiz_history table
+try {
+    // Drop the table if it exists with issues
+    $dropTable = "DROP TABLE IF EXISTS user_quiz_history";
+    $con->query($dropTable);
+    
+    // Create the table fresh
+    $createUserQuizHistory = "CREATE TABLE user_quiz_history (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_email VARCHAR(255) NOT NULL,
+        quizid INT NOT NULL,
+        question_id INT NOT NULL,
+        difficulty_level ENUM('easy', 'medium', 'intermediate', 'hard') NOT NULL DEFAULT 'easy',
+        attempt_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE KEY unique_attempt (user_email, quizid, question_id),
+        FOREIGN KEY (user_email) REFERENCES users(email) ON DELETE CASCADE,
+        FOREIGN KEY (quizid) REFERENCES quizdetails(quizid) ON DELETE CASCADE,
+        FOREIGN KEY (question_id) REFERENCES quizes(ID) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4";
+    
+    $con->query($createUserQuizHistory);
+} catch (Exception $e) {
+    error_log("Error creating user_quiz_history table: " . $e->getMessage());
+}
+
+$updateDifficulty = "UPDATE quizes SET difficulty_level = 'easy' WHERE difficulty_level IS NULL";
+$con->query($updateDifficulty);
+
 // Start session if not already started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -223,7 +262,7 @@ if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 
     session_unset();
     session_destroy();
     $_SESSION['status'] = "loggedout";
+    $_SESSION['email'] = null;
     $_SESSION['qid'] = null;
+    $_SESSION['last_activity'] = time();
 }
-$_SESSION['last_activity'] = time();
-?>
