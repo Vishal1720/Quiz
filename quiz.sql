@@ -298,6 +298,14 @@ ALTER TABLE `quizes`
   ADD CONSTRAINT `quizes_ibfk_1` FOREIGN KEY (`quizid`) REFERENCES `quizdetails` (`quizid`);
 
 --
+-- Add difficulty level to quizes table
+ALTER TABLE quizes ADD COLUMN difficulty_level ENUM('easy', 'medium', 'intermediate', 'hard') NOT NULL DEFAULT 'easy';
+
+-- Later in the file
+ALTER TABLE quizes ADD COLUMN difficulty 
+ENUM('easy', 'medium', 'intermediate', 'hard')NOT NULL DEFAULT 'easy';
+
+
 -- Constraints for table `scheduled_quizzes`
 --
 ALTER TABLE `scheduled_quizzes`
